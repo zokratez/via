@@ -173,7 +173,7 @@ export default async function DashboardPage({
     { href: "/log/dose", label: t("log_dose") },
     { href: "/log/weight", label: t("log_weight") },
     { href: "/log/symptom", label: t("log_symptom") },
-    { href: "/coach", label: t("ask_coach") },
+    { href: "/coach", label: t("action_coach") },
   ] as const;
 
   return (
