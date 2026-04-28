@@ -55,7 +55,18 @@
     "streak_days": "{count, plural, one {# día seguido} other {# días seguidos}}",
     "weight_this_week": "Esta semana",
     "weight_all_time": "Desde el inicio",
-    "toast_saved": "¡Guardado!"
+    "toast_saved": "¡Guardado!",
+    "stat_last_dose": "Última dosis",
+    "stat_weight": "Peso",
+    "stat_streak": "Racha",
+    "stat_empty": "Sin registro",
+    "time_just_now": "ahora mismo",
+    "time_minutes_short": "hace {count} min",
+    "time_hours_short": "hace {count} h",
+    "time_days_short": "hace {count} d",
+    "delta_label": "vs hace 7 días",
+    "chart_weight_title": "Peso (últimos 30 días)",
+    "chart_empty": "Aún no tienes registros de peso."
   },
   "dose": {
     "title": "Registrar dosis",

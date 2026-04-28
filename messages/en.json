@@ -55,7 +55,18 @@
     "streak_days": "{count, plural, one {# day streak} other {# day streak}}",
     "weight_this_week": "This week",
     "weight_all_time": "All time",
-    "toast_saved": "Saved!"
+    "toast_saved": "Saved!",
+    "stat_last_dose": "Last dose",
+    "stat_weight": "Weight",
+    "stat_streak": "Streak",
+    "stat_empty": "No log yet",
+    "time_just_now": "just now",
+    "time_minutes_short": "{count}m ago",
+    "time_hours_short": "{count}h ago",
+    "time_days_short": "{count}d ago",
+    "delta_label": "vs 7d ago",
+    "chart_weight_title": "Weight (last 30 days)",
+    "chart_empty": "No weight entries yet."
   },
   "dose": {
     "title": "Log dose",
