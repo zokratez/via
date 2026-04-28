@@ -54,7 +54,8 @@
     "ask_coach": "Ask the coach",
     "streak_days": "{count, plural, one {# day streak} other {# day streak}}",
     "weight_this_week": "This week",
-    "weight_all_time": "All time"
+    "weight_all_time": "All time",
+    "toast_saved": "Saved!"
   },
   "dose": {
     "title": "Log dose",
@@ -70,7 +71,21 @@
     "site_arm_left": "Arm left",
     "site_arm_right": "Arm right",
     "notes": "Notes",
-    "save": "Save"
+    "save": "Save",
+    "saving": "Saving…",
+    "back": "Back",
+    "validation_failed": "Check the fields",
+    "add_first_medication": "Add your first medication",
+    "add_first_medication_sub": "You don't have any medications saved yet. Start here.",
+    "medication_name": "Name",
+    "medication_name_placeholder": "Ozempic, Wegovy, Mounjaro, compounded…",
+    "medication_generic": "Type",
+    "medication_generic_semaglutide": "Semaglutide",
+    "medication_generic_tirzepatide": "Tirzepatide",
+    "medication_generic_liraglutide": "Liraglutide",
+    "medication_concentration": "Concentration (mg/mL)",
+    "medication_concentration_hint": "(optional)",
+    "add_medication": "Add medication"
   },
   "coach": {
     "title": "Coach",

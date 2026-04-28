@@ -54,7 +54,8 @@
     "ask_coach": "Preguntar al coach",
     "streak_days": "{count, plural, one {# día seguido} other {# días seguidos}}",
     "weight_this_week": "Esta semana",
-    "weight_all_time": "Desde el inicio"
+    "weight_all_time": "Desde el inicio",
+    "toast_saved": "¡Guardado!"
   },
   "dose": {
     "title": "Registrar dosis",
@@ -70,7 +71,21 @@
     "site_arm_left": "Brazo izquierdo",
     "site_arm_right": "Brazo derecho",
     "notes": "Notas",
-    "save": "Guardar"
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "back": "Volver",
+    "validation_failed": "Revisa los campos",
+    "add_first_medication": "Agrega tu primer medicamento",
+    "add_first_medication_sub": "Aún no tienes medicamentos guardados. Empieza por aquí.",
+    "medication_name": "Nombre",
+    "medication_name_placeholder": "Ozempic, Wegovy, Mounjaro, compuesto…",
+    "medication_generic": "Tipo",
+    "medication_generic_semaglutide": "Semaglutida",
+    "medication_generic_tirzepatide": "Tirzepatida",
+    "medication_generic_liraglutide": "Liraglutida",
+    "medication_concentration": "Concentración (mg/mL)",
+    "medication_concentration_hint": "(opcional)",
+    "add_medication": "Agregar medicamento"
   },
   "coach": {
     "title": "Coach",

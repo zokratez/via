@@ -14,11 +14,16 @@ function greetingKey(now = new Date()): "morning" | "afternoon" | "evening" {
 
 export default async function DashboardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ ok?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const sp = await searchParams;
+  const showSavedToast =
+    sp.ok === "dose" || sp.ok === "weight" || sp.ok === "symptom";
 
   const supabase = await createClient();
   const {
@@ -71,6 +76,14 @@ export default async function DashboardPage({
       </header>
 
       <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-10">
+        {showSavedToast && (
+          <div
+            role="status"
+            className="mb-6 rounded-lg border border-border/60 bg-accent/40 px-4 py-3 text-sm"
+          >
+            {t("toast_saved")}
+          </div>
+        )}
         <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
           {greeting}
         </h1>
