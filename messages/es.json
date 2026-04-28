@@ -87,6 +87,19 @@
     "medication_concentration_hint": "(opcional)",
     "add_medication": "Agregar medicamento"
   },
+  "weight": {
+    "title": "Registrar peso",
+    "weight_kg": "Peso (kg)",
+    "waist_cm": "Cintura (cm)",
+    "body_fat_pct": "% grasa corporal",
+    "measured_at": "¿Cuándo?",
+    "now": "Ahora",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "back": "Volver",
+    "optional": "(opcional)",
+    "validation_failed": "Revisa los campos"
+  },
   "coach": {
     "title": "Coach",
     "placeholder": "Pregúntame lo que quieras sobre tu día con GLP-1",

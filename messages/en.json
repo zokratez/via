@@ -87,6 +87,19 @@
     "medication_concentration_hint": "(optional)",
     "add_medication": "Add medication"
   },
+  "weight": {
+    "title": "Log weight",
+    "weight_kg": "Weight (kg)",
+    "waist_cm": "Waist (cm)",
+    "body_fat_pct": "Body fat %",
+    "measured_at": "When?",
+    "now": "Now",
+    "save": "Save",
+    "saving": "Saving…",
+    "back": "Back",
+    "optional": "(optional)",
+    "validation_failed": "Check the fields"
+  },
   "coach": {
     "title": "Coach",
     "placeholder": "Ask anything about your GLP-1 day",
