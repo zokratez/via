@@ -24,7 +24,7 @@ const credentialsSchema = z.object({
 
 type FormValues = { email: string; password: string };
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const t = useTranslations("auth");
   const tApp = useTranslations("app");
   const tErrors = useTranslations("errors");
@@ -48,15 +48,21 @@ export default function SignInPage() {
     }
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error: signUpError } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
     });
-    if (error) {
-      const msg = error.message.toLowerCase();
-      const isInvalid =
-        msg.includes("invalid") || msg.includes("credentials");
-      setErrorMsg(isInvalid ? t("error_invalid_credentials") : error.message);
+    if (signUpError) {
+      setErrorMsg(signUpError.message);
+      return;
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+    if (signInError) {
+      setErrorMsg(signInError.message);
       return;
     }
 
@@ -87,7 +93,7 @@ export default function SignInPage() {
       <main className="flex-1 flex items-center justify-center px-6 py-10">
         <Card className="w-full max-w-sm border-border/60">
           <CardHeader>
-            <CardTitle className="text-xl">{t("sign_in_title")}</CardTitle>
+            <CardTitle className="text-xl">{t("sign_up_title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form
@@ -111,7 +117,7 @@ export default function SignInPage() {
                 <Input
                   id="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   placeholder={t("password_placeholder")}
                   {...register("password", { required: true, minLength: 8 })}
                   aria-invalid={!!errors.password}
@@ -123,7 +129,7 @@ export default function SignInPage() {
                 disabled={isSubmitting}
                 className="rounded-full"
               >
-                {t("sign_in")}
+                {t("sign_up")}
               </Button>
 
               <div className="relative py-2">
@@ -153,12 +159,12 @@ export default function SignInPage() {
               )}
 
               <p className="text-center text-sm text-muted-foreground">
-                {t("dont_have_account")}{" "}
+                {t("already_have_account")}{" "}
                 <Link
-                  href="/auth/sign-up"
+                  href="/auth/sign-in"
                   className="text-foreground hover:underline"
                 >
-                  {t("sign_up_link")}
+                  {t("sign_in")}
                 </Link>
               </p>
             </form>
