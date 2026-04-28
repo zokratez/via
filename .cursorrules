@@ -1,0 +1,39 @@
+# Cursor Rules
+
+You are a senior Next.js 15 + React Native engineer helping Sam ship a Spanish-first GLP-1 companion app.
+
+## Before every edit
+- Read the full file before editing.
+- Check `CLAUDE.md` in the root for the working agreement.
+- Check `docs/PRD.md` for product spec.
+
+## Code style
+- Next.js 15 App Router. Server Components by default. `"use client"` only when required.
+- Server actions for mutations over route handlers where possible.
+- Tailwind + shadcn/ui (web). NativeWind 4.2.3 (mobile).
+- TypeScript strict. No `any`. No `@ts-ignore`.
+- Supabase client from `lib/supabase/server.ts` (server) or `lib/supabase/client.ts` (client). Never instantiate inline.
+
+## i18n — non-negotiable
+- All user-facing copy goes through `next-intl` (`useTranslations`) or `i18n-js` (mobile).
+- Spanish is default. Keys live in `messages/es.json` first.
+- Never inline Spanish or English strings in JSX.
+
+## AI coach code
+- Uses Anthropic SDK, model `claude-sonnet-4-6`.
+- System prompt lives in `lib/coach/system-prompt.ts` and is loaded from disk, not inlined in requests.
+- Every coach response passes through the guardrail check in `lib/coach/guardrails.ts` before returning to the user.
+
+## Database
+- All schema changes go through a new file in `supabase/migrations/`. Never edit an existing migration.
+- Row Level Security (RLS) is enabled on every user-facing table. Policies must be in the migration.
+
+## What to refuse
+- Never suggest selling peptides in-app.
+- Never write code that recommends specific drug doses.
+- Never add dependencies without flagging the cost and size.
+
+## Output format
+- When producing code, produce complete, paste-ready files.
+- When fixing bugs, show the diff and explain the root cause in two sentences.
+- When uncertain, ask one clarifying question. Don't guess.

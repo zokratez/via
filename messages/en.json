@@ -1,0 +1,104 @@
+{
+  "app": {
+    "name": "Vía",
+    "tagline": "Your copilot on the GLP-1 journey",
+    "description": "Track your doses, your weight, and how you feel. Get clear answers, in your language, no fluff."
+  },
+  "landing": {
+    "hero_title": "The missing companion for your GLP-1 journey",
+    "hero_sub": "Built for people on Ozempic, Wegovy, Mounjaro, Zepbound — branded or compounded. Your personal log, your AI coach, Spanish-first, English-ready.",
+    "cta_primary": "Start free",
+    "cta_secondary": "How it works",
+    "features_title": "Everything you need, nothing you don't",
+    "feature_log_title": "Logging you'll actually use",
+    "feature_log_desc": "One tap to log a dose, weight, or symptom. No endless forms.",
+    "feature_coach_title": "AI coach, 24/7",
+    "feature_coach_desc": "Ask anything about food, hydration, injection site rotation. Answers in seconds.",
+    "feature_privacy_title": "Your data is yours",
+    "feature_privacy_desc": "End-to-end encrypted. Export anytime. We don't sell data.",
+    "disclaimer": "This app does not replace your doctor. We do not prescribe or sell medication."
+  },
+  "auth": {
+    "sign_up_title": "Create your account",
+    "sign_in_title": "Welcome back",
+    "email": "Email",
+    "password": "Password",
+    "continue": "Continue",
+    "or_continue_with": "Or continue with",
+    "google": "Google",
+    "apple": "Apple",
+    "magic_link_sent": "We sent you a magic link. Check your email.",
+    "sign_out": "Sign out"
+  },
+  "onboarding": {
+    "welcome_title": "Tell us a bit about you",
+    "welcome_sub": "Three quick questions and you're in.",
+    "question_medication": "Which medication are you on?",
+    "question_goal": "What's your main goal?",
+    "goal_lose_weight": "Lose weight",
+    "goal_manage_diabetes": "Manage diabetes",
+    "goal_other": "Other",
+    "question_starting_weight": "Today's weight?",
+    "skip": "Skip",
+    "next": "Next",
+    "finish": "Done"
+  },
+  "dashboard": {
+    "greeting_morning": "Good morning, {name}",
+    "greeting_afternoon": "Good afternoon, {name}",
+    "greeting_evening": "Good evening, {name}",
+    "next_dose_in": "Next dose in {time}",
+    "log_dose": "Log dose",
+    "log_weight": "Log weight",
+    "log_symptom": "Log symptom",
+    "ask_coach": "Ask the coach",
+    "streak_days": "{count, plural, one {# day streak} other {# day streak}}",
+    "weight_this_week": "This week",
+    "weight_all_time": "All time"
+  },
+  "dose": {
+    "title": "Log dose",
+    "medication": "Medication",
+    "dose_mg": "Dose (mg)",
+    "when": "When?",
+    "now": "Now",
+    "injection_site": "Injection site",
+    "site_abdomen_left": "Abdomen left",
+    "site_abdomen_right": "Abdomen right",
+    "site_thigh_left": "Thigh left",
+    "site_thigh_right": "Thigh right",
+    "site_arm_left": "Arm left",
+    "site_arm_right": "Arm right",
+    "notes": "Notes",
+    "save": "Save"
+  },
+  "coach": {
+    "title": "Coach",
+    "placeholder": "Ask anything about your GLP-1 day",
+    "quota_free": "You have {remaining} of {total} questions today",
+    "quota_exhausted": "You've used your free questions for today. Go Pro for unlimited.",
+    "disclaimer_inline": "I'm not a doctor. For dose changes or serious symptoms, talk to your provider.",
+    "example_1": "What should I eat if I have nausea?",
+    "example_2": "I missed a dose — what do I do?",
+    "example_3": "How do I rotate injection sites?"
+  },
+  "paywall": {
+    "title": "Go Pro",
+    "sub": "Unlock unlimited coach and more.",
+    "feature_unlimited_coach": "Unlimited coach questions",
+    "feature_exports": "Export PDF for your doctor",
+    "feature_meal_plans": "Weekly meal plans",
+    "feature_priority": "Priority support",
+    "price_monthly": "{price} per month",
+    "price_annual": "{price} per year",
+    "subscribe": "Subscribe",
+    "restore": "Restore purchase",
+    "terms_and_privacy": "By continuing you agree to the Terms and Privacy Policy."
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again.",
+    "network": "No connection. Check your internet.",
+    "auth_invalid": "Incorrect email or password.",
+    "quota_exceeded": "Daily limit reached."
+  }
+}

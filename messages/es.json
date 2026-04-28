@@ -1,0 +1,104 @@
+{
+  "app": {
+    "name": "Vía",
+    "tagline": "Tu copiloto en tu camino con GLP-1",
+    "description": "Registra tus dosis, tu peso y cómo te sientes. Recibe respuestas claras, en español, sin rodeos."
+  },
+  "landing": {
+    "hero_title": "El compañero que faltaba en tu viaje con GLP-1",
+    "hero_sub": "Hecho para quienes toman Ozempic, Wegovy, Mounjaro, Zepbound o su versión compuesta. Tu bitácora personal, tu coach de IA, todo en español.",
+    "cta_primary": "Empezar gratis",
+    "cta_secondary": "Cómo funciona",
+    "features_title": "Todo lo que necesitas, nada que no",
+    "feature_log_title": "Bitácora que de verdad usas",
+    "feature_log_desc": "Un tap para registrar dosis, peso, síntomas. Sin formularios eternos.",
+    "feature_coach_title": "Coach con IA, 24/7",
+    "feature_coach_desc": "Pregunta lo que quieras sobre tu dieta, hidratación, rotación de sitios de inyección. Respuestas en segundos.",
+    "feature_privacy_title": "Tus datos son tuyos",
+    "feature_privacy_desc": "Cifrado de punta a punta. Exporta todo cuando quieras. Sin venta de datos.",
+    "disclaimer": "Esta app no reemplaza a tu médico. No recetamos ni vendemos medicamentos."
+  },
+  "auth": {
+    "sign_up_title": "Crea tu cuenta",
+    "sign_in_title": "Bienvenido de vuelta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "continue": "Continuar",
+    "or_continue_with": "O continúa con",
+    "google": "Google",
+    "apple": "Apple",
+    "magic_link_sent": "Te enviamos un enlace mágico. Revisa tu correo.",
+    "sign_out": "Cerrar sesión"
+  },
+  "onboarding": {
+    "welcome_title": "Cuéntanos un poquito de ti",
+    "welcome_sub": "Tres preguntas rápidas y listo.",
+    "question_medication": "¿Qué medicamento estás tomando?",
+    "question_goal": "¿Cuál es tu meta principal?",
+    "goal_lose_weight": "Bajar de peso",
+    "goal_manage_diabetes": "Controlar diabetes",
+    "goal_other": "Otro",
+    "question_starting_weight": "¿Tu peso de hoy?",
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "finish": "Listo"
+  },
+  "dashboard": {
+    "greeting_morning": "Buenos días, {name}",
+    "greeting_afternoon": "Buenas tardes, {name}",
+    "greeting_evening": "Buenas noches, {name}",
+    "next_dose_in": "Próxima dosis en {time}",
+    "log_dose": "Registrar dosis",
+    "log_weight": "Registrar peso",
+    "log_symptom": "Registrar síntoma",
+    "ask_coach": "Preguntar al coach",
+    "streak_days": "{count, plural, one {# día seguido} other {# días seguidos}}",
+    "weight_this_week": "Esta semana",
+    "weight_all_time": "Desde el inicio"
+  },
+  "dose": {
+    "title": "Registrar dosis",
+    "medication": "Medicamento",
+    "dose_mg": "Dosis (mg)",
+    "when": "¿Cuándo?",
+    "now": "Ahora",
+    "injection_site": "Sitio de inyección",
+    "site_abdomen_left": "Abdomen izquierdo",
+    "site_abdomen_right": "Abdomen derecho",
+    "site_thigh_left": "Muslo izquierdo",
+    "site_thigh_right": "Muslo derecho",
+    "site_arm_left": "Brazo izquierdo",
+    "site_arm_right": "Brazo derecho",
+    "notes": "Notas",
+    "save": "Guardar"
+  },
+  "coach": {
+    "title": "Coach",
+    "placeholder": "Pregúntame lo que quieras sobre tu día con GLP-1",
+    "quota_free": "Tienes {remaining} de {total} preguntas hoy",
+    "quota_exhausted": "Ya usaste tus preguntas gratis de hoy. Hazte Pro para preguntas ilimitadas.",
+    "disclaimer_inline": "No soy médico. Para cambios de dosis o síntomas graves, habla con tu doctor.",
+    "example_1": "¿Qué comer si tengo náuseas?",
+    "example_2": "Me salté una dosis, ¿qué hago?",
+    "example_3": "¿Cómo rotar los sitios de inyección?"
+  },
+  "paywall": {
+    "title": "Hazte Pro",
+    "sub": "Desbloquea el coach ilimitado y más.",
+    "feature_unlimited_coach": "Preguntas ilimitadas al coach",
+    "feature_exports": "Exporta PDF para tu médico",
+    "feature_meal_plans": "Planes de comidas semanales",
+    "feature_priority": "Soporte prioritario",
+    "price_monthly": "{price} al mes",
+    "price_annual": "{price} al año",
+    "subscribe": "Suscribirme",
+    "restore": "Restaurar compra",
+    "terms_and_privacy": "Al continuar aceptas los Términos y la Política de Privacidad."
+  },
+  "errors": {
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "network": "Sin conexión. Revisa tu internet.",
+    "auth_invalid": "Correo o contraseña incorrectos.",
+    "quota_exceeded": "Llegaste al límite diario."
+  }
+}
