@@ -100,6 +100,24 @@
     "optional": "(optional)",
     "validation_failed": "Check the fields"
   },
+  "symptom": {
+    "title": "Log symptom",
+    "category": "Category",
+    "category_nausea": "Nausea",
+    "category_fatigue": "Fatigue",
+    "category_constipation": "Constipation",
+    "category_headache": "Headache",
+    "category_injection_site": "Injection site",
+    "category_other": "Other",
+    "severity": "How bad?",
+    "occurred_at": "When?",
+    "now": "Now",
+    "notes": "Notes",
+    "save": "Save",
+    "saving": "Saving…",
+    "back": "Back",
+    "validation_failed": "Check the fields"
+  },
   "coach": {
     "title": "Coach",
     "placeholder": "Ask anything about your GLP-1 day",
