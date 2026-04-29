@@ -266,6 +266,7 @@ export async function POST(req: NextRequest) {
         controller.enqueue(encoder.encode(sseEvent({ type: "done" })));
         controller.close();
       } catch (err: unknown) {
+        console.error("[coach]", err);
         const status =
           err && typeof err === "object" && "status" in err
             ? (err as { status?: number }).status
