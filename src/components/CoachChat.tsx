@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "@/i18n/navigation";
 
 type Locale = "es" | "en";
 
@@ -35,6 +35,7 @@ export function CoachChat({
   isPro,
 }: Props) {
   const t = useTranslations("coach");
+  const tPaywall = useTranslations("paywall");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -44,6 +45,8 @@ export function CoachChat({
     isPro ? Number.POSITIVE_INFINITY : initialQuotaRemaining,
   );
   const [errorKey, setErrorKey] = useState<ErrorKey | null>(null);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -167,6 +170,34 @@ export function CoachChat({
     }
   }
 
+  async function startUpgrade() {
+    if (isUpgrading) return;
+    setIsUpgrading(true);
+    setUpgradeError(false);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
+      if (!res.ok) {
+        setUpgradeError(true);
+        setIsUpgrading(false);
+        return;
+      }
+      const data = (await res.json()) as { url?: string };
+      if (!data.url) {
+        setUpgradeError(true);
+        setIsUpgrading(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setUpgradeError(true);
+      setIsUpgrading(false);
+    }
+  }
+
   const quotaText = (() => {
     if (isPro || quotaExhausted) return null;
     if (quotaRemaining === 1) return t("quota_remaining_one");
@@ -254,10 +285,21 @@ export function CoachChat({
                   {t("quota_exhausted_body")}
                 </p>
                 <div className="mt-3">
-                  <Link href="/pro">
-                    <Button size="sm">{t("quota_exhausted_cta")}</Button>
-                  </Link>
+                  <Button
+                    size="sm"
+                    onClick={startUpgrade}
+                    disabled={isUpgrading}
+                  >
+                    {isUpgrading
+                      ? tPaywall("upgrading")
+                      : tPaywall("upgrade_button")}
+                  </Button>
                 </div>
+                {upgradeError && (
+                  <p className="mt-2 text-sm text-destructive">
+                    {tPaywall("checkout_error")}
+                  </p>
+                )}
               </CardContent>
             </Card>
           ) : (
