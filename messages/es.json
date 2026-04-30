@@ -74,7 +74,8 @@
     "time_days_short": "hace {count} d",
     "delta_label": "vs hace 7 días",
     "chart_weight_title": "Peso (últimos 30 días)",
-    "chart_empty": "Aún no tienes registros de peso."
+    "chart_empty": "Aún no tienes registros de peso.",
+    "manage_subscription": "Administrar suscripción"
   },
   "dose": {
     "title": "Registrar dosis",
@@ -181,7 +182,10 @@
     "price_annual": "{price} al año",
     "subscribe": "Suscribirme",
     "restore": "Restaurar compra",
-    "terms_and_privacy": "Al continuar aceptas los Términos y la Política de Privacidad."
+    "terms_and_privacy": "Al continuar aceptas los Términos y la Política de Privacidad.",
+    "upgrade_button": "Hazte Pro",
+    "upgrading": "Abriendo Stripe…",
+    "checkout_error": "No pudimos abrir el pago. Intenta de nuevo en un momento."
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

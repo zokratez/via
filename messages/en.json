@@ -74,7 +74,8 @@
     "time_days_short": "{count} d ago",
     "delta_label": "vs 7 days ago",
     "chart_weight_title": "Weight (last 30 days)",
-    "chart_empty": "No weight records yet."
+    "chart_empty": "No weight records yet.",
+    "manage_subscription": "Manage subscription"
   },
   "dose": {
     "title": "Log dose",
@@ -181,7 +182,10 @@
     "price_annual": "{price} per year",
     "subscribe": "Subscribe",
     "restore": "Restore purchase",
-    "terms_and_privacy": "By continuing you agree to the Terms and Privacy Policy."
+    "terms_and_privacy": "By continuing you agree to the Terms and Privacy Policy.",
+    "upgrade_button": "Go Pro",
+    "upgrading": "Opening Stripe…",
+    "checkout_error": "We couldn't open checkout. Try again in a moment."
   },
   "errors": {
     "generic": "Something went wrong. Try again.",
