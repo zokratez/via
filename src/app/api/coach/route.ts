@@ -90,24 +90,26 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_tier")
+    .select("stripe_price_id")
     .eq("id", user.id)
     .maybeSingle();
 
-  const tier = profile?.subscription_tier ?? "free";
-  const isPro = tier === "pro";
+  const isPro = profile?.stripe_price_id != null;
   const today = todayInMexicoCity();
 
-  const { data: counter } = await supabase
-    .from("usage_counters")
-    .select("coach_queries")
-    .eq("user_id", user.id)
-    .eq("day", today)
-    .maybeSingle();
+  let usedToday = 0;
+  if (!isPro) {
+    const { data: counter } = await supabase
+      .from("usage_counters")
+      .select("coach_queries")
+      .eq("user_id", user.id)
+      .eq("day", today)
+      .maybeSingle();
 
-  const usedToday = counter?.coach_queries ?? 0;
-  if (!isPro && usedToday >= FREE_TIER_DAILY_LIMIT) {
-    return jsonResponse(429, { error: "quota_exhausted" });
+    usedToday = counter?.coach_queries ?? 0;
+    if (usedToday >= FREE_TIER_DAILY_LIMIT) {
+      return jsonResponse(429, { error: "quota_exhausted" });
+    }
   }
 
   // Resolve or create thread
