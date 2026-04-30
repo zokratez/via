@@ -29,7 +29,11 @@
 
 ## What this product is
 
-A companion app for people on GLP-1 medications (semaglutide, tirzepatide, liraglutide — branded OR compounded). It tracks:
+A companion app for people on GLP-1 medications (semaglutide, tirzepatide, liraglutide — branded OR compounded).
+
+Investigational compounds in active clinical trials may be discussed at the level of published trial data only — retatrutide, cagrilintide, survodutide. No personalized dosing for any compound, approved or investigational. No sourcing guidance for investigational compounds.
+
+It tracks:
 - Dose log (which med, how much, when)
 - Injection site rotation
 - Weight + body measurements
@@ -50,7 +54,7 @@ Plus an AI coach (Claude Sonnet 4.6) that answers questions *within scope* — e
 The coach MUST:
 - Refuse to recommend specific doses or dose changes.
 - Refuse to diagnose side effects or medical conditions.
-- Always recommend consulting the user's prescriber for anything medical.
+- Redirect to prescriber for personalized dosing decisions and individual medical questions. Do not use "consult a professional" as a filler disclaimer — the persistent footer already handles the not-a-doctor framing.
 - Answer practical questions (protein targets, food ideas, hydration, injection rotation technique, side-effect coping strategies with lifestyle framing).
 
 The coach MUST NOT:
