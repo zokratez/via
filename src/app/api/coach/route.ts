@@ -7,6 +7,7 @@ import {
   checkUserMessage,
   type GuardrailHit,
 } from "@/lib/coach/guardrails";
+import { findReferrals, buildReferralInjection } from "@/lib/coach/referrals";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -158,8 +159,23 @@ export async function POST(req: NextRequest) {
 
   const tCoach = await getTranslations({ locale, namespace: "coach" });
 
-  // Guardrail path: send canned response, do NOT increment quota
-  if (guardrail) {
+  // Referral path: augment the system prompt with vetted providers (or
+  // a directory-fallback instruction when the table is empty / no fit)
+  // and fall through to the streaming Anthropic path. Quota counts.
+  // profiles.country / profiles.state do not exist yet; default to US.
+  let referralInjection = "";
+  if (guardrail?.category === "referral_request") {
+    const referrals = await findReferrals({
+      locale,
+      country: "US",
+      limit: 3,
+    });
+    referralInjection = buildReferralInjection(locale, referrals);
+  }
+
+  // Canned guardrail path: send canned response, do NOT increment quota.
+  // referral_request is excluded — it streams from the model above.
+  if (guardrail && guardrail.category !== "referral_request") {
     const cannedKey = `canned.${guardrail.category}` as const;
     const cannedText = tCoach(cannedKey);
 
@@ -229,7 +245,7 @@ export async function POST(req: NextRequest) {
         const anthropicStream = client.messages.stream({
           model: MODEL,
           max_tokens: MAX_TOKENS,
-          system: getSystemPrompt(locale),
+          system: getSystemPrompt(locale) + referralInjection,
           messages: anthropicMessages,
         });
 

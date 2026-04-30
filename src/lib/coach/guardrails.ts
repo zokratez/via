@@ -1,14 +1,20 @@
-export type GuardrailCategory =
+export type CannedGuardrailCategory =
   | "crisis"
   | "dose_advice"
   | "vendor_question"
   | "reconstitution"
   | "expired_med";
 
-export type GuardrailHit = {
-  category: GuardrailCategory;
-  cannedResponseKey: `coach.canned.${GuardrailCategory}`;
-};
+export type GuardrailCategory =
+  | CannedGuardrailCategory
+  | "referral_request";
+
+export type GuardrailHit =
+  | {
+      category: CannedGuardrailCategory;
+      cannedResponseKey: `coach.canned.${CannedGuardrailCategory}`;
+    }
+  | { category: "referral_request" };
 
 function normalize(text: string): string {
   return text
@@ -63,6 +69,25 @@ const DOSE_PATTERNS_EN: RegExp[] = [
   /can i (skip|miss) (a|my) dose/,
   /i (injected|took) too much/,
   /double dose/,
+];
+
+const REFERRAL_PATTERNS_ES: RegExp[] = [
+  /(conoces|recomiendas|conoce|recomienda) (a |algun |alguna |un |una )?(medico|medica|doctor|doctora|endocrino|endocrinolog|nutriolog|profesional|internista)/,
+  /\bque (medico|doctor|endocrinolog|profesional)\b/,
+  /donde (encuentro|busco|hallo|consigo|puedo encontrar)( un| una| a un| a una)? (medico|doctor|endocrino|endocrinolog|profesional)/,
+  /necesito (un|una|a un|a una) (medico|doctor|endocrino|endocrinolog|profesional)/,
+  /\balgun (medico|doctor|endocrino|endocrinolog|profesional)\b/,
+  /(medico|doctor|endocrinolog) (que|de) (recomiend|conozc|trabaj|sepa|trate)/,
+  /(medico|doctor) (cerca|en mi)/,
+];
+
+const REFERRAL_PATTERNS_EN: RegExp[] = [
+  /know (any|of any|a) (doctor|physician|provider|endocrinologist|md|do)\b/,
+  /recommend (a|an|any) (doctor|physician|provider|endocrinologist)/,
+  /where can i find (a|an|any)? ?(doctor|physician|provider|endocrinologist)/,
+  /\bwho should i see\b/,
+  /any (doctor|physician|provider|endocrinologist) (that|who|near|in)/,
+  /doctor (near me|in my area)/,
 ];
 
 const VENDOR_PATTERNS_ES: RegExp[] = [
@@ -134,6 +159,12 @@ export function checkUserMessage(
       category: "dose_advice",
       cannedResponseKey: "coach.canned.dose_advice",
     };
+  }
+
+  const referral =
+    locale === "en" ? REFERRAL_PATTERNS_EN : REFERRAL_PATTERNS_ES;
+  if (anyMatch(t, referral)) {
+    return { category: "referral_request" };
   }
 
   const vendor = locale === "en" ? VENDOR_PATTERNS_EN : VENDOR_PATTERNS_ES;

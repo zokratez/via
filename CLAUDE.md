@@ -43,6 +43,8 @@ It tracks:
 
 Plus an AI coach (Claude Sonnet 4.6) that answers questions *within scope* — explicitly non-medical, explicitly not a prescriber.
 
+- **Referral system:** `coach_referrals` Supabase table holds the vetted physician/provider list. Operator (Sam) populates and toggles `active=true` manually after vetting and consent. Bukowski reads via service role at request time when `REFERRAL_REQUEST` intent fires. Never hardcode names in prompt or code.
+
 ## What this product is NOT
 
 - Not a pharmacy. We do not sell peptides. Not RUO, not compounded, not any form.
