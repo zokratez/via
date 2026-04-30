@@ -3,6 +3,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { WeightChart } from "@/components/WeightChart";
 
@@ -51,13 +52,14 @@ export default async function DashboardPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name")
+    .select("display_name, stripe_price_id")
     .eq("id", user!.id)
     .maybeSingle();
 
   const name =
     profile?.display_name?.trim() ||
     (user!.email ? user!.email.split("@")[0] : "");
+  const hasStripeSubscription = Boolean(profile?.stripe_price_id);
 
   const now = new Date();
   const cutoff14 = new Date(now.getTime() - 14 * 86_400_000).toISOString();
@@ -183,6 +185,9 @@ export default async function DashboardPage({
           {tApp("name")}
         </Link>
         <div className="flex items-center gap-3">
+          {hasStripeSubscription && (
+            <ManageSubscriptionLink locale={locale as "es" | "en"} />
+          )}
           <LocaleSwitcher />
           <SignOutButton label={tAuth("sign_out")} />
         </div>
