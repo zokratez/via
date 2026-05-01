@@ -192,5 +192,10 @@
     "network": "No connection. Check your internet.",
     "auth_invalid": "Invalid email or password.",
     "quota_exceeded": "You hit the daily limit."
+  },
+  "footer": {
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2026 ooabi LLC. All rights reserved."
   }
 }

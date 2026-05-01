@@ -192,5 +192,10 @@
     "network": "Sin conexión. Revisa tu internet.",
     "auth_invalid": "Correo o contraseña incorrectos.",
     "quota_exceeded": "Llegaste al límite diario."
+  },
+  "footer": {
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
   }
 }
