@@ -1,7 +1,7 @@
 # CLAUDE.md — Working Agreement
 
 **Product:** Vía — Spanish-first GLP-1 tracker + AI coach.
-**Owner:** Sam (ooabisabi LLC). Single developer. Ship-fast mode.
+**Owner:** Sam (ooabi LLC). Single developer. Ship-fast mode.
 
 ## Hard rules (do not violate)
 

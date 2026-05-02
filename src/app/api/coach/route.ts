@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import * as Sentry from "@sentry/nextjs";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSystemPrompt } from "@/lib/coach/system-prompt";
@@ -285,6 +286,7 @@ export async function POST(req: NextRequest) {
         controller.close();
       } catch (err: unknown) {
         console.error("[coach]", err);
+        Sentry.captureException(err);
         const status =
           err && typeof err === "object" && "status" in err
             ? (err as { status?: number }).status

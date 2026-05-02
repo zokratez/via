@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
+import * as Sentry from "@sentry/nextjs";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
 
@@ -140,6 +141,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[stripe/webhook] handler error", err);
+    Sentry.captureException(err);
     return jsonResponse(500, { error: "generic" });
   }
 
