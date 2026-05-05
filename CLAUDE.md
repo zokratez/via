@@ -28,6 +28,10 @@
 - **Analytics:** PostHog (funnels) + Plausible (public metrics)
 - **i18n:** next-intl (web) + expo-localization + i18n-js (mobile)
 
+## Dev setup
+
+- Fresh git worktrees don't inherit `node_modules` from the parent. Run `npm install` the first time you enter any new worktree under `.claude/worktrees/` before `tsc`, `next dev`, or `next build` will work.
+
 ## What this product is
 
 A companion app for people on GLP-1 medications (semaglutide, tirzepatide, liraglutide — branded OR compounded).
