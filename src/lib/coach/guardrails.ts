@@ -1,9 +1,4 @@
-export type CannedGuardrailCategory =
-  | "crisis"
-  | "dose_advice"
-  | "vendor_question"
-  | "reconstitution"
-  | "expired_med";
+export type CannedGuardrailCategory = "crisis" | "expired_med";
 
 export type GuardrailCategory =
   | CannedGuardrailCategory
@@ -53,24 +48,6 @@ const CRISIS_PATTERNS_EN: RegExp[] = [
   /fainting/,
 ];
 
-const DOSE_PATTERNS_ES: RegExp[] = [
-  /cuant[ao]s? (mg|miligramos|unidades) (debo|tengo que|puedo)/,
-  /(debo|puedo|tengo que) (subir|bajar|aumentar|reducir|cambiar) (la|mi) dosis/,
-  /que dosis (es|debo|me toca|me corresponde)/,
-  /puedo (saltarme|saltar) (una|la|mi) dosis/,
-  /me (inyecte|puse) de mas/,
-  /doble dosis/,
-];
-
-const DOSE_PATTERNS_EN: RegExp[] = [
-  /how (many|much) (mg|milligrams|units) should i/,
-  /should i (go up|go down|increase|decrease|change) (my )?dose/,
-  /what dose (is|should|do i)/,
-  /can i (skip|miss) (a|my) dose/,
-  /i (injected|took) too much/,
-  /double dose/,
-];
-
 const REFERRAL_PATTERNS_ES: RegExp[] = [
   /(conoces|recomiendas|conoce|recomienda) (a |algun |alguna |un |una )?(medico|medica|doctor|doctora|endocrino|endocrinolog|nutriolog|profesional|internista)/,
   /\bque (medico|doctor|endocrinolog|profesional)\b/,
@@ -88,42 +65,6 @@ const REFERRAL_PATTERNS_EN: RegExp[] = [
   /\bwho should i see\b/,
   /any (doctor|physician|provider|endocrinologist) (that|who|near|in)/,
   /doctor (near me|in my area)/,
-];
-
-const VENDOR_PATTERNS_ES: RegExp[] = [
-  /donde (compro|consigo|puedo comprar|encuentro)/,
-  /que (pagina|farmacia|sitio|web) (vende|recomiendas)/,
-  /farmacia compuesta (recomiendas|buena|confiable)/,
-  /(semaglutida|tirzepatida|ozempic|wegovy|mounjaro|zepbound) (sin receta|barato|china|de china)/,
-  /\bruo\b/,
-  /research grade/,
-  /peptidos investigacion/,
-];
-
-const VENDOR_PATTERNS_EN: RegExp[] = [
-  /where (do i|can i) (buy|get|find)/,
-  /what (website|pharmacy|site) (sells|do you recommend)/,
-  /compounding pharmacy (recommend|good|trustworthy)/,
-  /(semaglutide|tirzepatide|ozempic|wegovy|mounjaro|zepbound) (without prescription|cheap|from china)/,
-  /\bruo\b/,
-  /research grade/,
-  /research peptides/,
-];
-
-const RECONSTITUTION_PATTERNS_ES: RegExp[] = [
-  /como reconstituyo/,
-  /como mezclo (la|el) peptido/,
-  /agua bacterio/,
-  /cuanto bac water/,
-  /como calculo (las unidades|la dosis del vial)/,
-];
-
-const RECONSTITUTION_PATTERNS_EN: RegExp[] = [
-  /how (do i|to) reconstitute/,
-  /how (do i|to) mix (the )?peptide/,
-  /bacteriostatic water/,
-  /how much bac water/,
-  /how (do i|to) calculate (units|vial dose)/,
 ];
 
 const EXPIRED_PATTERNS_ES: RegExp[] = [
@@ -153,35 +94,10 @@ export function checkUserMessage(
     return { category: "crisis", cannedResponseKey: "coach.canned.crisis" };
   }
 
-  const dose = locale === "en" ? DOSE_PATTERNS_EN : DOSE_PATTERNS_ES;
-  if (anyMatch(t, dose)) {
-    return {
-      category: "dose_advice",
-      cannedResponseKey: "coach.canned.dose_advice",
-    };
-  }
-
   const referral =
     locale === "en" ? REFERRAL_PATTERNS_EN : REFERRAL_PATTERNS_ES;
   if (anyMatch(t, referral)) {
     return { category: "referral_request" };
-  }
-
-  const vendor = locale === "en" ? VENDOR_PATTERNS_EN : VENDOR_PATTERNS_ES;
-  if (anyMatch(t, vendor)) {
-    return {
-      category: "vendor_question",
-      cannedResponseKey: "coach.canned.vendor_question",
-    };
-  }
-
-  const recon =
-    locale === "en" ? RECONSTITUTION_PATTERNS_EN : RECONSTITUTION_PATTERNS_ES;
-  if (anyMatch(t, recon)) {
-    return {
-      category: "reconstitution",
-      cannedResponseKey: "coach.canned.reconstitution",
-    };
   }
 
   const expired =
