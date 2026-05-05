@@ -2,15 +2,15 @@
 
 **Effective: April 30, 2026**
 
-Vía ("we", "our") is an application operated by ooabi LLC. This policy explains what information we collect when you use Vía, how we use it, and what control you have over it.
+PACO Peptide ("we", "our") is an application operated by ooabi LLC. This policy explains what information we collect when you use PACO Peptide, how we use it, and what control you have over it.
 
-Vía is an informational tool for people using GLP-1 medications. **We are not a medical provider.** This policy describes our privacy practices — not our clinical practices (we don't have any).
+PACO Peptide is an informational tool for people using GLP-1 medications. **We are not a medical provider.** This policy describes our privacy practices — not our clinical practices (we don't have any).
 
 ## Information we collect
 
 ### Information you give us directly
 
-When you create an account and use Vía, we collect:
+When you create an account and use PACO Peptide, we collect:
 
 - **Email address** — for authentication and account communication
 - **Health data you enter** — weight, recorded doses, injection sites, symptoms you log voluntarily
@@ -23,7 +23,7 @@ When you create an account and use Vía, we collect:
 
 ### Payment information
 
-If you subscribe to Vía Pro, **Stripe** processes your payment. We do not store your credit card number. Stripe provides us with:
+If you subscribe to PACO Peptide Pro, **Stripe** processes your payment. We do not store your credit card number. Stripe provides us with:
 
 - Your customer identifier (Stripe Customer ID)
 - Your subscription status (active, canceled, etc.)
@@ -49,7 +49,7 @@ Your messages to the coach are sent to **Anthropic** (the developers of the Clau
 
 Anthropic's policy: [anthropic.com/legal/privacy](https://www.anthropic.com/legal/privacy)
 
-We store your conversations in our database so you have history within Vía. If you delete your account, we delete your conversations.
+We store your conversations in our database so you have history within PACO Peptide. If you delete your account, we delete your conversations.
 
 ## Where your data is stored
 
@@ -66,13 +66,13 @@ You have the right to:
 - **Delete** your account and all associated data
 - **Export** your history in a readable format
 
-To exercise any of these rights, email us at **privacy@via-app.com**. We respond within 30 days.
+To exercise any of these rights, email us at **privacy@pacopeptide.com**. We respond within 30 days.
 
 If you live in California (CCPA), the European Union (GDPR), or any jurisdiction with similar data protection laws, you have additional rights under those laws. We honor them as well.
 
 ## Minors
 
-Vía is not directed at people under 18. We do not knowingly collect data from minors. If you discover that a minor has created an account, email us and we will delete it.
+PACO Peptide is not directed at people under 18. We do not knowingly collect data from minors. If you discover that a minor has created an account, email us and we will delete it.
 
 ## Security
 
@@ -91,7 +91,7 @@ If we change this policy in a significant way, we will notify you by email befor
 ## Contact
 
 **ooabi LLC**
-privacy@via-app.com
+privacy@pacopeptide.com
 
 For questions about this policy or your data.
 

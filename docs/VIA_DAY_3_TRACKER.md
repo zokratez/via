@@ -1,4 +1,4 @@
-# Vía — Day 3 Tracker
+# PACO Peptide — Day 3 Tracker
 
 **Goal:** Bukowski (the AI coach) lives. Spanish-first. Guardrails locked. 3/day quota for free tier, unlimited for Pro (gate exists but Pro tier isn't built yet — that's Day 4, so for now treat everyone as free).
 
@@ -181,7 +181,7 @@ Open Claude Code. Paste this prompt verbatim into a new conversation.
 - [ ] In Terminal: `git status` — confirm clean
 - [ ] `git push origin main`
 - [ ] Open Vercel → Deployments tab → wait for green Ready (~60s)
-- [ ] Open `https://via-mauve.vercel.app/es/coach` (sign in if needed)
+- [ ] Open `https://pacopeptide.com/es/coach` (sign in if needed)
 - [ ] Repeat one normal question + one guardrail test on production
 - [ ] **→ checkpoint:** Bukowski works on production
 

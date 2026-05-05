@@ -78,18 +78,18 @@ export function buildReferralInjection(
     return [
       "",
       "[REFERRAL CONTEXT FOR THIS TURN]",
-      "The user is asking for a referral but Vía has no matching vetted providers yet. Give directory-level guidance: ABOM directory (abom.org) for obesity medicine, endocrinologist via insurance, telehealth platforms like Ro/Hims/Henry Meds for approved compounds (sema/tirz). Do NOT name individual physicians. Stay in voice.",
+      "The user is asking for a referral but PACO Peptide has no matching vetted providers yet. Give directory-level guidance: ABOM directory (abom.org) for obesity medicine, endocrinologist via insurance, telehealth platforms like Ro/Hims/Henry Meds for approved compounds (sema/tirz). Do NOT name individual physicians. Stay in voice.",
     ].join("\n");
   }
 
   const disclosure =
     locale === "es"
-      ? '"Vía no ha verificado resultados clínicos; tú decides."'
-      : '"Vía has not verified clinical outcomes; you decide."';
+      ? '"PACO Peptide no ha verificado resultados clínicos; tú decides."'
+      : '"PACO Peptide has not verified clinical outcomes; you decide."';
 
   return [
     "",
     "[REFERRAL CONTEXT FOR THIS TURN]",
-    `The user is asking for a referral. Vía has the following vetted providers matching their locale and location: ${JSON.stringify(referrals)}. Surface them in Bukowski's voice with the one-line scope disclosure for each. Add: ${disclosure} Then offer to keep talking.`,
+    `The user is asking for a referral. PACO Peptide has the following vetted providers matching their locale and location: ${JSON.stringify(referrals)}. Surface them in Bukowski's voice with the one-line scope disclosure for each. Add: ${disclosure} Then offer to keep talking.`,
   ].join("\n");
 }

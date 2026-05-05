@@ -2,17 +2,17 @@
 
 **Vigente desde: 30 de abril de 2026**
 
-Bienvenido a Vía. Estos términos son un acuerdo legal entre tú y **ooabi LLC** ("nosotros", "Vía"). Al usar Vía, aceptas estos términos. Si no estás de acuerdo, no uses la aplicación.
+Bienvenido a PACO Peptide. Estos términos son un acuerdo legal entre tú y **ooabi LLC** ("nosotros", "PACO Peptide"). Al usar PACO Peptide, aceptas estos términos. Si no estás de acuerdo, no uses la aplicación.
 
-## 1. Qué es Vía y qué no es
+## 1. Qué es PACO Peptide y qué no es
 
-Vía es una herramienta informativa para personas usando o considerando GLP-1. Te ayuda a:
+PACO Peptide es una herramienta informativa para personas usando o considerando GLP-1. Te ayuda a:
 
 - Registrar dosis, peso, síntomas
 - Conversar con un coach (Bukowski) sobre el uso de GLP-1
 - Acceder a información sobre estudios clínicos publicados
 
-**Vía NO es:**
+**PACO Peptide NO es:**
 
 - Un proveedor médico
 - Un sustituto de atención médica profesional
@@ -24,20 +24,20 @@ Bukowski no es médico. La información que comparte es educativa, basada en lit
 
 ## 2. Aviso médico importante
 
-Vía proporciona información general sobre medicamentos GLP-1 aprobados (semaglutida, tirzepatida, liraglutida) y compuestos en investigación clínica activa (retatrutide, cagrilintide, survodutide). Esta información:
+PACO Peptide proporciona información general sobre medicamentos GLP-1 aprobados (semaglutida, tirzepatida, liraglutida) y compuestos en investigación clínica activa (retatrutide, cagrilintide, survodutide). Esta información:
 
 - Se basa en estudios publicados disponibles públicamente
 - No constituye asesoramiento médico
 - No reemplaza la consulta con un profesional de la salud
 - No debe usarse para autodiagnóstico, autoprescripción, o ajustar tratamientos sin supervisión médica
 
-**Si experimentas una emergencia médica, llama al 911 o al servicio de emergencias de tu país inmediatamente. No uses Vía para emergencias.**
+**Si experimentas una emergencia médica, llama al 911 o al servicio de emergencias de tu país inmediatamente. No uses PACO Peptide para emergencias.**
 
-Banderas rojas que requieren atención médica urgente al usar GLP-1 incluyen, entre otras: dolor abdominal severo, vómito persistente, signos de pancreatitis, reacción alérgica grave. Vía menciona estas situaciones a manera informativa, pero no las diagnostica ni las trata.
+Banderas rojas que requieren atención médica urgente al usar GLP-1 incluyen, entre otras: dolor abdominal severo, vómito persistente, signos de pancreatitis, reacción alérgica grave. PACO Peptide menciona estas situaciones a manera informativa, pero no las diagnostica ni las trata.
 
 ## 3. Tu cuenta
 
-Para usar Vía debes:
+Para usar PACO Peptide debes:
 
 - Tener al menos 18 años de edad
 - Proporcionar información veraz al registrarte
@@ -46,11 +46,11 @@ Para usar Vía debes:
 
 Eres responsable de toda actividad en tu cuenta.
 
-## 4. Suscripción Vía Pro
+## 4. Suscripción PACO Peptide Pro
 
 ### Plan y precio
 
-Vía Pro cuesta **$9.99 USD por mes**, facturado mensualmente. El precio puede cambiar; te avisaremos por correo con al menos 30 días de anticipación.
+PACO Peptide Pro cuesta **$9.99 USD por mes**, facturado mensualmente. El precio puede cambiar; te avisaremos por correo con al menos 30 días de anticipación.
 
 ### Renovación automática
 
@@ -66,20 +66,20 @@ Stripe procesa todos los pagos. Al suscribirte, también aceptas los [términos 
 
 ## 5. Uso aceptable
 
-Al usar Vía, aceptas no:
+Al usar PACO Peptide, aceptas no:
 
 - Usar la aplicación para diagnosticar a otras personas
 - Compartir tu cuenta con terceros
 - Intentar extraer datos del coach mediante prompts adversarios o ingeniería inversa
-- Usar Vía para actividades ilegales en tu jurisdicción
-- Distribuir, modificar, o crear obras derivadas de Vía sin autorización
+- Usar PACO Peptide para actividades ilegales en tu jurisdicción
+- Distribuir, modificar, o crear obras derivadas de PACO Peptide sin autorización
 - Interferir con la seguridad o el funcionamiento del servicio
 
 Nos reservamos el derecho de suspender o cancelar cuentas que violen estos términos.
 
 ## 6. Propiedad intelectual
 
-Vía, su diseño, código, la persona "Bukowski", y todo el contenido producido por la aplicación son propiedad de ooabi LLC. Tú conservas la propiedad de los datos que tú ingresas (dosis, peso, mensajes que envías al coach).
+PACO Peptide, su diseño, código, la persona "Bukowski", y todo el contenido producido por la aplicación son propiedad de ooabi LLC. Tú conservas la propiedad de los datos que tú ingresas (dosis, peso, mensajes que envías al coach).
 
 Nos otorgas una licencia limitada para procesar tus datos según se describe en la [Política de Privacidad](/es/privacy).
 
@@ -87,13 +87,13 @@ Nos otorgas una licencia limitada para procesar tus datos según se describe en 
 
 **LEE ESTA SECCIÓN CON ATENCIÓN.**
 
-Vía se proporciona "tal cual" y "según disponibilidad". No garantizamos que la información sea completa, libre de errores, o aplicable a tu situación particular.
+PACO Peptide se proporciona "tal cual" y "según disponibilidad". No garantizamos que la información sea completa, libre de errores, o aplicable a tu situación particular.
 
 En la máxima medida permitida por la ley:
 
-- ooabi LLC no será responsable por daños médicos, pérdida de salud, o consecuencias clínicas derivadas del uso de Vía
-- ooabi LLC no será responsable por decisiones que tú tomes basándote en información de Vía
-- Nuestra responsabilidad total, en cualquier caso, no excederá lo que pagaste por Vía en los últimos 12 meses
+- ooabi LLC no será responsable por daños médicos, pérdida de salud, o consecuencias clínicas derivadas del uso de PACO Peptide
+- ooabi LLC no será responsable por decisiones que tú tomes basándote en información de PACO Peptide
+- Nuestra responsabilidad total, en cualquier caso, no excederá lo que pagaste por PACO Peptide en los últimos 12 meses
 
 Algunas jurisdicciones no permiten ciertas limitaciones de responsabilidad. En ese caso, las limitaciones aplicarán solo en la medida permitida por la ley.
 
@@ -101,13 +101,13 @@ Algunas jurisdicciones no permiten ciertas limitaciones de responsabilidad. En e
 
 Aceptas indemnizar y mantener indemne a ooabi LLC, sus empleados, y socios, frente a reclamos derivados de:
 
-- Tu uso de Vía
+- Tu uso de PACO Peptide
 - Tu violación de estos términos
-- Decisiones médicas que hayas tomado, con o sin información de Vía
+- Decisiones médicas que hayas tomado, con o sin información de PACO Peptide
 
 ## 9. Cambios a estos términos
 
-Podemos modificar estos términos. Si los cambios son significativos, te avisaremos por correo con al menos 30 días de anticipación. Si continúas usando Vía después de la fecha efectiva, aceptas los nuevos términos.
+Podemos modificar estos términos. Si los cambios son significativos, te avisaremos por correo con al menos 30 días de anticipación. Si continúas usando PACO Peptide después de la fecha efectiva, aceptas los nuevos términos.
 
 ## 10. Terminación
 
@@ -136,7 +136,7 @@ Si vives en una jurisdicción donde las leyes locales otorgan derechos no renunc
 ## 13. Contacto
 
 **ooabi LLC**
-legal@via-app.com
+legal@pacopeptide.com
 
 Para preguntas sobre estos términos, asuntos legales, o disputas.
 
