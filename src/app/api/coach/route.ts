@@ -10,6 +10,7 @@ import {
 } from "@/lib/coach/guardrails";
 import { findReferrals, buildReferralInjection } from "@/lib/coach/referrals";
 import { isActiveSubscriber } from "@/lib/subscription";
+import { coachRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -115,6 +116,30 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  let rateLimitInfo: { remaining: number; reset: number } | null = null;
+  if (!isPro) {
+    const rl = await coachRateLimit.limit(user.id);
+    if (!rl.success) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((rl.reset - Date.now()) / 1000),
+      );
+      return new Response(
+        JSON.stringify({ error: "rate_limited", retry_after: rl.reset }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(retryAfterSeconds),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(rl.reset),
+          },
+        },
+      );
+    }
+    rateLimitInfo = { remaining: rl.remaining, reset: rl.reset };
+  }
+
   // Resolve or create thread
   let threadIdToUse: string | null = null;
   if (incomingThreadId) {
@@ -217,6 +242,10 @@ export async function POST(req: NextRequest) {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
         Connection: "keep-alive",
+        ...(rateLimitInfo && {
+          "X-RateLimit-Remaining": String(rateLimitInfo.remaining),
+          "X-RateLimit-Reset": String(rateLimitInfo.reset),
+        }),
       },
     });
   }
@@ -308,6 +337,10 @@ export async function POST(req: NextRequest) {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      ...(rateLimitInfo && {
+        "X-RateLimit-Remaining": String(rateLimitInfo.remaining),
+        "X-RateLimit-Reset": String(rateLimitInfo.reset),
+      }),
     },
   });
 }
