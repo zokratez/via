@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MODEL = "claude-sonnet-4-5-20250929";
-const MAX_TOKENS = 1024;
+const MAX_TOKENS = 4096;
 const FREE_TIER_DAILY_LIMIT = 3;
 
 type ChatRole = "user" | "assistant";
