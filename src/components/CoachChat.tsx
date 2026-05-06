@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const CHARS_PER_FRAME = 30;
 
@@ -39,6 +39,7 @@ export function CoachChat({
 }: Props) {
   const t = useTranslations("coach");
   const tPaywall = useTranslations("paywall");
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -291,6 +292,13 @@ export function CoachChat({
     }
   }
 
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace("/auth/sign-in");
+    router.refresh();
+  }
+
   async function startUpgrade() {
     if (isUpgrading) return;
     setIsUpgrading(true);
@@ -334,49 +342,83 @@ export function CoachChat({
 
   const showEmptyState = messages.length === 0 && !isStreaming;
 
-  return (
-    <div className="fixed inset-0 flex flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border/60 px-6 py-4 md:px-10">
-        <div className="flex flex-col">
-          <h1 className="text-base font-semibold tracking-tight">
-            {t("page_title")}
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            {t("page_subtitle")}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {quotaText && (
-            <span className="text-xs text-muted-foreground">{quotaText}</span>
-          )}
-          <Link
-            href="/dashboard"
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            {t("back_to_dashboard")}
-          </Link>
-        </div>
-      </header>
+  const topbarLinkStyle: React.CSSProperties = {
+    fontFamily: "var(--pp-font-sans)",
+    fontSize: "11px",
+    letterSpacing: "0.22em",
+  };
 
+  return (
+    <div
+      className="fixed inset-0 flex flex-col"
+      style={{ backgroundColor: "var(--pp-bg)", color: "var(--pp-text)" }}
+    >
+      {/* Topbar */}
+      <div className="mx-auto w-full max-w-[660px] px-6 pt-6">
+        <div
+          className="flex items-center justify-between uppercase"
+          style={{ ...topbarLinkStyle, color: "var(--pp-text-tertiary)" }}
+        >
+          <span>{t("topbar_brand")}</span>
+          <span className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="hover:text-[var(--pp-text-secondary)] transition-colors"
+            >
+              {t("topbar_panel")}
+            </Link>
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="uppercase hover:text-[var(--pp-text-secondary)] transition-colors"
+              style={topbarLinkStyle}
+            >
+              {t("topbar_signout")}
+            </button>
+          </span>
+        </div>
+      </div>
+
+      {/* Masthead */}
+      <div className="mx-auto w-full max-w-[660px] px-6 mt-12">
+        <h1
+          className="italic font-normal"
+          style={{
+            fontFamily: "var(--pp-font-serif)",
+            fontSize: showEmptyState ? "48px" : "32px",
+            color: "var(--pp-text)",
+            lineHeight: 1.1,
+          }}
+        >
+          {t("page_title")}
+        </h1>
+        <p
+          className="italic mt-1"
+          style={{
+            fontFamily: "var(--pp-font-serif)",
+            fontSize: "15px",
+            color: "var(--pp-text-secondary)",
+          }}
+        >
+          {t("page_subtitle")}
+        </p>
+      </div>
+
+      <div
+        className="mx-auto w-full max-w-[660px] px-6 mt-8 mb-12"
+        aria-hidden="true"
+      >
+        <div style={{ borderTop: "0.5px solid var(--pp-border)" }} />
+      </div>
+
+      {/* Scroll messages container */}
       <div
         ref={scrollRef}
         onScroll={onScrollContainer}
-        className="flex-1 overflow-y-auto px-6 py-8 md:px-10"
+        className="flex-1 overflow-y-auto pp-scroll"
       >
-        <div className="mx-auto w-full max-w-2xl space-y-4">
-          {showEmptyState && (
-            <Card className="border-border/60">
-              <CardContent className="py-8">
-                <h2 className="text-lg font-medium">
-                  {t("empty_state_title")}
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {t("empty_state_body")}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
+        <div className="mx-auto w-full max-w-[660px] px-6">
           {messages.map((m) => (
             <MessageBubble key={m.id} role={m.role} content={m.content} />
           ))}
@@ -386,27 +428,71 @@ export function CoachChat({
           )}
 
           {isStreaming && streamingText.length === 0 && (
-            <p className="text-sm text-muted-foreground">{t("thinking")}</p>
+            <p
+              className="italic"
+              style={{
+                fontFamily: "var(--pp-font-serif)",
+                fontSize: "15px",
+                color: "var(--pp-text-secondary)",
+                marginBottom: "1.75rem",
+              }}
+            >
+              {t("thinking")}
+            </p>
           )}
 
           {errorText && (
-            <p className="text-sm text-destructive">{errorText}</p>
+            <p
+              style={{
+                fontFamily: "var(--pp-font-sans)",
+                fontSize: "13px",
+                color: "var(--pp-accent)",
+                marginBottom: "1.75rem",
+              }}
+            >
+              {errorText}
+            </p>
           )}
         </div>
       </div>
 
-      <div className="border-t border-border/60 px-6 py-4 md:px-10">
-        <div className="mx-auto w-full max-w-2xl">
+      {/* Input area */}
+      <div className="mx-auto w-full max-w-[660px] px-6">
+        <div
+          className="pt-5 mt-8 pb-6"
+          style={{ borderTop: "0.5px solid var(--pp-border)" }}
+        >
           {quotaExhausted ? (
-            <Card className="border-border/60">
+            <Card
+              className="border"
+              style={{
+                backgroundColor: "var(--pp-surface)",
+                borderColor: "var(--pp-border)",
+              }}
+            >
               <CardContent className="py-5">
-                <h3 className="text-sm font-semibold">
+                <h3
+                  className="italic"
+                  style={{
+                    fontFamily: "var(--pp-font-serif)",
+                    fontSize: "20px",
+                    color: "var(--pp-text)",
+                  }}
+                >
                   {t("quota_exhausted_title")}
                 </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p
+                  className="mt-2"
+                  style={{
+                    fontFamily: "var(--pp-font-serif)",
+                    fontSize: "15px",
+                    color: "var(--pp-text-secondary)",
+                    lineHeight: 1.6,
+                  }}
+                >
                   {t("quota_exhausted_body")}
                 </p>
-                <div className="mt-3">
+                <div className="mt-4">
                   <Button
                     size="sm"
                     onClick={startUpgrade}
@@ -418,7 +504,14 @@ export function CoachChat({
                   </Button>
                 </div>
                 {upgradeError && (
-                  <p className="mt-2 text-sm text-destructive">
+                  <p
+                    className="mt-2"
+                    style={{
+                      fontFamily: "var(--pp-font-sans)",
+                      fontSize: "13px",
+                      color: "var(--pp-accent)",
+                    }}
+                  >
                     {tPaywall("checkout_error")}
                   </p>
                 )}
@@ -430,33 +523,77 @@ export function CoachChat({
                 e.preventDefault();
                 if (canSend) void send();
               }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3"
             >
-              <Input
+              <input
+                type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder={t("input_placeholder")}
                 aria-label={t("input_placeholder")}
-                className="h-10"
+                className="flex-1 bg-transparent border-0 outline-none placeholder:italic placeholder:text-[var(--pp-text-tertiary)]"
+                style={{
+                  fontFamily: "var(--pp-font-serif)",
+                  fontSize: "18px",
+                  color: "var(--pp-text)",
+                }}
               />
               {isStreaming ? (
-                <Button
+                <button
                   type="button"
                   onClick={stop}
-                  size="lg"
-                  variant="outline"
+                  className="uppercase shrink-0 transition-opacity hover:opacity-80"
+                  style={{
+                    fontFamily: "var(--pp-font-sans)",
+                    fontSize: "11px",
+                    letterSpacing: "0.22em",
+                    color: "var(--pp-accent)",
+                  }}
                 >
                   {t("stop")}
-                </Button>
+                </button>
               ) : (
-                <Button type="submit" disabled={!canSend} size="lg">
+                <button
+                  type="submit"
+                  disabled={!canSend}
+                  className="uppercase shrink-0 transition-opacity hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    fontFamily: "var(--pp-font-sans)",
+                    fontSize: "11px",
+                    letterSpacing: "0.22em",
+                    color: "var(--pp-accent)",
+                  }}
+                >
                   {t("send")}
-                </Button>
+                </button>
               )}
             </form>
           )}
-          <p className="mt-3 text-xs text-muted-foreground">
+
+          {quotaText && (
+            <p
+              className="italic mt-3 text-left"
+              style={{
+                fontFamily: "var(--pp-font-serif)",
+                fontSize: "12px",
+                color: "var(--pp-text-tertiary)",
+                lineHeight: 1.6,
+              }}
+            >
+              {quotaText}
+            </p>
+          )}
+
+          <p
+            className="italic mt-3 text-left"
+            style={{
+              fontFamily: "var(--pp-font-serif)",
+              fontSize: "13px",
+              color: "var(--pp-text-tertiary)",
+              lineHeight: 1.6,
+            }}
+          >
             {t("disclaimer")}
           </p>
         </div>
@@ -472,85 +609,156 @@ function MessageBubble({
   role: "user" | "assistant";
   content: string;
 }) {
-  const isUser = role === "user";
-  return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={
-          isUser
-            ? "max-w-[80%] rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground"
-            : "max-w-[80%] rounded-2xl border border-border/60 bg-accent/40 px-4 py-3 text-base leading-relaxed"
-        }
-      >
-        {isUser ? (
+  if (role === "user") {
+    return (
+      <div className="flex justify-end mb-8">
+        <div
+          className="rounded-[20px]"
+          style={{
+            backgroundColor: "var(--pp-user-bubble-bg)",
+            color: "var(--pp-user-bubble-text)",
+            fontFamily: "var(--pp-font-sans)",
+            fontSize: "14px",
+            lineHeight: 1.5,
+            padding: "11px 18px",
+            maxWidth: "75%",
+          }}
+        >
           <p className="whitespace-pre-wrap break-words">{content}</p>
-        ) : (
-          <ReactMarkdown
-            components={{
-              p: (props) => (
-                <p className="mb-3 break-words last:mb-0" {...props} />
-              ),
-              h1: (props) => (
-                <h1
-                  className="mt-4 mb-2 text-lg font-semibold first:mt-0"
-                  {...props}
-                />
-              ),
-              h2: (props) => (
-                <h2
-                  className="mt-4 mb-2 text-base font-semibold first:mt-0"
-                  {...props}
-                />
-              ),
-              h3: (props) => (
-                <h3
-                  className="mt-3 mb-1 text-base font-semibold first:mt-0"
-                  {...props}
-                />
-              ),
-              ul: (props) => (
-                <ul
-                  className="mb-3 list-disc space-y-1.5 pl-5 last:mb-0"
-                  {...props}
-                />
-              ),
-              ol: (props) => (
-                <ol
-                  className="mb-3 list-decimal space-y-1.5 pl-5 last:mb-0"
-                  {...props}
-                />
-              ),
-              li: (props) => <li className="break-words" {...props} />,
-              strong: (props) => (
-                <strong className="font-semibold" {...props} />
-              ),
-              em: (props) => <em className="italic" {...props} />,
-              code: (props) => (
-                <code
-                  className="rounded bg-muted px-1 py-0.5 font-mono text-sm"
-                  {...props}
-                />
-              ),
-              pre: (props) => (
-                <pre
-                  className="mb-3 overflow-x-auto rounded bg-muted p-3 font-mono text-sm last:mb-0"
-                  {...props}
-                />
-              ),
-              a: (props) => (
-                <a
-                  className="underline underline-offset-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  {...props}
-                />
-              ),
-            }}
-          >
-            {content}
-          </ReactMarkdown>
-        )}
+        </div>
       </div>
+    );
+  }
+
+  // Assistant: editorial prose, no bubble. Pilcrow on first paragraph only.
+  let pCount = 0;
+  return (
+    <div
+      className="mb-10"
+      style={{
+        fontFamily: "var(--pp-font-serif)",
+        fontSize: "19px",
+        lineHeight: 1.75,
+        color: "#e8ddc8",
+      }}
+    >
+      <ReactMarkdown
+        components={{
+          p: ({ children, ...rest }) => {
+            pCount += 1;
+            const isFirst = pCount === 1;
+            return (
+              <p className="break-words mb-7 last:mb-0" {...rest}>
+                {isFirst && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      fontSize: "28px",
+                      color: "var(--pp-accent)",
+                      fontStyle: "italic",
+                      verticalAlign: "-6px",
+                      marginRight: "8px",
+                    }}
+                  >
+                    ¶
+                  </span>
+                )}
+                {children}
+              </p>
+            );
+          },
+          h1: (props) => (
+            <h1
+              className="font-semibold mt-8 mb-3 first:mt-0"
+              style={{
+                fontFamily: "var(--pp-font-serif)",
+                fontSize: "26px",
+                color: "var(--pp-text)",
+                lineHeight: 1.25,
+              }}
+              {...props}
+            />
+          ),
+          h2: (props) => (
+            <h2
+              className="font-semibold mt-8 mb-3 first:mt-0"
+              style={{
+                fontFamily: "var(--pp-font-serif)",
+                fontSize: "22px",
+                color: "var(--pp-text)",
+                lineHeight: 1.3,
+              }}
+              {...props}
+            />
+          ),
+          h3: (props) => (
+            <h3
+              className="font-semibold mt-6 mb-2 first:mt-0"
+              style={{
+                fontFamily: "var(--pp-font-serif)",
+                fontSize: "19px",
+                color: "var(--pp-text)",
+              }}
+              {...props}
+            />
+          ),
+          ul: (props) => (
+            <ul className="list-disc pl-6 mb-7 last:mb-0" {...props} />
+          ),
+          ol: (props) => (
+            <ol className="list-decimal pl-6 mb-7 last:mb-0" {...props} />
+          ),
+          li: (props) => (
+            <li className="break-words mb-2 last:mb-0" {...props} />
+          ),
+          strong: (props) => (
+            <strong
+              className="font-semibold"
+              style={{ color: "var(--pp-text)" }}
+              {...props}
+            />
+          ),
+          em: (props) => <em className="italic" {...props} />,
+          code: (props) => (
+            <code
+              className="rounded px-1 py-0.5"
+              style={{
+                fontFamily:
+                  "ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
+                fontSize: "0.9em",
+                backgroundColor: "var(--pp-surface)",
+                color: "var(--pp-text)",
+              }}
+              {...props}
+            />
+          ),
+          pre: (props) => (
+            <pre
+              className="overflow-x-auto rounded p-3 mb-7 last:mb-0"
+              style={{
+                fontFamily:
+                  "ui-monospace, SFMono-Regular, Menlo, Monaco, monospace",
+                fontSize: "14px",
+                backgroundColor: "var(--pp-surface)",
+                color: "var(--pp-text)",
+                lineHeight: 1.6,
+              }}
+              {...props}
+            />
+          ),
+          a: (props) => (
+            <a
+              className="underline underline-offset-2"
+              style={{ color: "var(--pp-accent)" }}
+              target="_blank"
+              rel="noopener noreferrer"
+              {...props}
+            />
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }
