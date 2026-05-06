@@ -57,8 +57,17 @@ export function CoachChat({
   const bufferRef = useRef<string>("");
   const streamDoneRef = useRef<boolean>(false);
   const wasGuardrailRef = useRef<boolean>(false);
+  const isStuckToBottomRef = useRef<boolean>(true);
+
+  function onScrollContainer() {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.clientHeight - el.scrollTop;
+    isStuckToBottomRef.current = distanceFromBottom < 50;
+  }
 
   useEffect(() => {
+    if (!isStuckToBottomRef.current) return;
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
       behavior: "smooth",
@@ -136,6 +145,7 @@ export function CoachChat({
       content: trimmed,
     };
     const history = [...baseMessages, userMsg];
+    isStuckToBottomRef.current = true;
     setMessages(history);
     setInput("");
     setIsStreaming(true);
@@ -325,7 +335,7 @@ export function CoachChat({
   const showEmptyState = messages.length === 0 && !isStreaming;
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="fixed inset-0 flex flex-col bg-background">
       <header className="flex items-center justify-between border-b border-border/60 px-6 py-4 md:px-10">
         <div className="flex flex-col">
           <h1 className="text-base font-semibold tracking-tight">
@@ -350,6 +360,7 @@ export function CoachChat({
 
       <div
         ref={scrollRef}
+        onScroll={onScrollContainer}
         className="flex-1 overflow-y-auto px-6 py-8 md:px-10"
       >
         <div className="mx-auto w-full max-w-2xl space-y-4">
@@ -468,7 +479,7 @@ function MessageBubble({
         className={
           isUser
             ? "max-w-[80%] rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground"
-            : "max-w-[80%] rounded-2xl border border-border/60 bg-accent/40 px-4 py-3 text-sm"
+            : "max-w-[80%] rounded-2xl border border-border/60 bg-accent/40 px-4 py-3 text-base leading-relaxed"
         }
       >
         {isUser ? (
@@ -477,35 +488,35 @@ function MessageBubble({
           <ReactMarkdown
             components={{
               p: (props) => (
-                <p className="mb-2 break-words last:mb-0" {...props} />
+                <p className="mb-3 break-words last:mb-0" {...props} />
               ),
               h1: (props) => (
                 <h1
-                  className="mt-3 mb-2 text-base font-semibold first:mt-0"
+                  className="mt-4 mb-2 text-lg font-semibold first:mt-0"
                   {...props}
                 />
               ),
               h2: (props) => (
                 <h2
-                  className="mt-3 mb-2 text-sm font-semibold first:mt-0"
+                  className="mt-4 mb-2 text-base font-semibold first:mt-0"
                   {...props}
                 />
               ),
               h3: (props) => (
                 <h3
-                  className="mt-2 mb-1 text-sm font-semibold first:mt-0"
+                  className="mt-3 mb-1 text-base font-semibold first:mt-0"
                   {...props}
                 />
               ),
               ul: (props) => (
                 <ul
-                  className="mb-2 list-disc space-y-1 pl-5 last:mb-0"
+                  className="mb-3 list-disc space-y-1.5 pl-5 last:mb-0"
                   {...props}
                 />
               ),
               ol: (props) => (
                 <ol
-                  className="mb-2 list-decimal space-y-1 pl-5 last:mb-0"
+                  className="mb-3 list-decimal space-y-1.5 pl-5 last:mb-0"
                   {...props}
                 />
               ),
@@ -516,13 +527,13 @@ function MessageBubble({
               em: (props) => <em className="italic" {...props} />,
               code: (props) => (
                 <code
-                  className="rounded bg-muted px-1 py-0.5 font-mono text-xs"
+                  className="rounded bg-muted px-1 py-0.5 font-mono text-sm"
                   {...props}
                 />
               ),
               pre: (props) => (
                 <pre
-                  className="mb-2 overflow-x-auto rounded bg-muted p-2 font-mono text-xs last:mb-0"
+                  className="mb-3 overflow-x-auto rounded bg-muted p-3 font-mono text-sm last:mb-0"
                   {...props}
                 />
               ),
