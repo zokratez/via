@@ -49,10 +49,6 @@ function sseEvent(payload: unknown): string {
 }
 
 export async function POST(req: NextRequest) {
-  if (req.headers.get("x-sentry-test") === "1") {
-    throw new Error("Sentry capture verification — Sam testing");
-  }
-
   let body: unknown;
   try {
     body = await req.json();
