@@ -24,6 +24,7 @@
 - **Email:** Resend
 - **AI coach:** Claude Sonnet 4.6 via Anthropic API
 - **Hosting:** Vercel (web) + EAS (mobile)
+- **Domain:** apex `pacopeptide.com` 307 redirects to `www.pacopeptide.com` (canonical). Stripe webhooks must target www. Confirmed via Vercel Domains May 5 2026.
 - **Analytics:** PostHog (funnels) + Plausible (public metrics)
 - **i18n:** next-intl (web) + expo-localization + i18n-js (mobile)
 
