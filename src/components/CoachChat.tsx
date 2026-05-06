@@ -52,6 +52,11 @@ export function CoachChat({
   const [upgradeError, setUpgradeError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const rafIdRef = useRef<number | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const fullTextRef = useRef<string>("");
+  const bufferRef = useRef<string>("");
+  const streamDoneRef = useRef<boolean>(false);
+  const wasGuardrailRef = useRef<boolean>(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -66,56 +71,107 @@ export function CoachChat({
         cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;
       }
+      abortControllerRef.current?.abort();
     };
   }, []);
 
   const quotaExhausted = !isPro && quotaRemaining <= 0;
-  const canSend =
-    !quotaExhausted && !isStreaming && input.trim().length > 0;
+  const canSend = !quotaExhausted && input.trim().length > 0;
+
+  function abortAndCleanup() {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    abortControllerRef.current?.abort();
+    bufferRef.current = "";
+    streamDoneRef.current = false;
+  }
+
+  function stop() {
+    if (!isStreaming) return;
+    const partial = fullTextRef.current;
+    abortAndCleanup();
+    if (partial.length > 0) {
+      const assistantMsg: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: partial,
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+    }
+    fullTextRef.current = "";
+    setStreamingText("");
+    if (!isPro && !wasGuardrailRef.current && !errorKey) {
+      setQuotaRemaining((q) => Math.max(0, q - 1));
+    }
+    setIsStreaming(false);
+  }
 
   async function send() {
     const trimmed = input.trim();
-    if (!trimmed || isStreaming || quotaExhausted) return;
+    if (!trimmed || quotaExhausted) return;
+
+    let baseMessages = messages;
+
+    if (isStreaming) {
+      const partial = fullTextRef.current;
+      abortAndCleanup();
+      if (partial.length > 0) {
+        const partialMsg: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: partial,
+        };
+        baseMessages = [...messages, partialMsg];
+      }
+      if (!isPro && !wasGuardrailRef.current && !errorKey) {
+        setQuotaRemaining((q) => Math.max(0, q - 1));
+      }
+    }
 
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: "user",
       content: trimmed,
     };
-    const history = [...messages, userMsg];
+    const history = [...baseMessages, userMsg];
     setMessages(history);
     setInput("");
     setIsStreaming(true);
     setStreamingText("");
     setErrorKey(null);
 
-    let wasGuardrail = false;
-    let fullText = "";
-    let buffer = "";
-    let streamDone = false;
+    fullTextRef.current = "";
+    bufferRef.current = "";
+    streamDoneRef.current = false;
+    wasGuardrailRef.current = false;
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     function drain() {
       rafIdRef.current = null;
-      if (buffer.length > 0) {
-        const take = buffer.slice(0, CHARS_PER_FRAME);
-        buffer = buffer.slice(CHARS_PER_FRAME);
+      if (bufferRef.current.length > 0) {
+        const take = bufferRef.current.slice(0, CHARS_PER_FRAME);
+        bufferRef.current = bufferRef.current.slice(CHARS_PER_FRAME);
         setStreamingText((prev) => prev + take);
       }
-      if (buffer.length > 0) {
+      if (bufferRef.current.length > 0) {
         rafIdRef.current = requestAnimationFrame(drain);
         return;
       }
-      if (streamDone) {
-        if (fullText.length > 0) {
+      if (streamDoneRef.current && abortControllerRef.current === controller) {
+        if (fullTextRef.current.length > 0) {
           const assistantMsg: Message = {
             id: crypto.randomUUID(),
             role: "assistant",
-            content: fullText,
+            content: fullTextRef.current,
           };
           setMessages((prev) => [...prev, assistantMsg]);
         }
         setStreamingText("");
-        if (!isPro && !wasGuardrail && !errorKey) {
+        if (!isPro && !wasGuardrailRef.current && !errorKey) {
           setQuotaRemaining((q) => Math.max(0, q - 1));
         }
         setIsStreaming(false);
@@ -123,7 +179,7 @@ export function CoachChat({
     }
 
     function kick() {
-      if (rafIdRef.current === null && buffer.length > 0) {
+      if (rafIdRef.current === null && bufferRef.current.length > 0) {
         rafIdRef.current = requestAnimationFrame(drain);
       }
     }
@@ -131,6 +187,7 @@ export function CoachChat({
     try {
       const res = await fetch("/api/coach", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
@@ -139,10 +196,13 @@ export function CoachChat({
         }),
       });
 
+      if (abortControllerRef.current !== controller) return;
+
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as {
           error?: string;
         };
+        if (abortControllerRef.current !== controller) return;
         if (res.status === 429 && data.error === "quota_exhausted") {
           setQuotaRemaining(0);
         } else if (res.status === 429) {
@@ -156,6 +216,7 @@ export function CoachChat({
 
       const reader = res.body?.getReader();
       if (!reader) {
+        if (abortControllerRef.current !== controller) return;
         setErrorKey("generic");
         setIsStreaming(false);
         return;
@@ -181,10 +242,10 @@ export function CoachChat({
           }
           if (evt.type === "meta") {
             setThreadId(evt.threadId);
-            if (evt.guardrail) wasGuardrail = true;
+            if (evt.guardrail) wasGuardrailRef.current = true;
           } else if (evt.type === "text") {
-            fullText += evt.content;
-            buffer += evt.content;
+            fullTextRef.current += evt.content;
+            bufferRef.current += evt.content;
             kick();
           } else if (evt.type === "error") {
             setErrorKey(evt.key);
@@ -194,11 +255,16 @@ export function CoachChat({
         }
       }
 
-      streamDone = true;
+      if (abortControllerRef.current !== controller) return;
+      streamDoneRef.current = true;
       if (rafIdRef.current === null) {
         drain();
       }
-    } catch {
+    } catch (err) {
+      if (abortControllerRef.current !== controller) return;
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return;
+      }
       setErrorKey("generic");
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
@@ -360,13 +426,23 @@ export function CoachChat({
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder={t("input_placeholder")}
-                disabled={isStreaming}
                 aria-label={t("input_placeholder")}
                 className="h-10"
               />
-              <Button type="submit" disabled={!canSend} size="lg">
-                {t("send")}
-              </Button>
+              {isStreaming ? (
+                <Button
+                  type="button"
+                  onClick={stop}
+                  size="lg"
+                  variant="outline"
+                >
+                  {t("stop")}
+                </Button>
+              ) : (
+                <Button type="submit" disabled={!canSend} size="lg">
+                  {t("send")}
+                </Button>
+              )}
             </form>
           )}
           <p className="mt-3 text-xs text-muted-foreground">

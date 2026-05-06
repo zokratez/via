@@ -145,6 +145,7 @@
     "input_placeholder": "Ask Bukowski…",
     "placeholder": "Ask me anything about your day with GLP-1",
     "send": "Send",
+    "stop": "Stop",
     "thinking": "Bukowski is thinking…",
     "empty_state_title": "Hi. I'm Bukowski.",
     "empty_state_body": "I'm here to keep you company. I'm not your doctor — that's what your doctor is for. But I am who gets it when it's 11pm and you're nauseous. Ask me anything.",
