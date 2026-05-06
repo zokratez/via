@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -347,10 +348,77 @@ function MessageBubble({
         className={
           isUser
             ? "max-w-[80%] rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground"
-            : "max-w-[80%] rounded-2xl border border-border/60 bg-accent/40 px-4 py-2 text-sm"
+            : "max-w-[80%] rounded-2xl border border-border/60 bg-accent/40 px-4 py-3 text-sm"
         }
       >
-        <p className="whitespace-pre-wrap break-words">{content}</p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap break-words">{content}</p>
+        ) : (
+          <ReactMarkdown
+            components={{
+              p: (props) => (
+                <p className="mb-2 break-words last:mb-0" {...props} />
+              ),
+              h1: (props) => (
+                <h1
+                  className="mt-3 mb-2 text-base font-semibold first:mt-0"
+                  {...props}
+                />
+              ),
+              h2: (props) => (
+                <h2
+                  className="mt-3 mb-2 text-sm font-semibold first:mt-0"
+                  {...props}
+                />
+              ),
+              h3: (props) => (
+                <h3
+                  className="mt-2 mb-1 text-sm font-semibold first:mt-0"
+                  {...props}
+                />
+              ),
+              ul: (props) => (
+                <ul
+                  className="mb-2 list-disc space-y-1 pl-5 last:mb-0"
+                  {...props}
+                />
+              ),
+              ol: (props) => (
+                <ol
+                  className="mb-2 list-decimal space-y-1 pl-5 last:mb-0"
+                  {...props}
+                />
+              ),
+              li: (props) => <li className="break-words" {...props} />,
+              strong: (props) => (
+                <strong className="font-semibold" {...props} />
+              ),
+              em: (props) => <em className="italic" {...props} />,
+              code: (props) => (
+                <code
+                  className="rounded bg-muted px-1 py-0.5 font-mono text-xs"
+                  {...props}
+                />
+              ),
+              pre: (props) => (
+                <pre
+                  className="mb-2 overflow-x-auto rounded bg-muted p-2 font-mono text-xs last:mb-0"
+                  {...props}
+                />
+              ),
+              a: (props) => (
+                <a
+                  className="underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  {...props}
+                />
+              ),
+            }}
+          >
+            {content}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   );
