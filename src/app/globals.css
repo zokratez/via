@@ -102,11 +102,19 @@
     "Segoe UI", sans-serif;
 }
 
+.pp-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pp-text-tertiary) transparent;
+}
 .pp-scroll::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
 }
 .pp-scroll::-webkit-scrollbar-thumb {
-  background: var(--pp-border);
+  background: var(--pp-text-tertiary);
+  border-radius: 5px;
+}
+.pp-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--pp-text-secondary);
 }
 .pp-scroll::-webkit-scrollbar-track {
   background: transparent;

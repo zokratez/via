@@ -71,7 +71,7 @@ export function CoachChat({
     if (!isStuckToBottomRef.current) return;
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+      behavior: "auto",
     });
   }, [messages, streamingText, isStreaming]);
 
