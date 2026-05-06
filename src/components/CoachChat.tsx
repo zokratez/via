@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 
+const CHARS_PER_FRAME = 30;
+
 type Locale = "es" | "en";
 
 type Message = {
@@ -49,6 +51,7 @@ export function CoachChat({
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [upgradeError, setUpgradeError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -56,6 +59,15 @@ export function CoachChat({
       behavior: "smooth",
     });
   }, [messages, streamingText, isStreaming]);
+
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, []);
 
   const quotaExhausted = !isPro && quotaRemaining <= 0;
   const canSend =
@@ -78,7 +90,43 @@ export function CoachChat({
     setErrorKey(null);
 
     let wasGuardrail = false;
-    let assembled = "";
+    let fullText = "";
+    let buffer = "";
+    let streamDone = false;
+
+    function drain() {
+      rafIdRef.current = null;
+      if (buffer.length > 0) {
+        const take = buffer.slice(0, CHARS_PER_FRAME);
+        buffer = buffer.slice(CHARS_PER_FRAME);
+        setStreamingText((prev) => prev + take);
+      }
+      if (buffer.length > 0) {
+        rafIdRef.current = requestAnimationFrame(drain);
+        return;
+      }
+      if (streamDone) {
+        if (fullText.length > 0) {
+          const assistantMsg: Message = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: fullText,
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+        }
+        setStreamingText("");
+        if (!isPro && !wasGuardrail && !errorKey) {
+          setQuotaRemaining((q) => Math.max(0, q - 1));
+        }
+        setIsStreaming(false);
+      }
+    }
+
+    function kick() {
+      if (rafIdRef.current === null && buffer.length > 0) {
+        rafIdRef.current = requestAnimationFrame(drain);
+      }
+    }
 
     try {
       const res = await fetch("/api/coach", {
@@ -135,8 +183,9 @@ export function CoachChat({
             setThreadId(evt.threadId);
             if (evt.guardrail) wasGuardrail = true;
           } else if (evt.type === "text") {
-            assembled += evt.content;
-            setStreamingText(assembled);
+            fullText += evt.content;
+            buffer += evt.content;
+            kick();
           } else if (evt.type === "error") {
             setErrorKey(evt.key);
           } else if (evt.type === "done") {
@@ -145,21 +194,16 @@ export function CoachChat({
         }
       }
 
-      if (assembled.length > 0) {
-        const assistantMsg: Message = {
-          id: crypto.randomUUID(),
-          role: "assistant",
-          content: assembled,
-        };
-        setMessages((prev) => [...prev, assistantMsg]);
-      }
-      setStreamingText("");
-      if (!isPro && !wasGuardrail && !errorKey) {
-        setQuotaRemaining((q) => Math.max(0, q - 1));
+      streamDone = true;
+      if (rafIdRef.current === null) {
+        drain();
       }
     } catch {
       setErrorKey("generic");
-    } finally {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       setIsStreaming(false);
     }
   }
