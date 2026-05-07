@@ -1,9 +1,38 @@
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+
+const SERIF = "var(--pp-font-serif)";
+const SANS = "var(--pp-font-sans)";
+
+const eyebrowStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "11px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-tertiary)",
+};
+
+const dividerStyle: React.CSSProperties = {
+  maxWidth: "720px",
+  margin: "5rem auto",
+  border: "none",
+  borderTop: "0.5px solid var(--pp-border)",
+};
+
+const ctaButtonStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  background: "var(--pp-accent)",
+  color: "var(--pp-bg)",
+  padding: "14px 28px",
+  borderRadius: "4px",
+  display: "inline-block",
+  textDecoration: "none",
+};
 
 export default async function LandingPage({
   params,
@@ -12,80 +41,296 @@ export default async function LandingPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const t = await getTranslations("landing");
-  const tApp = await getTranslations("app");
-
-  const features = [
-    { key: "log", title: t("feature_log_title"), desc: t("feature_log_desc") },
-    {
-      key: "coach",
-      title: t("feature_coach_title"),
-      desc: t("feature_coach_desc"),
-    },
-    {
-      key: "privacy",
-      title: t("feature_privacy_title"),
-      desc: t("feature_privacy_desc"),
-    },
-  ];
+  const t = await getTranslations("home");
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--pp-bg)",
+        color: "var(--pp-text)",
+        fontFamily: SERIF,
+      }}
+    >
+      {/* Top nav */}
+      <nav
+        style={{
+          maxWidth: "880px",
+          margin: "0 auto",
+          padding: "1.5rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span style={eyebrowStyle}>{t("nav_brand")}</span>
         <Link
-          href="/"
-          className="text-lg font-semibold tracking-tight"
+          href="/auth/sign-in"
+          style={{ ...eyebrowStyle, color: "var(--pp-accent)" }}
         >
-          {tApp("name")}
+          {t("nav_signin")}
         </Link>
-        <LocaleSwitcher />
-      </header>
+      </nav>
 
-      <main className="flex-1">
-        <section className="mx-auto max-w-3xl px-6 pt-16 pb-20 md:pt-24 md:pb-28 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
-            {t("hero_title")}
-          </h1>
-          <p className="mt-5 text-lg text-muted-foreground leading-relaxed max-w-xl md:max-w-2xl md:mx-0 mx-auto">
-            {t("hero_sub")}
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-            <Button asChild size="lg" className="rounded-full">
-              <Link href="/auth/sign-in">{t("cta_primary")}</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full">
-              <a href="#features">{t("cta_secondary")}</a>
-            </Button>
-          </div>
-        </section>
-
-        <section
-          id="features"
-          className="mx-auto max-w-5xl px-6 py-16 md:py-24"
-        >
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-center md:text-left">
-            {t("features_title")}
-          </h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {features.map((f) => (
-              <Card key={f.key} className="border-border/60">
-                <CardHeader>
-                  <CardTitle className="text-lg">{f.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground leading-relaxed">
-                  {f.desc}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-border/60 px-6 py-8 md:px-10">
-        <p className="mx-auto max-w-3xl text-xs text-muted-foreground text-center md:text-left">
-          {t("disclaimer")}
+      {/* Hero */}
+      <section
+        style={{
+          maxWidth: "720px",
+          margin: "4rem auto 0",
+          padding: "0 2rem",
+        }}
+      >
+        <p style={{ ...eyebrowStyle, marginBottom: "1rem" }}>
+          {t("hero_eyebrow")}
         </p>
+        <h1
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "clamp(56px, 11vw, 84px)",
+            lineHeight: 0.95,
+            letterSpacing: "-0.01em",
+            fontWeight: 400,
+            color: "var(--pp-text)",
+            margin: 0,
+          }}
+        >
+          <span style={{ display: "block" }}>{t("hero_mast_line1")}</span>
+          <span style={{ display: "block" }}>{t("hero_mast_line2")}</span>
+        </h1>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "clamp(19px, 2.6vw, 22px)",
+            lineHeight: 1.4,
+            color: "#e8ddc8",
+            maxWidth: "560px",
+            marginTop: "1.5rem",
+          }}
+        >
+          {t("hero_subtitle")}
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: "24px",
+            alignItems: "center",
+            marginTop: "3rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <Link href="/auth/sign-up" style={ctaButtonStyle}>
+            {t("hero_cta_primary")}
+          </Link>
+          <span
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "14px",
+              color: "var(--pp-text-tertiary)",
+            }}
+          >
+            {t("hero_cta_aside")}
+          </span>
+        </div>
+      </section>
+
+      <hr style={dividerStyle} />
+
+      {/* Demo */}
+      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "0 2rem" }}>
+        <p style={{ ...eyebrowStyle, marginBottom: "1.5rem" }}>
+          {t("demo_eyebrow")}
+        </p>
+        <span
+          style={{
+            display: "inline-block",
+            background: "var(--pp-user-bubble-bg)",
+            color: "var(--pp-user-bubble-text)",
+            padding: "11px 18px",
+            borderRadius: "20px",
+            fontFamily: SANS,
+            fontSize: "14px",
+            lineHeight: 1.5,
+            marginBottom: "2rem",
+          }}
+        >
+          {t("demo_question")}
+        </span>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontSize: "clamp(17px, 2.2vw, 19px)",
+            lineHeight: 1.75,
+            color: "#e8ddc8",
+            margin: 0,
+          }}
+        >
+          <span
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "28px",
+              color: "var(--pp-accent)",
+              verticalAlign: "-6px",
+              marginRight: "8px",
+            }}
+            aria-hidden="true"
+          >
+            ¶
+          </span>
+          {t("demo_answer")}
+        </p>
+      </section>
+
+      <hr style={dividerStyle} />
+
+      {/* What it does */}
+      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "0 2rem" }}>
+        <p style={{ ...eyebrowStyle, marginBottom: "1.5rem" }}>
+          {t("what_eyebrow")}
+        </p>
+        {(
+          [
+            ["what_p1_lead", "what_p1_strong", "what_p1_rest"],
+            ["what_p2_lead", "what_p2_strong", "what_p2_rest"],
+            ["what_p3_lead", "what_p3_strong", "what_p3_rest"],
+          ] as const
+        ).map(([leadKey, strongKey, restKey]) => (
+          <p
+            key={leadKey}
+            style={{
+              fontFamily: SERIF,
+              fontSize: "clamp(16px, 2vw, 18px)",
+              lineHeight: 1.75,
+              color: "#e8ddc8",
+              marginTop: 0,
+              marginBottom: "1.5rem",
+            }}
+          >
+            {t(leadKey)}
+            <span style={{ color: "var(--pp-accent)", fontStyle: "italic" }}>
+              {t(strongKey)}
+            </span>
+            {t(restKey)}
+          </p>
+        ))}
+      </section>
+
+      <hr style={dividerStyle} />
+
+      {/* What it isn't */}
+      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "0 2rem" }}>
+        <p style={{ ...eyebrowStyle, marginBottom: "1.5rem" }}>
+          {t("isnt_eyebrow")}
+        </p>
+        {(["isnt_line1", "isnt_line2", "isnt_line3"] as const).map((key) => (
+          <p
+            key={key}
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "17px",
+              lineHeight: 1.7,
+              color: "var(--pp-text-secondary)",
+              marginTop: 0,
+              marginBottom: "1rem",
+            }}
+          >
+            {t(key)}
+          </p>
+        ))}
+      </section>
+
+      <hr style={dividerStyle} />
+
+      {/* Pricing */}
+      <section
+        style={{
+          maxWidth: "540px",
+          margin: "5rem auto 0",
+          padding: "0 2rem",
+          textAlign: "center",
+        }}
+      >
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontSize: "clamp(52px, 9vw, 64px)",
+            lineHeight: 1,
+            color: "var(--pp-text)",
+            margin: 0,
+          }}
+        >
+          {t("pricing_amount")}
+        </p>
+        <p
+          style={{
+            fontFamily: SANS,
+            fontSize: "13px",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--pp-text-tertiary)",
+            marginTop: "12px",
+            marginBottom: 0,
+          }}
+        >
+          {t("pricing_period")}
+        </p>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "15px",
+            lineHeight: 1.6,
+            color: "var(--pp-text-secondary)",
+            margin: "1.5rem 0 2rem",
+          }}
+        >
+          {t("pricing_detail")}
+        </p>
+        <Link href="/auth/sign-up" style={ctaButtonStyle}>
+          {t("pricing_cta")}
+        </Link>
+      </section>
+
+      {/* Footer */}
+      <footer
+        style={{
+          maxWidth: "880px",
+          margin: "6rem auto 0",
+          padding: "2rem 2rem 2rem",
+          borderTop: "0.5px solid var(--pp-border)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <span
+          style={{
+            ...eyebrowStyle,
+            letterSpacing: "0.18em",
+          }}
+        >
+          {t("footer_copyright")}
+        </span>
+        <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+          <Link
+            href="/privacy"
+            style={{ ...eyebrowStyle, letterSpacing: "0.18em" }}
+          >
+            {t("footer_privacy")}
+          </Link>
+          <Link
+            href="/terms"
+            style={{ ...eyebrowStyle, letterSpacing: "0.18em" }}
+          >
+            {t("footer_terms")}
+          </Link>
+        </span>
       </footer>
     </div>
   );

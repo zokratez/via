@@ -3,6 +3,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
+import { FooterGate } from "@/components/FooterGate";
 import { routing } from "@/i18n/routing";
 
 export async function generateMetadata({
@@ -38,7 +39,9 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       {children}
-      <Footer />
+      <FooterGate>
+        <Footer />
+      </FooterGate>
     </NextIntlClientProvider>
   );
 }
