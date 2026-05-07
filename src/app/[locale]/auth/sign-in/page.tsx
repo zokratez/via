@@ -4,18 +4,123 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLocale, useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { Link, useRouter } from "@/i18n/navigation";
+
+const SERIF = "var(--pp-font-serif)";
+const SANS = "var(--pp-font-sans)";
+
+const navLinkStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
+  letterSpacing: "0.24em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+  textDecoration: "none",
+};
+
+const mastStyle: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontStyle: "italic",
+  fontSize: "clamp(48px, 9vw, 64px)",
+  lineHeight: 0.95,
+  letterSpacing: "-0.01em",
+  fontWeight: 400,
+  color: "var(--pp-text)",
+  margin: 0,
+  textAlign: "center",
+};
+
+const primaryButtonStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "13px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  background: "var(--pp-accent)",
+  color: "var(--pp-bg)",
+  padding: "16px 24px",
+  borderRadius: "4px",
+  border: "none",
+  width: "100%",
+  cursor: "pointer",
+  display: "block",
+  textAlign: "center",
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "13px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  background: "transparent",
+  color: "var(--pp-text)",
+  padding: "14px 24px",
+  borderRadius: "4px",
+  border: "0.5px solid var(--pp-border)",
+  width: "100%",
+  cursor: "pointer",
+  display: "block",
+  textAlign: "center",
+};
+
+const ghostLinkStyle: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontStyle: "italic",
+  fontSize: "15px",
+  color: "var(--pp-text-secondary)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: "8px",
+  textAlign: "center",
+  display: "block",
+  width: "100%",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "11px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+  fontWeight: 500,
+  display: "block",
+  marginBottom: "8px",
+};
+
+const inputStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "15px",
+  background: "var(--pp-surface)",
+  color: "var(--pp-text)",
+  border: "0.5px solid var(--pp-border)",
+  borderRadius: "4px",
+  padding: "12px 14px",
+  width: "100%",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const errorStyle: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontStyle: "italic",
+  fontSize: "15px",
+  color: "#d97b6a",
+  margin: 0,
+  textAlign: "center",
+};
+
+const bottomLinkStyle: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontStyle: "italic",
+  fontSize: "15px",
+  color: "var(--pp-text-secondary)",
+  textAlign: "center",
+  margin: 0,
+};
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -26,12 +131,12 @@ type FormValues = { email: string; password: string };
 
 export default function SignInPage() {
   const t = useTranslations("auth");
-  const tApp = useTranslations("app");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showEmail, setShowEmail] = useState(false);
 
   const {
     register,
@@ -77,93 +182,137 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          {tApp("name")}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--pp-bg)",
+        color: "var(--pp-text)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <nav
+        style={{
+          maxWidth: "880px",
+          width: "100%",
+          margin: "0 auto",
+          padding: "1.5rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Link href="/" style={navLinkStyle}>
+          {t("nav_brand")}
         </Link>
-        <LocaleSwitcher />
-      </header>
-      <main className="flex-1 flex items-center justify-center px-6 py-10">
-        <Card className="w-full max-w-sm border-border/60">
-          <CardHeader>
-            <CardTitle className="text-xl">{t("sign_in_title")}</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <LocaleSwitcher variant="dark" />
+      </nav>
+
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "2rem",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "440px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "2.5rem",
+          }}
+        >
+          <h1 style={mastStyle}>{t("sign_in_mast")}</h1>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              style={primaryButtonStyle}
+            >
+              {t("google_cta")}
+            </button>
+
+            {!showEmail && (
+              <button
+                type="button"
+                onClick={() => setShowEmail(true)}
+                style={ghostLinkStyle}
+              >
+                {t("email_expand")}
+              </button>
+            )}
+          </div>
+
+          {showEmail && (
             <form
-              className="flex flex-col gap-4"
               onSubmit={handleSubmit(onSubmit)}
               noValidate
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.25rem",
+              }}
             >
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="email">{t("email")}</Label>
-                <Input
+              <div>
+                <label htmlFor="email" style={labelStyle}>
+                  {t("email")}
+                </label>
+                <input
                   id="email"
                   type="email"
                   autoComplete="email"
                   {...register("email", { required: true })}
                   aria-invalid={!!errors.email}
+                  style={inputStyle}
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="password">{t("password")}</Label>
-                <Input
+              <div>
+                <label htmlFor="password" style={labelStyle}>
+                  {t("password")}
+                </label>
+                <input
                   id="password"
                   type="password"
                   autoComplete="current-password"
                   placeholder={t("password_placeholder")}
                   {...register("password", { required: true, minLength: 8 })}
                   aria-invalid={!!errors.password}
+                  style={inputStyle}
                 />
               </div>
 
-              <Button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                className="rounded-full"
+                style={{ ...secondaryButtonStyle, opacity: isSubmitting ? 0.5 : 1 }}
               >
                 {t("sign_in")}
-              </Button>
-
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border/60" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase tracking-wide">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    {t("or_continue_with")}
-                  </span>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={signInWithGoogle}
-                className="rounded-full"
-              >
-                {t("google")}
-              </Button>
-
-              {errorMsg && (
-                <p className="text-sm text-destructive" role="alert">
-                  {errorMsg}
-                </p>
-              )}
-
-              <p className="text-center text-sm text-muted-foreground">
-                {t("dont_have_account")}{" "}
-                <Link
-                  href="/auth/sign-up"
-                  className="text-foreground hover:underline"
-                >
-                  {t("sign_up_link")}
-                </Link>
-              </p>
+              </button>
             </form>
-          </CardContent>
-        </Card>
+          )}
+
+          {errorMsg && (
+            <p style={errorStyle} role="alert">
+              {errorMsg}
+            </p>
+          )}
+
+          <p style={bottomLinkStyle}>
+            {t("dont_have_account")}{" "}
+            <Link
+              href="/auth/sign-up"
+              style={{ color: "var(--pp-accent)", textDecoration: "none" }}
+            >
+              {t("sign_up_link")}
+            </Link>
+          </p>
+        </div>
       </main>
     </div>
   );

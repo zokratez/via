@@ -54,6 +54,11 @@
     "disclaimer": "Esta app no reemplaza a tu médico. No recetamos ni vendemos medicamentos."
   },
   "auth": {
+    "sign_in_mast": "entrar",
+    "sign_up_mast": "empezar",
+    "google_cta": "Continúa con Google",
+    "email_expand": "¿prefieres correo?",
+    "nav_brand": "paco peptide",
     "sign_up_title": "Crea tu cuenta",
     "sign_in_title": "Bienvenido de vuelta",
     "email": "Correo electrónico",

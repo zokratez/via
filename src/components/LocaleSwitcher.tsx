@@ -6,7 +6,9 @@ import { routing } from "@/i18n/routing";
 import { useTransition } from "react";
 import { cn } from "@/lib/utils";
 
-export function LocaleSwitcher() {
+type Variant = "default" | "dark";
+
+export function LocaleSwitcher({ variant = "default" }: { variant?: Variant } = {}) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -17,6 +19,51 @@ export function LocaleSwitcher() {
     startTransition(() => {
       router.replace(pathname, { locale: next });
     });
+  }
+
+  if (variant === "dark") {
+    return (
+      <div
+        className="inline-flex items-center"
+        role="group"
+        aria-label="Language"
+        style={{
+          fontFamily: "var(--pp-font-sans)",
+          fontSize: "12px",
+          letterSpacing: "0.24em",
+          textTransform: "uppercase",
+          gap: "0.5rem",
+        }}
+      >
+        {routing.locales.map((code, i) => (
+          <span key={code} style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+            {i > 0 && <span aria-hidden="true" style={{ color: "var(--pp-text-tertiary)" }}>·</span>}
+            <button
+              type="button"
+              onClick={() => switchTo(code)}
+              disabled={isPending}
+              aria-pressed={code === locale}
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: 0,
+                cursor: code === locale ? "default" : "pointer",
+                color:
+                  code === locale
+                    ? "var(--pp-text)"
+                    : "var(--pp-text-tertiary)",
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                letterSpacing: "inherit",
+                textTransform: "inherit",
+              }}
+            >
+              {code}
+            </button>
+          </span>
+        ))}
+      </div>
+    );
   }
 
   return (
