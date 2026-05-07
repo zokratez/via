@@ -7,10 +7,27 @@ const SANS = "var(--pp-font-sans)";
 
 const eyebrowStyle: React.CSSProperties = {
   fontFamily: SANS,
-  fontSize: "11px",
+  fontSize: "13px",
+  letterSpacing: "0.24em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+  fontWeight: 500,
+};
+
+const navLinkStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
+  letterSpacing: "0.24em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+};
+
+const footerLinkStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
   letterSpacing: "0.22em",
   textTransform: "uppercase",
-  color: "var(--pp-text-tertiary)",
+  color: "var(--pp-text-secondary)",
 };
 
 const dividerStyle: React.CSSProperties = {
@@ -63,10 +80,10 @@ export default async function LandingPage({
           alignItems: "center",
         }}
       >
-        <span style={eyebrowStyle}>{t("nav_brand")}</span>
+        <span style={navLinkStyle}>{t("nav_brand")}</span>
         <Link
           href="/auth/sign-in"
-          style={{ ...eyebrowStyle, color: "var(--pp-accent)" }}
+          style={{ ...navLinkStyle, color: "var(--pp-accent)" }}
         >
           {t("nav_signin")}
         </Link>
@@ -127,8 +144,8 @@ export default async function LandingPage({
             style={{
               fontFamily: SERIF,
               fontStyle: "italic",
-              fontSize: "14px",
-              color: "var(--pp-text-tertiary)",
+              fontSize: "15px",
+              color: "var(--pp-text-secondary)",
             }}
           >
             {t("hero_cta_aside")}
@@ -268,10 +285,11 @@ export default async function LandingPage({
         <p
           style={{
             fontFamily: SANS,
-            fontSize: "13px",
-            letterSpacing: "0.18em",
+            fontSize: "14px",
+            letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color: "var(--pp-text-tertiary)",
+            color: "var(--pp-text-secondary)",
+            fontWeight: 500,
             marginTop: "12px",
             marginBottom: 0,
           }}
@@ -309,25 +327,12 @@ export default async function LandingPage({
           gap: "1rem",
         }}
       >
-        <span
-          style={{
-            ...eyebrowStyle,
-            letterSpacing: "0.18em",
-          }}
-        >
-          {t("footer_copyright")}
-        </span>
+        <span style={footerLinkStyle}>{t("footer_copyright")}</span>
         <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-          <Link
-            href="/privacy"
-            style={{ ...eyebrowStyle, letterSpacing: "0.18em" }}
-          >
+          <Link href="/privacy" style={footerLinkStyle}>
             {t("footer_privacy")}
           </Link>
-          <Link
-            href="/terms"
-            style={{ ...eyebrowStyle, letterSpacing: "0.18em" }}
-          >
+          <Link href="/terms" style={footerLinkStyle}>
             {t("footer_terms")}
           </Link>
         </span>
