@@ -137,7 +137,7 @@ export default async function LandingPage({
             flexWrap: "wrap",
           }}
         >
-          <Link href="/auth/sign-up" style={ctaButtonStyle}>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
             {t("hero_cta_primary")}
           </Link>
           <span
@@ -262,7 +262,7 @@ export default async function LandingPage({
 
       <hr style={dividerStyle} />
 
-      {/* Pricing */}
+      {/* Pricing — annual primary + monthly alt */}
       <section
         style={{
           maxWidth: "540px",
@@ -271,6 +271,7 @@ export default async function LandingPage({
           textAlign: "center",
         }}
       >
+        {/* Annual block */}
         <p
           style={{
             fontFamily: SERIF,
@@ -280,7 +281,7 @@ export default async function LandingPage({
             margin: 0,
           }}
         >
-          {t("pricing_amount")}
+          {t("pricing_annual_amount")}
         </p>
         <p
           style={{
@@ -294,23 +295,80 @@ export default async function LandingPage({
             marginBottom: 0,
           }}
         >
-          {t("pricing_period")}
+          {t("pricing_annual_period")}
         </p>
         <p
           style={{
-            fontFamily: SERIF,
-            fontStyle: "italic",
-            fontSize: "15px",
-            lineHeight: 1.6,
-            color: "var(--pp-text-secondary)",
-            margin: "1.5rem 0 2rem",
+            display: "inline-block",
+            fontFamily: SANS,
+            fontSize: "12px",
+            letterSpacing: "0.24em",
+            fontWeight: 500,
+            color: "var(--pp-accent)",
+            border: "0.5px solid var(--pp-accent)",
+            borderRadius: "4px",
+            padding: "6px 12px",
+            marginTop: "1.25rem",
+            marginBottom: 0,
           }}
         >
-          {t("pricing_detail")}
+          {t("pricing_annual_badge")}
         </p>
-        <Link href="/auth/sign-up" style={ctaButtonStyle}>
-          {t("pricing_cta")}
-        </Link>
+        <div style={{ marginTop: "2rem" }}>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
+            {t("pricing_annual_cta")}
+          </Link>
+        </div>
+
+        {/* Monthly alt — quieter, separated by hairline */}
+        <div
+          style={{
+            marginTop: "3rem",
+            paddingTop: "2rem",
+            borderTop: "0.5px solid var(--pp-border)",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: SANS,
+              fontSize: "11px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "var(--pp-text-tertiary)",
+              fontWeight: 500,
+              margin: 0,
+            }}
+          >
+            {t("pricing_monthly_eyebrow")}
+          </p>
+          <p
+            style={{
+              fontFamily: SERIF,
+              fontSize: "20px",
+              color: "var(--pp-text-secondary)",
+              margin: "0.5rem 0 0.75rem",
+            }}
+          >
+            {t("pricing_monthly_amount")}{" "}
+            <span style={{ fontStyle: "italic", fontSize: "16px" }}>
+              {t("pricing_monthly_period")}
+            </span>
+          </p>
+          <Link
+            href="/auth/sign-up?plan=monthly"
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "15px",
+              color: "var(--pp-text-secondary)",
+              textDecoration: "none",
+              display: "inline-block",
+              padding: "8px",
+            }}
+          >
+            {t("pricing_monthly_cta")}
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
