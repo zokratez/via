@@ -9,6 +9,7 @@ import {
   type GuardrailHit,
 } from "@/lib/coach/guardrails";
 import { findReferrals, buildReferralInjection } from "@/lib/coach/referrals";
+import { isActiveSubscriber } from "@/lib/subscription";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -92,11 +93,11 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("stripe_price_id")
+    .select("subscription_tier")
     .eq("id", user.id)
     .maybeSingle();
 
-  const isPro = profile?.stripe_price_id != null;
+  const isPro = isActiveSubscriber(profile?.subscription_tier);
   const today = todayInMexicoCity();
 
   let usedToday = 0;

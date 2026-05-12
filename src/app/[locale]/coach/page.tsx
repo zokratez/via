@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CoachChat } from "@/components/CoachChat";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
+import { isActiveSubscriber } from "@/lib/subscription";
 
 const FREE_TIER_DAILY_LIMIT = 3;
 
@@ -42,7 +43,7 @@ export default async function CoachPage({
     .eq("id", user!.id)
     .maybeSingle();
   const tier = profile?.subscription_tier ?? "free";
-  const isPro = tier === "pro";
+  const isPro = isActiveSubscriber(tier);
 
   let initialQuotaRemaining = FREE_TIER_DAILY_LIMIT;
   if (!isPro) {
