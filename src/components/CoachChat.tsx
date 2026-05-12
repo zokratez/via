@@ -307,7 +307,7 @@ export function CoachChat({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale }),
+        body: JSON.stringify({ locale, plan: "annual" }),
       });
       if (!res.ok) {
         setUpgradeError(true);

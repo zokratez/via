@@ -31,17 +31,10 @@ export async function POST(req: NextRequest) {
   if (!isCheckoutLocale(locale)) {
     return jsonResponse(400, { error: "invalid_locale" });
   }
-  // Plan defaults to annual when caller omits it (the in-coach upgrade
-  // button at CoachChat.tsx:307 sends only { locale }). Sam-approved.
-  const plan =
-    planInput === undefined
-      ? "annual"
-      : isCheckoutPlan(planInput)
-        ? planInput
-        : null;
-  if (plan === null) {
+  if (!isCheckoutPlan(planInput)) {
     return jsonResponse(400, { error: "invalid_plan" });
   }
+  const plan = planInput;
 
   const supabase = await createClient();
   const {
