@@ -104,16 +104,31 @@ export default async function LandingPage({
           style={{
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: "clamp(40px, 6.5vw, 56px)",
-            lineHeight: 1.05,
+            fontSize: "clamp(56px, 11vw, 84px)",
+            lineHeight: 0.95,
             letterSpacing: "-0.01em",
             fontWeight: 400,
             color: "var(--pp-text)",
             margin: 0,
           }}
         >
-          {t("hero_tagline")}
+          <span style={{ display: "block" }}>{t("hero_mast_line1")}</span>
+          <span style={{ display: "block" }}>{t("hero_mast_line2")}</span>
         </h1>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "clamp(40px, 6.5vw, 56px)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.01em",
+            fontWeight: 400,
+            color: "var(--pp-text)",
+            margin: "1.5rem 0 0",
+          }}
+        >
+          {t("hero_tagline")}
+        </p>
         {(["hero_body_p1", "hero_body_p2", "hero_body_p3"] as const).map(
           (key, i) => (
             <p
