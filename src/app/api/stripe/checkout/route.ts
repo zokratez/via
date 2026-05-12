@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getStripe } from "@/lib/stripe/server";
+import {
+  createCheckoutSession,
+  isCheckoutLocale,
+  isCheckoutPlan,
+} from "@/lib/stripe/checkout-session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,14 +23,24 @@ export async function POST(req: NextRequest) {
   } catch {
     return jsonResponse(400, { error: "invalid_body" });
   }
-  const { locale } = (body ?? {}) as { locale?: unknown };
-  if (locale !== "es" && locale !== "en") {
+
+  const { locale, plan: planInput } = (body ?? {}) as {
+    locale?: unknown;
+    plan?: unknown;
+  };
+  if (!isCheckoutLocale(locale)) {
     return jsonResponse(400, { error: "invalid_locale" });
   }
-
-  const priceId = process.env.STRIPE_PRICE_ID_VIA_PRO;
-  if (!priceId) {
-    return jsonResponse(500, { error: "generic" });
+  // Plan defaults to annual when caller omits it (the in-coach upgrade
+  // button at CoachChat.tsx:307 sends only { locale }). Sam-approved.
+  const plan =
+    planInput === undefined
+      ? "annual"
+      : isCheckoutPlan(planInput)
+        ? planInput
+        : null;
+  if (plan === null) {
+    return jsonResponse(400, { error: "invalid_plan" });
   }
 
   const supabase = await createClient();
@@ -37,48 +51,17 @@ export async function POST(req: NextRequest) {
     return jsonResponse(401, { error: "unauthorized" });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("stripe_customer_id")
-    .eq("id", user.id)
-    .maybeSingle();
+  const result = await createCheckoutSession({
+    supabase,
+    userId: user.id,
+    userEmail: user.email ?? null,
+    plan,
+    locale,
+    origin: req.nextUrl.origin,
+  });
 
-  const stripe = getStripe();
-  let stripeCustomerId = profile?.stripe_customer_id ?? null;
-  if (!stripeCustomerId) {
-    const customer = await stripe.customers.create({
-      email: user.email ?? undefined,
-      metadata: { supabase_user_id: user.id },
-    });
-    stripeCustomerId = customer.id;
-    const { error: updateErr } = await supabase
-      .from("profiles")
-      .update({ stripe_customer_id: stripeCustomerId })
-      .eq("id", user.id);
-    if (updateErr) {
-      console.error("[stripe/checkout] persist customer", updateErr);
-      return jsonResponse(500, { error: "generic" });
-    }
-  }
-
-  const origin = req.nextUrl.origin;
-
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      line_items: [{ price: priceId, quantity: 1 }],
-      customer: stripeCustomerId,
-      success_url: `${origin}/${locale}/dashboard?upgraded=true`,
-      cancel_url: `${origin}/${locale}/coach`,
-      locale: locale === "es" ? "es" : "en",
-      metadata: { supabase_user_id: user.id },
-    });
-    if (!session.url) {
-      return jsonResponse(500, { error: "generic" });
-    }
-    return jsonResponse(200, { url: session.url });
-  } catch (err) {
-    console.error("[stripe/checkout]", err);
+  if (!result.ok) {
     return jsonResponse(500, { error: "generic" });
   }
+  return jsonResponse(200, { url: result.url });
 }
