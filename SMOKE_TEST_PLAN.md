@@ -21,7 +21,7 @@ from the top.
 
 | Check | How | Pass criterion |
 |---|---|---|
-| Migration 0004 applied to Supabase prod | Supabase SQL editor: `select pg_get_constraintdef(c.oid) from pg_constraint c where c.conname = 'profiles_subscription_tier_chk';` | Returns a row with the CHECK definition listing all four legal tiers. **If empty: run the migration before proceeding.** |
+| Migration 0004 applied to Supabase prod | Supabase SQL editor: `select pg_get_constraintdef(c.oid) from pg_constraint c where c.conname = 'profiles_subscription_tier_chk';` | ✅ **APPLIED** (verified May 11, 2026 by Sam via `pg_get_constraintdef()`). Constraint `profiles_subscription_tier_chk` exists allowing `'free','pro','trialing','past_due_grace'`. Original criterion: returns a row with the CHECK definition listing all four legal tiers. |
 | Vercel env `STRIPE_PRICE_ID_VIA_PRO` is live monthly | Vercel dashboard → env vars → Production scope | Value starts with `price_` and matches the **live** $9.99/mo price in Stripe Dashboard. **Sam confirmed: YES (corrected from sk_live_… bug).** |
 | Vercel env `STRIPE_PRICE_ID_VIA_PRO_ANNUAL` is set | Same | Value = `price_1TW0RjC0ioyOCtQFITaFq8wX` (live annual $79/yr). |
 | Vercel env `STRIPE_SECRET_KEY` is live key | Same | Starts with `sk_live_`. |
