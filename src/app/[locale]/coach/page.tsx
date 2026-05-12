@@ -5,6 +5,7 @@ import { CoachChat } from "@/components/CoachChat";
 import { hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { isActiveSubscriber } from "@/lib/subscription";
+import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
 const FREE_TIER_DAILY_LIMIT = 3;
 
@@ -20,8 +21,10 @@ function todayInMexicoCity(): string {
 
 export default async function CoachPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ upgraded?: string }>;
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
@@ -43,6 +46,16 @@ export default async function CoachPage({
     .eq("id", user!.id)
     .maybeSingle();
   const tier = profile?.subscription_tier ?? "free";
+
+  // Paywall gate. ?upgraded=true is the one-shot bypass for the race
+  // window between Stripe success redirect and webhook delivery.
+  const sp = await searchParams;
+  await enforceActiveSubscription({
+    tier,
+    locale: locale as "es" | "en",
+    upgradedBypass: sp.upgraded === "true",
+  });
+
   const isPro = isActiveSubscriber(tier);
 
   let initialQuotaRemaining = FREE_TIER_DAILY_LIMIT;

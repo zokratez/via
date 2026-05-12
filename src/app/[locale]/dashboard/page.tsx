@@ -7,6 +7,7 @@ import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { WeightChart } from "@/components/WeightChart";
 import { isActiveSubscriber } from "@/lib/subscription";
+import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
 function greetingKey(now = new Date()): "morning" | "afternoon" | "evening" {
   const h = now.getHours();
@@ -56,6 +57,13 @@ export default async function DashboardPage({
     .select("display_name, subscription_tier")
     .eq("id", user!.id)
     .maybeSingle();
+
+  // Paywall gate. Dashboard is not the Stripe success_url target so no
+  // ?upgraded=true bypass is needed here (success_url goes to /coach).
+  await enforceActiveSubscription({
+    tier: profile?.subscription_tier,
+    locale: locale as "es" | "en",
+  });
 
   const name =
     profile?.display_name?.trim() ||
