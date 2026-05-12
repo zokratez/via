@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { FooterGate } from "@/components/FooterGate";
 import { routing } from "@/i18n/routing";
+import { SITE_URL } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -14,7 +15,8 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "app" });
   return {
-    title: t("name"),
+    metadataBase: new URL(SITE_URL),
+    title: { default: t("name"), template: `%s — ${t("name")}` },
     description: t("description"),
   };
 }

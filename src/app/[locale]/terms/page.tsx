@@ -7,6 +7,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -96,9 +97,19 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return {
-    title: locale === "es" ? "Términos de Servicio" : "Terms of Service",
-  };
+  const seoLocale = (locale === "en" ? "en" : "es") as SeoLocale;
+  const tHome = await getTranslations({ locale: seoLocale, namespace: "home" });
+  return buildMetadata({
+    locale: seoLocale,
+    title: tHome("seo_terms_title"),
+    description: tHome("seo_terms_description"),
+    pathname: `/${seoLocale}/terms`,
+    type: "website",
+    languages: {
+      es: `${SITE_URL}/es/terms`,
+      en: `${SITE_URL}/en/terms`,
+    },
+  });
 }
 
 export default async function TermsPage({

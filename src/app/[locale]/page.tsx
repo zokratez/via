@@ -1,6 +1,27 @@
+import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "home" });
+  const seoLocale = (locale === "en" ? "en" : "es") as SeoLocale;
+  return buildMetadata({
+    locale: seoLocale,
+    title: t("seo_home_title"),
+    description: t("seo_home_description"),
+    pathname: `/${seoLocale}`,
+    type: "website",
+    keywords: t("seo_home_keywords").split(",").map((k) => k.trim()),
+    languages: { es: `${SITE_URL}/es`, en: `${SITE_URL}/en` },
+  });
+}
 
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";

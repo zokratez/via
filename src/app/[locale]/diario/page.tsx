@@ -10,6 +10,7 @@ import { Link, redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { loadArticles, type Locale } from "@/lib/journal/articles";
+import { buildMetadata, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -99,9 +100,18 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return {
-    title: locale === "es" ? "Diario · PACO Peptide" : "Journal · PACO Peptide",
-  };
+  if (locale !== "es") {
+    return { alternates: { canonical: `${SITE_URL}/en/journal` } };
+  }
+  const t = await getTranslations({ locale, namespace: "home" });
+  return buildMetadata({
+    locale: "es",
+    title: t("seo_diario_title"),
+    description: t("seo_diario_description"),
+    pathname: "/es/diario",
+    type: "website",
+    languages: { es: `${SITE_URL}/es/diario`, en: `${SITE_URL}/en/journal` },
+  });
 }
 
 export default async function DiarioIndexPage({

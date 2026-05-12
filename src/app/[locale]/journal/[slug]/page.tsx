@@ -12,6 +12,7 @@ import { Link, redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { loadArticle, loadArticles, type Locale } from "@/lib/journal/articles";
+import { buildMetadata, SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -131,10 +132,19 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  if (locale !== "en") return { title: "PACO Peptide" };
+  if (locale !== "en") {
+    return { alternates: { canonical: `${SITE_URL}/es/diario/${slug}` } };
+  }
   const article = await loadArticle("en", slug);
   if (!article) return { title: "PACO Peptide" };
-  return { title: `${article.title} · PACO Peptide` };
+  return buildMetadata({
+    locale: "en",
+    title: `${article.title} — PACO Peptide`,
+    description: article.summary,
+    pathname: `/en/journal/${slug}`,
+    type: "article",
+    publishedTime: article.date,
+  });
 }
 
 export default async function JournalArticlePage({
