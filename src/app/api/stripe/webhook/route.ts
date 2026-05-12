@@ -25,10 +25,39 @@ function getAdminClient() {
   });
 }
 
+type ProfileTier = "free" | "pro" | "trialing" | "past_due_grace";
+
 type ProfileUpdate = {
   stripe_price_id?: string | null;
-  subscription_tier?: "free" | "pro";
+  subscription_tier?: ProfileTier;
 };
+
+/**
+ * Map a Stripe subscription status to the corresponding DB tier.
+ *
+ *   trialing                                    → 'trialing'
+ *   active                                      → 'pro'
+ *   past_due                                    → 'past_due_grace'
+ *   unpaid | canceled | incomplete |
+ *   incomplete_expired | paused                 → 'free'
+ *
+ * The DB CHECK constraint added in 0004_subscription_tier_extended.sql
+ * enforces this set at write time.
+ */
+function tierFromSubscriptionStatus(
+  status: Stripe.Subscription.Status,
+): ProfileTier {
+  switch (status) {
+    case "trialing":
+      return "trialing";
+    case "active":
+      return "pro";
+    case "past_due":
+      return "past_due_grace";
+    default:
+      return "free";
+  }
+}
 
 async function applyToProfile(
   customerId: string,
@@ -98,6 +127,12 @@ export async function POST(req: NextRequest) {
           (session.metadata?.supabase_user_id as string | undefined) ?? null;
 
         let priceId: string | null = null;
+        // Tier derived from the subscription's status (trialing for the
+        // 7-day reverse trial; active for immediate-pay or post-trial).
+        // Fallback to "pro" only if for some reason the session has no
+        // subscription attached (defensive — every Checkout we create is
+        // mode:subscription so this branch should not be reachable).
+        let tier: ProfileTier = "pro";
         if (session.subscription) {
           const subId =
             typeof session.subscription === "string"
@@ -105,11 +140,17 @@ export async function POST(req: NextRequest) {
               : session.subscription.id;
           const sub = await stripe.subscriptions.retrieve(subId);
           priceId = priceIdFromSubscription(sub);
+          tier = tierFromSubscriptionStatus(sub.status);
+        } else {
+          console.warn(
+            "[stripe/webhook] checkout.session.completed without subscription",
+            { sessionId: session.id, customerId },
+          );
         }
 
         await applyToProfile(customerId, supabaseUserId, {
           stripe_price_id: priceId,
-          subscription_tier: "pro",
+          subscription_tier: tier,
         });
         break;
       }
@@ -118,10 +159,9 @@ export async function POST(req: NextRequest) {
         const customerId =
           typeof sub.customer === "string" ? sub.customer : sub.customer.id;
         const priceId = priceIdFromSubscription(sub);
-        const isActive = sub.status === "active" || sub.status === "trialing";
         await applyToProfile(customerId, null, {
           stripe_price_id: priceId,
-          subscription_tier: isActive ? "pro" : "free",
+          subscription_tier: tierFromSubscriptionStatus(sub.status),
         });
         break;
       }
@@ -132,6 +172,24 @@ export async function POST(req: NextRequest) {
         await applyToProfile(customerId, null, {
           stripe_price_id: null,
           subscription_tier: "free",
+        });
+        break;
+      }
+      case "invoice.payment_failed": {
+        // Defense-in-depth: Stripe will also emit customer.subscription.updated
+        // with status='past_due' alongside this event. Either handler reaching
+        // the DB first lands the user in past_due_grace; the second is a
+        // no-op write of the same value. Stays in grace until either:
+        //   • next charge attempt succeeds → subscription.updated active → 'pro'
+        //   • dunning gives up             → subscription.deleted        → 'free'
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId =
+          typeof invoice.customer === "string"
+            ? invoice.customer
+            : invoice.customer?.id ?? null;
+        if (!customerId) break;
+        await applyToProfile(customerId, null, {
+          subscription_tier: "past_due_grace",
         });
         break;
       }
