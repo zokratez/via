@@ -59,6 +59,7 @@ export default async function LandingPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
+  const journalHref = locale === "es" ? "/diario" : "/journal";
 
   return (
     <div
@@ -81,12 +82,17 @@ export default async function LandingPage({
         }}
       >
         <span style={navLinkStyle}>{t("nav_brand")}</span>
-        <Link
-          href="/auth/sign-in"
-          style={{ ...navLinkStyle, color: "var(--pp-accent)" }}
-        >
-          {t("nav_signin")}
-        </Link>
+        <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+          <Link href={journalHref} style={navLinkStyle}>
+            {t("nav_diario")}
+          </Link>
+          <Link
+            href="/auth/sign-in"
+            style={{ ...navLinkStyle, color: "var(--pp-accent)" }}
+          >
+            {t("nav_signin")}
+          </Link>
+        </span>
       </nav>
 
       {/* Hero */}
@@ -387,6 +393,9 @@ export default async function LandingPage({
       >
         <span style={footerLinkStyle}>{t("footer_copyright")}</span>
         <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+          <Link href={journalHref} style={footerLinkStyle}>
+            {t("footer_diario")}
+          </Link>
           <Link href="/privacy" style={footerLinkStyle}>
             {t("footer_privacy")}
           </Link>

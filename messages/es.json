@@ -6,7 +6,12 @@
   },
   "home": {
     "nav_brand": "paco peptide",
+    "nav_diario": "diario",
     "nav_signin": "entrar",
+    "diario_empty_state": "Próximos artículos. Bukowski lee a diario.",
+    "diario_back": "← volver al diario",
+    "diario_read_more": "leer →",
+    "footer_diario": "diario",
     "hero_eyebrow": "PACO PEPTIDE",
     "hero_tagline": "Si ya tienes el vial, esto es para ti.",
     "hero_body_p1": "Retatrutide. Cagrilintide. Survodutide. Y los 20+ péptidos que la gente está usando antes de que tu farmacia sepa cómo se escriben.",
