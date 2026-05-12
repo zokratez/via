@@ -97,59 +97,44 @@ export default async function LandingPage({
           padding: "0 2rem",
         }}
       >
-        <p style={{ ...eyebrowStyle, marginBottom: "1rem" }}>
+        <p style={{ ...eyebrowStyle, marginBottom: "1.25rem" }}>
           {t("hero_eyebrow")}
         </p>
         <h1
           style={{
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: "clamp(56px, 11vw, 84px)",
-            lineHeight: 0.95,
+            fontSize: "clamp(40px, 6.5vw, 56px)",
+            lineHeight: 1.05,
             letterSpacing: "-0.01em",
             fontWeight: 400,
             color: "var(--pp-text)",
             margin: 0,
           }}
         >
-          <span style={{ display: "block" }}>{t("hero_mast_line1")}</span>
-          <span style={{ display: "block" }}>{t("hero_mast_line2")}</span>
+          {t("hero_tagline")}
         </h1>
-        <p
-          style={{
-            fontFamily: SERIF,
-            fontStyle: "italic",
-            fontSize: "clamp(19px, 2.6vw, 22px)",
-            lineHeight: 1.4,
-            color: "#e8ddc8",
-            maxWidth: "560px",
-            marginTop: "1.5rem",
-          }}
-        >
-          {t("hero_subtitle")}
-        </p>
-        <div
-          style={{
-            display: "flex",
-            gap: "24px",
-            alignItems: "center",
-            marginTop: "3rem",
-            flexWrap: "wrap",
-          }}
-        >
+        {(["hero_body_p1", "hero_body_p2", "hero_body_p3"] as const).map(
+          (key, i) => (
+            <p
+              key={key}
+              style={{
+                fontFamily: SERIF,
+                fontSize: "clamp(17px, 2.2vw, 19px)",
+                lineHeight: 1.75,
+                color: "#e8ddc8",
+                marginTop: i === 0 ? "2rem" : "1.5rem",
+                marginBottom: 0,
+              }}
+            >
+              {t(key)}
+            </p>
+          ),
+        )}
+        <div style={{ marginTop: "3rem" }}>
           <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
             {t("hero_cta_primary")}
           </Link>
-          <span
-            style={{
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: "15px",
-              color: "var(--pp-text-secondary)",
-            }}
-          >
-            {t("hero_cta_aside")}
-          </span>
         </div>
       </section>
 
