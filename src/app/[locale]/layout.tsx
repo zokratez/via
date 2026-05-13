@@ -14,10 +14,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "app" });
+  const rssTitle =
+    locale === "es" ? "Diario — PACO Peptide" : "Journal — PACO Peptide";
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: t("name"), template: `%s — ${t("name")}` },
     description: t("description"),
+    alternates: {
+      types: {
+        "application/rss+xml": [
+          { url: `${SITE_URL}/${locale}/feed.xml`, title: rssTitle },
+        ],
+      },
+    },
   };
 }
 

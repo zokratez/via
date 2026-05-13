@@ -54,6 +54,8 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
 
   const url = `${SITE_URL}${pathname}`;
   const ogImage = `${SITE_URL}/og-default.png`;
+  const rssTitle =
+    locale === "es" ? "Diario — PACO Peptide" : "Journal — PACO Peptide";
 
   return {
     title,
@@ -62,6 +64,11 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
     alternates: {
       canonical: url,
       ...(languages ? { languages } : {}),
+      types: {
+        "application/rss+xml": [
+          { url: `${SITE_URL}/${locale}/feed.xml`, title: rssTitle },
+        ],
+      },
     },
     openGraph: {
       title,
