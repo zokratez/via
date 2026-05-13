@@ -1,6 +1,6 @@
 # Política de Privacidad
 
-**Vigente desde: 30 de abril de 2026**
+**Vigente desde: 13 de mayo de 2026**
 
 PACO Peptide ("nosotros", "nuestro") es una aplicación operada por ooabi LLC. Esta política explica qué información recopilamos cuando usas PACO Peptide, cómo la usamos, y qué control tienes sobre ella.
 
@@ -51,11 +51,22 @@ Política de Anthropic: [anthropic.com/legal/privacy](https://www.anthropic.com/
 
 Guardamos tus conversaciones en nuestra base de datos para que tengas historial dentro de PACO Peptide. Si eliminas tu cuenta, eliminamos las conversaciones.
 
+## Artículos en nuestro diario
+
+Los artículos en el diario editorial de PACO Peptide se producen mediante un pipeline automatizado:
+
+- Extraemos resúmenes de investigación recién publicada sobre GLP-1 y péptidos desde **PubMed** (la base de datos pública de NIH/NCBI)
+- Un borrador del artículo se genera con **Claude** (el LLM de Anthropic) resumiendo la investigación
+- Un editor humano revisa y aprueba cada borrador antes de su publicación — los borradores no se publican automáticamente
+
+No enviamos datos de usuarios a PubMed ni a Anthropic durante este proceso. La generación de artículos opera únicamente sobre resúmenes de investigación públicamente disponibles.
+
 ## Dónde se almacenan tus datos
 
 - **Cuenta y datos de salud:** Supabase (servidores en EE.UU., región AWS us-west-1)
 - **Pagos:** Stripe (cumple PCI-DSS)
 - **Conversaciones del coach:** Supabase, mismo lugar que tu cuenta
+- **Contadores de límite de uso:** Upstash (basado en Redis, se usa para aplicar los límites diarios del plan gratis — recibe únicamente un identificador interno opaco; nunca correo, datos de salud, ni contenido de mensajes)
 
 ## Tus derechos
 
@@ -69,6 +80,14 @@ Tienes derecho a:
 Para ejercer cualquiera de estos derechos, escríbenos a **privacy@pacopeptide.com**. Respondemos en máximo 30 días.
 
 Si vives en California (CCPA), la Unión Europea (GDPR), o cualquier jurisdicción con leyes de protección de datos similares, tienes derechos adicionales bajo esas leyes. Los respetamos también.
+
+## Retención de datos
+
+Conservamos tus datos mientras tu cuenta esté activa. Si eliminas tu cuenta, eliminamos tus datos personales — registros de salud, conversaciones con el coach, detalles de cuenta — dentro de **30 días** desde la solicitud de eliminación, incluyendo de nuestros respaldos activos.
+
+Podemos conservar estadísticas de uso anonimizadas (conteos, frecuencias, sin identificadores personales) de forma indefinida para análisis de producto. Estas no pueden vincularse contigo después de la eliminación.
+
+También podemos conservar un registro mínimo de la eliminación misma (fecha, referencia anonimizada de cuenta) para cumplimiento legal y para defendernos contra intentos fraudulentos de re-registro.
 
 ## Menores
 

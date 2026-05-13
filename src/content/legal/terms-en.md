@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Effective: April 30, 2026**
+**Effective: May 13, 2026**
 
 Welcome to PACO Peptide. These terms are a legal agreement between you and **ooabi LLC** ("we", "PACO Peptide"). By using PACO Peptide, you agree to these terms. If you don't agree, don't use the application.
 
@@ -21,6 +21,10 @@ PACO Peptide is an informational tool for people using or considering GLP-1 medi
 - Personalized medical advice
 
 Bukowski is not a doctor. The information shared is educational, based on published clinical literature. **For dosing decisions, treatment, or any personal medical matter, consult your doctor.**
+
+Bukowski is an AI assistant — a large language model (LLM) developed by **Anthropic** (the makers of Claude). Bukowski is not a human, not a doctor, and not a medical provider. Responses are generated automatically and may contain errors; they are not a basis for medical decisions.
+
+Articles in PACO Peptide's editorial journal are drafted by AI from publicly available research abstracts (PubMed) and reviewed by a human editor before publication. Articles are not auto-published. See the [Privacy Policy](/en/privacy) for details on how this pipeline works.
 
 ## 2. Important medical disclaimer
 

@@ -1,6 +1,6 @@
 # Términos de Servicio
 
-**Vigente desde: 30 de abril de 2026**
+**Vigente desde: 13 de mayo de 2026**
 
 Bienvenido a PACO Peptide. Estos términos son un acuerdo legal entre tú y **ooabi LLC** ("nosotros", "PACO Peptide"). Al usar PACO Peptide, aceptas estos términos. Si no estás de acuerdo, no uses la aplicación.
 
@@ -21,6 +21,10 @@ PACO Peptide es una herramienta informativa para personas usando o considerando 
 - Asesoramiento médico personalizado
 
 Bukowski no es médico. La información que comparte es educativa, basada en literatura clínica publicada. **Para decisiones de dosis, tratamiento, o cualquier asunto médico personal, consulta a tu médico.**
+
+Bukowski es un asistente de inteligencia artificial — un modelo de lenguaje (LLM) desarrollado por **Anthropic** (los creadores de Claude). Bukowski no es humano, no es médico, y no es proveedor médico. Las respuestas se generan automáticamente y pueden contener errores; no son base para decisiones médicas.
+
+Los artículos en el diario editorial de PACO Peptide son redactados por IA a partir de resúmenes de investigación públicamente disponibles (PubMed) y revisados por un editor humano antes de su publicación. Los artículos no se publican automáticamente. Consulta la [Política de Privacidad](/es/privacy) para detalles sobre cómo funciona este pipeline.
 
 ## 2. Aviso médico importante
 
