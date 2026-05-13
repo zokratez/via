@@ -62,7 +62,14 @@
     "pricing_monthly_cta": "monthly ↗",
     "footer_copyright": "© 2026 ooabi llc",
     "footer_privacy": "privacy",
-    "footer_terms": "terms"
+    "footer_terms": "terms",
+    "newsletter_eyebrow": "newsletter",
+    "newsletter_pitch": "Get the latest in peptide research",
+    "newsletter_email_placeholder": "you@email.com",
+    "newsletter_button": "Subscribe",
+    "newsletter_button_loading": "Sending…",
+    "newsletter_success": "Done. We'll keep you posted.",
+    "newsletter_error": "Something went wrong. Try again."
   },
   "landing": {
     "_deprecated_note": "TODO: superseded by home.* — kept for safe revert of editorial redesign",

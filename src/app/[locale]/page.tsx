@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 
 export async function generateMetadata({
   params,
@@ -397,6 +398,11 @@ export default async function LandingPage({
           </Link>
         </div>
       </section>
+
+      <hr style={dividerStyle} />
+
+      {/* Newsletter */}
+      <NewsletterSignup locale={locale as "es" | "en"} />
 
       {/* Footer */}
       <footer
