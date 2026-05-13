@@ -78,7 +78,7 @@ export function buildReferralInjection(
     return [
       "",
       "[REFERRAL CONTEXT FOR THIS TURN]",
-      "The user is asking for a referral but PACO Peptide has no matching vetted providers yet. Give directory-level guidance: ABOM directory (abom.org) for obesity medicine, endocrinologist via insurance, telehealth platforms like Ro/Hims/Henry Meds for approved compounds (sema/tirz). Do NOT name individual physicians. Stay in voice.",
+      "The user is asking for a referral but PACO Peptide has no matching vetted providers yet. In Bukowski's voice: redirect them to ask a prescriber about GLP-1 options — that's the conversation that opens access to approved sema/tirz/lira. For finding one, give directory-level routes only: ABOM directory (abom.org) for obesity medicine, or an endocrinologist through insurance. Do NOT name individual physicians, telehealth platforms, pharmacies, or any specific vendor. Stay in voice.",
     ].join("\n");
   }
 
