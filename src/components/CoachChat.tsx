@@ -9,6 +9,58 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const CHARS_PER_FRAME = 30;
+const JSPDF_CDN =
+  "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+
+type JsPDFInstance = {
+  internal: {
+    pageSize: { getWidth: () => number; getHeight: () => number };
+  };
+  setFillColor: (r: number, g: number, b: number) => void;
+  rect: (x: number, y: number, w: number, h: number, style?: string) => void;
+  setTextColor: (r: number, g: number, b: number) => void;
+  setFont: (name: string, style?: string) => void;
+  setFontSize: (s: number) => void;
+  text: (
+    t: string | string[],
+    x: number,
+    y: number,
+    opts?: { align?: string },
+  ) => void;
+  splitTextToSize: (t: string, maxW: number) => string[];
+  addPage: () => void;
+  save: (filename: string) => void;
+};
+type JsPDFCtor = new (opts?: { unit?: string; format?: string }) => JsPDFInstance;
+
+async function loadJsPdf(): Promise<JsPDFCtor> {
+  const w = window as unknown as { jspdf?: { jsPDF: JsPDFCtor } };
+  if (w.jspdf?.jsPDF) return w.jspdf.jsPDF;
+  await new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector(
+      "script[data-jspdf]",
+    ) as HTMLScriptElement | null;
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error("jspdf load failed")),
+        { once: true },
+      );
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = JSPDF_CDN;
+    s.async = true;
+    s.dataset.jspdf = "1";
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("jspdf load failed"));
+    document.head.appendChild(s);
+  });
+  const after = window as unknown as { jspdf?: { jsPDF: JsPDFCtor } };
+  if (!after.jspdf?.jsPDF) throw new Error("jspdf global missing");
+  return after.jspdf.jsPDF;
+}
 
 type Locale = "es" | "en";
 
@@ -51,6 +103,7 @@ export function CoachChat({
   const [errorKey, setErrorKey] = useState<ErrorKey | null>(null);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [upgradeError, setUpgradeError] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const rafIdRef = useRef<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -299,6 +352,73 @@ export function CoachChat({
     router.refresh();
   }
 
+  async function downloadPdf() {
+    if (downloadingPdf || messages.length === 0) return;
+    setDownloadingPdf(true);
+    try {
+      const JsPDF = await loadJsPdf();
+      const doc = new JsPDF({ unit: "mm", format: "a4" });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const margin = 18;
+      const contentW = pageW - margin * 2;
+      const lineHeight = 5.4;
+
+      doc.setFillColor(196, 162, 101);
+      doc.rect(0, 0, pageW, 14, "F");
+      doc.setTextColor(28, 24, 18);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("PACO PEPTIDE", margin, 9);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      const dateLabel = new Date().toLocaleDateString(
+        locale === "es" ? "es-MX" : "en-US",
+        { year: "numeric", month: "long", day: "numeric" },
+      );
+      doc.text(dateLabel, pageW - margin, 9, { align: "right" });
+
+      let y = 14 + 12;
+      function ensureSpace(needed: number) {
+        if (y + needed > pageH - margin) {
+          doc.addPage();
+          y = margin;
+        }
+      }
+
+      const youLabel = locale === "es" ? "TÚ" : "YOU";
+      const bukowskiLabel = "BUKOWSKI";
+
+      for (const m of messages) {
+        const label = m.role === "user" ? youLabel : bukowskiLabel;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(196, 162, 101);
+        ensureSpace(lineHeight);
+        doc.text(label, margin, y);
+        y += lineHeight;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(40, 40, 40);
+        const lines = doc.splitTextToSize(m.content, contentW);
+        for (const ln of lines) {
+          ensureSpace(lineHeight);
+          doc.text(ln, margin, y);
+          y += lineHeight;
+        }
+        y += 5;
+      }
+
+      const dateSlug = new Date().toISOString().slice(0, 10);
+      doc.save(`paco-coach-${dateSlug}.pdf`);
+    } catch (err) {
+      console.error("[coach pdf]", err);
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
+
   async function startUpgrade() {
     if (isUpgrading) return;
     setIsUpgrading(true);
@@ -361,6 +481,35 @@ export function CoachChat({
         >
           <span>{t("topbar_brand")}</span>
           <span className="flex items-center gap-2">
+            {isPro && messages.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => void downloadPdf()}
+                  disabled={downloadingPdf}
+                  title={t("download_tooltip")}
+                  aria-label={t("download_tooltip")}
+                  className="inline-flex items-center hover:text-[var(--pp-text-secondary)] transition-colors disabled:opacity-50"
+                >
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 2v8" />
+                    <path d="M4.5 6.5L8 10l3.5-3.5" />
+                    <path d="M2.5 12.5v1A1.5 1.5 0 0 0 4 15h8a1.5 1.5 0 0 0 1.5-1.5v-1" />
+                  </svg>
+                </button>
+                <span aria-hidden="true">·</span>
+              </>
+            )}
             <Link
               href="/dashboard"
               className="hover:text-[var(--pp-text-secondary)] transition-colors"
