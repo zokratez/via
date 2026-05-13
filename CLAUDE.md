@@ -69,6 +69,17 @@ The coach MUST NOT:
 - Discuss acquiring medication outside a prescription.
 - Make weight-loss promises or guarantees.
 
+## Diario publishing pipeline (locked)
+
+Four-stage flow, fully cron-driven except for the human review step:
+
+1. **Scrape** (`/api/cron/scrape-pubmed`, daily 06:00 UTC) — pulls the last 7 days of PubMed results for the locked peptide term list into `peptide_research_raw`.
+2. **Draft** (`/api/cron/draft-articles`, daily 07:00 UTC) — picks up to 3 newest research rows not yet drafted, generates ES + EN article drafts via Claude Sonnet 4.5 with Bukowski-voice few-shot, inserts into `article_drafts` as `pending_review`.
+3. **Review** (manual, Supabase SQL editor) — Sam reads each draft, sets `status='approved'` (or `'rejected'`) and `reviewed_at=now()` on the row. There is no UI; Supabase Dashboard is the editorial surface.
+4. **Publish** (`/api/cron/publish-drafts`, every 4 hours) — picks up all `approved` drafts (capped 20/run), writes `.md` files to `src/content/articles/{language}/{slug}.md` via the GitHub Git Data API in a single atomic commit, then flips drafts to `status='published'` with the commit SHA recorded.
+
+No force-push, no rebase, no PR flow. Sam's approval in step 3 IS the editorial gate; the publish cron just executes it.
+
 ## Ship checklist (gate for public launch)
 
 - [ ] Auth works end-to-end (sign up → verify → log in → log out)
