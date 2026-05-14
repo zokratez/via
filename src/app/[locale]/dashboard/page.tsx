@@ -11,6 +11,10 @@ import {
   type SymptomEntry,
 } from "@/components/SymptomChart";
 import { SleepChart, type SleepEntry } from "@/components/SleepChart";
+import {
+  CoachHistory,
+  type CoachThread,
+} from "@/components/CoachHistory";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -88,6 +92,7 @@ export default async function DashboardPage({
     doses90Res,
     symptoms90Res,
     sleep90Res,
+    threadsRes,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -126,6 +131,13 @@ export default async function DashboardPage({
       .select("slept_at, hours, quality, notes")
       .gte("slept_at", cutoff90.slice(0, 10))
       .order("slept_at", { ascending: true }),
+    supabase
+      .from("coach_threads")
+      .select(
+        "id, title, created_at, updated_at, coach_messages(role, content, created_at)",
+      )
+      .order("updated_at", { ascending: false })
+      .limit(50),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -212,6 +224,33 @@ export default async function DashboardPage({
       | { name: string | null; generic_name: string | null }[]
       | null;
   };
+  type ThreadRow = {
+    id: string;
+    title: string | null;
+    created_at: string;
+    updated_at: string;
+    coach_messages:
+      | Array<{
+          role: "user" | "assistant" | "system";
+          content: string;
+          created_at: string;
+        }>
+      | null;
+  };
+  const coachThreads: CoachThread[] = (
+    (threadsRes.data ?? []) as ThreadRow[]
+  ).map((th) => ({
+    id: th.id,
+    title: th.title,
+    created_at: th.created_at,
+    updated_at: th.updated_at,
+    messages: (th.coach_messages ?? []).map((m) => ({
+      role: m.role,
+      content: m.content,
+      created_at: m.created_at,
+    })),
+  }));
+
   const sleepEntries: SleepEntry[] = (
     (sleep90Res.data ?? []) as Array<{
       slept_at: string;
@@ -519,6 +558,16 @@ export default async function DashboardPage({
           <div style={{ marginTop: "1rem" }}>
             <SleepChart
               entries={sleepEntries}
+              locale={locale as "es" | "en"}
+            />
+          </div>
+        </div>
+
+        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
+          <p style={eyebrowStyle}>{t("coach_history_title")}</p>
+          <div style={{ marginTop: "1rem" }}>
+            <CoachHistory
+              threads={coachThreads}
               locale={locale as "es" | "en"}
             />
           </div>

@@ -166,6 +166,15 @@
     "sleep_chart_empty": "Log your first night to see your sleep trend.",
     "sleep_chart_avg_hours": "Average hours",
     "sleep_chart_avg_quality": "Average quality",
+    "coach_history_title": "Conversations with Bukowski",
+    "coach_history_empty": "No conversations yet. Ask Bukowski something.",
+    "coach_history_no_match": "No matching conversations.",
+    "coach_history_search_placeholder": "Search conversations…",
+    "coach_history_msg_count": "messages",
+    "coach_history_role_user": "You",
+    "coach_history_role_assistant": "Bukowski",
+    "coach_history_questions_asked": "questions from you",
+    "coach_history_asked_n": "Asked {count} times",
     "manage_subscription": "Manage subscription"
   },
   "dose": {
