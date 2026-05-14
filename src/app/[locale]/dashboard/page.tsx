@@ -10,6 +10,7 @@ import {
   SymptomChart,
   type SymptomEntry,
 } from "@/components/SymptomChart";
+import { SleepChart, type SleepEntry } from "@/components/SleepChart";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -86,6 +87,7 @@ export default async function DashboardPage({
     symptoms14Res,
     doses90Res,
     symptoms90Res,
+    sleep90Res,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -119,6 +121,11 @@ export default async function DashboardPage({
       .select("occurred_at, category, severity, notes")
       .gte("occurred_at", cutoff90)
       .order("occurred_at", { ascending: true }),
+    supabase
+      .from("sleep_entries")
+      .select("slept_at, hours, quality, notes")
+      .gte("slept_at", cutoff90.slice(0, 10))
+      .order("slept_at", { ascending: true }),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -205,6 +212,20 @@ export default async function DashboardPage({
       | { name: string | null; generic_name: string | null }[]
       | null;
   };
+  const sleepEntries: SleepEntry[] = (
+    (sleep90Res.data ?? []) as Array<{
+      slept_at: string;
+      hours: number | string;
+      quality: number;
+      notes: string | null;
+    }>
+  ).map((s) => ({
+    slept_at: s.slept_at,
+    hours: Number(s.hours),
+    quality: s.quality,
+    notes: s.notes,
+  }));
+
   const symptomEntries: SymptomEntry[] = (
     (symptoms90Res.data ?? []) as Array<{
       occurred_at: string;
@@ -250,6 +271,7 @@ export default async function DashboardPage({
     { href: "/log/dose", label: t("log_dose") },
     { href: "/log/weight", label: t("log_weight") },
     { href: "/log/symptom", label: t("log_symptom") },
+    { href: "/log/sleep", label: t("log_sleep") },
     { href: "/coach", label: t("action_coach") },
   ] as const;
 
@@ -487,6 +509,16 @@ export default async function DashboardPage({
           <div style={{ marginTop: "1rem" }}>
             <SymptomChart
               entries={symptomEntries}
+              locale={locale as "es" | "en"}
+            />
+          </div>
+        </div>
+
+        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
+          <p style={eyebrowStyle}>{t("sleep_chart_title")}</p>
+          <div style={{ marginTop: "1rem" }}>
+            <SleepChart
+              entries={sleepEntries}
               locale={locale as "es" | "en"}
             />
           </div>
