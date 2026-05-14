@@ -156,6 +156,11 @@
     "weight_chart_goal": "Meta",
     "dose_timeline_title": "Cronología de dosis (90 días)",
     "dose_timeline_empty": "Registra tu primera dosis para ver tu cronología.",
+    "symptom_chart_title": "Síntomas por semana (90 días)",
+    "symptom_chart_empty": "Aún no has registrado síntomas.",
+    "symptom_chart_most_frequent": "Más frecuente",
+    "symptom_chart_avg_severity": "Severidad promedio",
+    "symptom_chart_severity_short": "sev",
     "manage_subscription": "Administrar suscripción"
   },
   "dose": {

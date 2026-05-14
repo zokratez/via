@@ -6,6 +6,10 @@ import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { WeightChart, type WeightPoint } from "@/components/WeightChart";
 import { DoseTimeline, type DosePoint } from "@/components/DoseTimeline";
+import {
+  SymptomChart,
+  type SymptomEntry,
+} from "@/components/SymptomChart";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -81,6 +85,7 @@ export default async function DashboardPage({
     weights14Res,
     symptoms14Res,
     doses90Res,
+    symptoms90Res,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -109,6 +114,11 @@ export default async function DashboardPage({
       )
       .gte("taken_at", cutoff90)
       .order("taken_at", { ascending: true }),
+    supabase
+      .from("side_effects")
+      .select("occurred_at, category, severity, notes")
+      .gte("occurred_at", cutoff90)
+      .order("occurred_at", { ascending: true }),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -195,6 +205,20 @@ export default async function DashboardPage({
       | { name: string | null; generic_name: string | null }[]
       | null;
   };
+  const symptomEntries: SymptomEntry[] = (
+    (symptoms90Res.data ?? []) as Array<{
+      occurred_at: string;
+      category: string;
+      severity: number;
+      notes: string | null;
+    }>
+  ).map((s) => ({
+    occurred_at: s.occurred_at,
+    category: s.category,
+    severity: s.severity,
+    notes: s.notes,
+  }));
+
   const dosePoints: DosePoint[] = ((doses90Res.data ?? []) as DoseRow[]).map(
     (d) => {
       const med = Array.isArray(d.medications)
@@ -453,6 +477,16 @@ export default async function DashboardPage({
           <div style={{ marginTop: "1rem" }}>
             <DoseTimeline
               doses={dosePoints}
+              locale={locale as "es" | "en"}
+            />
+          </div>
+        </div>
+
+        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
+          <p style={eyebrowStyle}>{t("symptom_chart_title")}</p>
+          <div style={{ marginTop: "1rem" }}>
+            <SymptomChart
+              entries={symptomEntries}
               locale={locale as "es" | "en"}
             />
           </div>

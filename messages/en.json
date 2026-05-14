@@ -156,6 +156,11 @@
     "weight_chart_goal": "Goal",
     "dose_timeline_title": "Dose Timeline (90 days)",
     "dose_timeline_empty": "Log your first dose to see your timeline.",
+    "symptom_chart_title": "Symptoms by week (90 days)",
+    "symptom_chart_empty": "No symptoms logged yet.",
+    "symptom_chart_most_frequent": "Most frequent",
+    "symptom_chart_avg_severity": "Average severity",
+    "symptom_chart_severity_short": "sev",
     "manage_subscription": "Manage subscription"
   },
   "dose": {
