@@ -152,6 +152,8 @@
     "delta_label": "vs 7 days ago",
     "chart_weight_title": "Weight (last 30 days)",
     "chart_empty": "No weight records yet.",
+    "dose_timeline_title": "Dose Timeline (90 days)",
+    "dose_timeline_empty": "Log your first dose to see your timeline.",
     "manage_subscription": "Manage subscription"
   },
   "dose": {

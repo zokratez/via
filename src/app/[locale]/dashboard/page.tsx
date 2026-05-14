@@ -5,6 +5,7 @@ import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { WeightChart } from "@/components/WeightChart";
+import { DoseTimeline, type DosePoint } from "@/components/DoseTimeline";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -72,6 +73,7 @@ export default async function DashboardPage({
   const now = new Date();
   const cutoff14 = new Date(now.getTime() - 14 * 86_400_000).toISOString();
   const cutoff30 = new Date(now.getTime() - 30 * 86_400_000).toISOString();
+  const cutoff90 = new Date(now.getTime() - 90 * 86_400_000).toISOString();
 
   const [
     lastDoseRes,
@@ -79,6 +81,7 @@ export default async function DashboardPage({
     doses14Res,
     weights14Res,
     symptoms14Res,
+    doses90Res,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -100,6 +103,13 @@ export default async function DashboardPage({
       .from("side_effects")
       .select("occurred_at")
       .gte("occurred_at", cutoff14),
+    supabase
+      .from("doses")
+      .select(
+        "taken_at, dose_mg, injection_site, medications(name, generic_name)",
+      )
+      .gte("taken_at", cutoff90)
+      .order("taken_at", { ascending: true }),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -166,6 +176,30 @@ export default async function DashboardPage({
       weightDeltaStr = `${sign}${abs} kg ${t("delta_label")}`;
     }
   }
+
+  type DoseRow = {
+    taken_at: string;
+    dose_mg: number | string;
+    injection_site: string | null;
+    medications:
+      | { name: string | null; generic_name: string | null }
+      | { name: string | null; generic_name: string | null }[]
+      | null;
+  };
+  const dosePoints: DosePoint[] = ((doses90Res.data ?? []) as DoseRow[]).map(
+    (d) => {
+      const med = Array.isArray(d.medications)
+        ? d.medications[0] ?? null
+        : d.medications;
+      return {
+        taken_at: d.taken_at,
+        dose_mg: Number(d.dose_mg),
+        injection_site: d.injection_site,
+        medication_name: med?.name ?? null,
+        generic_name: med?.generic_name ?? null,
+      };
+    },
+  );
 
   const days = new Set<string>();
   for (const r of (doses14Res.data ?? []) as { taken_at: string }[]) {
@@ -398,6 +432,16 @@ export default async function DashboardPage({
             ) : (
               <WeightChart data={chartData} locale={locale} />
             )}
+          </div>
+        </div>
+
+        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
+          <p style={eyebrowStyle}>{t("dose_timeline_title")}</p>
+          <div style={{ marginTop: "1rem" }}>
+            <DoseTimeline
+              doses={dosePoints}
+              locale={locale as "es" | "en"}
+            />
           </div>
         </div>
       </main>

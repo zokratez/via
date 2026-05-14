@@ -152,6 +152,8 @@
     "delta_label": "vs hace 7 días",
     "chart_weight_title": "Peso (últimos 30 días)",
     "chart_empty": "Aún no tienes registros de peso.",
+    "dose_timeline_title": "Cronología de dosis (90 días)",
+    "dose_timeline_empty": "Registra tu primera dosis para ver tu cronología.",
     "manage_subscription": "Administrar suscripción"
   },
   "dose": {
