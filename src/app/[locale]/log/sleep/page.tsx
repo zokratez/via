@@ -3,13 +3,16 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LocaleSwitcher } from "@/components/LocaleSwitcher";
-import { SignOutButton } from "@/components/SignOutButton";
-import { cn } from "@/lib/utils";
+import { LogShell } from "@/components/LogShell";
+import {
+  emojiChipStyle,
+  errorMessageStyle,
+  formGroupStyle,
+  inputStyle,
+  labelStyle,
+  saveBtnStyle,
+  textareaStyle,
+} from "@/lib/log-form-styles";
 import { logSleepAction } from "./actions";
 
 const QUALITIES = [1, 2, 3, 4, 5] as const;
@@ -37,8 +40,6 @@ function todayDateString(): string {
 
 export default function LogSleepPage() {
   const t = useTranslations("sleep");
-  const tApp = useTranslations("app");
-  const tAuth = useTranslations("auth");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
 
@@ -81,105 +82,88 @@ export default function LogSleepPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-          {tApp("name")}
-        </Link>
-        <div className="flex items-center gap-3">
-          <LocaleSwitcher />
-          <SignOutButton label={tAuth("sign_out")} />
+    <LogShell backLabel={t("back")} title={t("title")}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <div style={formGroupStyle}>
+          <label htmlFor="hours" style={labelStyle}>
+            {t("hours")}
+          </label>
+          <input
+            id="hours"
+            type="number"
+            step="0.5"
+            min="0"
+            max="24"
+            placeholder="7.5"
+            style={inputStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("hours", { required: true })}
+          />
         </div>
-      </header>
 
-      <main className="flex-1 mx-auto w-full max-w-xl px-6 py-10">
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground"
+        <div style={formGroupStyle}>
+          <label style={labelStyle}>{t("quality")}</label>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(5, 1fr)",
+              gap: "0.5rem",
+            }}
           >
-            ← {t("back")}
-          </Link>
+            {QUALITIES.map((q) => {
+              const isActive = selectedQuality === q;
+              return (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => form.setValue("quality", q)}
+                  aria-pressed={isActive}
+                  aria-label={t(`quality_${q}`)}
+                  style={emojiChipStyle(isActive)}
+                >
+                  {QUALITY_EMOJIS[q]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8">
-          {t("title")}
-        </h1>
+        <div style={formGroupStyle}>
+          <label htmlFor="slept-at" style={labelStyle}>
+            {t("slept_at")}
+          </label>
+          <input
+            id="slept-at"
+            type="date"
+            style={inputStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("slept_at", { required: true })}
+          />
+        </div>
 
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
-          noValidate
-        >
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="hours">{t("hours")}</Label>
-            <Input
-              id="hours"
-              type="number"
-              step="0.5"
-              min="0"
-              max="24"
-              placeholder="7.5"
-              {...form.register("hours", { required: true })}
-            />
-          </div>
+        <div style={formGroupStyle}>
+          <label htmlFor="notes" style={labelStyle}>
+            {t("notes")}
+          </label>
+          <textarea
+            id="notes"
+            rows={3}
+            style={textareaStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("notes")}
+          />
+        </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>{t("quality")}</Label>
-            <div className="grid grid-cols-5 gap-2">
-              {QUALITIES.map((q) => {
-                const isActive = selectedQuality === q;
-                return (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => form.setValue("quality", q)}
-                    aria-pressed={isActive}
-                    aria-label={t(`quality_${q}`)}
-                    className={cn(
-                      "rounded-lg border py-3 text-2xl transition-colors",
-                      isActive
-                        ? "border-foreground bg-accent"
-                        : "border-border hover:bg-accent",
-                    )}
-                  >
-                    {QUALITY_EMOJIS[q]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        <button type="submit" disabled={isSaving} style={saveBtnStyle}>
+          {isSaving ? t("saving") : t("save")}
+        </button>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="slept-at">{t("slept_at")}</Label>
-            <Input
-              id="slept-at"
-              type="date"
-              {...form.register("slept_at", { required: true })}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="notes">{t("notes")}</Label>
-            <textarea
-              id="notes"
-              rows={3}
-              className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-              {...form.register("notes")}
-            />
-          </div>
-
-          <Button type="submit" disabled={isSaving} className="rounded-full">
-            {isSaving ? t("saving") : t("save")}
-          </Button>
-
-          {errorMsg && (
-            <p className="text-sm text-destructive" role="alert">
-              {errorMsg}
-            </p>
-          )}
-        </form>
-      </main>
-    </div>
+        {errorMsg && (
+          <p style={errorMessageStyle} role="alert">
+            {errorMsg}
+          </p>
+        )}
+      </form>
+    </LogShell>
   );
 }

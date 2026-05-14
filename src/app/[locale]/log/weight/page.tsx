@@ -3,12 +3,17 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LocaleSwitcher } from "@/components/LocaleSwitcher";
-import { SignOutButton } from "@/components/SignOutButton";
+import { LogShell } from "@/components/LogShell";
+import {
+  errorMessageStyle,
+  formGroupStyle,
+  inlineRowStyle,
+  inputStyle,
+  labelHintStyle,
+  labelStyle,
+  saveBtnStyle,
+  secondaryBtnStyle,
+} from "@/lib/log-form-styles";
 import { logWeightAction } from "./actions";
 
 type WeightFormValues = {
@@ -27,8 +32,6 @@ function nowLocalDateTime(): string {
 
 export default function LogWeightPage() {
   const t = useTranslations("weight");
-  const tApp = useTranslations("app");
-  const tAuth = useTranslations("auth");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
 
@@ -64,115 +67,93 @@ export default function LogWeightPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-          {tApp("name")}
-        </Link>
-        <div className="flex items-center gap-3">
-          <LocaleSwitcher />
-          <SignOutButton label={tAuth("sign_out")} />
-        </div>
-      </header>
-
-      <main className="flex-1 mx-auto w-full max-w-xl px-6 py-10">
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            ← {t("back")}
-          </Link>
+    <LogShell backLabel={t("back")} title={t("title")}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <div style={formGroupStyle}>
+          <label htmlFor="weight-kg" style={labelStyle}>
+            {t("weight_kg")}
+          </label>
+          <input
+            id="weight-kg"
+            type="number"
+            step="0.1"
+            min="0"
+            inputMode="decimal"
+            style={inputStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("weight_kg", { required: true })}
+            aria-invalid={!!form.formState.errors.weight_kg}
+          />
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8">
-          {t("title")}
-        </h1>
+        <div style={formGroupStyle}>
+          <label htmlFor="waist-cm" style={labelStyle}>
+            {t("waist_cm")}
+            <span style={labelHintStyle}>{t("optional")}</span>
+          </label>
+          <input
+            id="waist-cm"
+            type="number"
+            step="0.1"
+            min="0"
+            inputMode="decimal"
+            style={inputStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("waist_cm")}
+          />
+        </div>
 
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
-          noValidate
-        >
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="weight-kg">{t("weight_kg")}</Label>
-            <Input
-              id="weight-kg"
-              type="number"
-              step="0.1"
-              min="0"
-              inputMode="decimal"
-              {...form.register("weight_kg", { required: true })}
-              aria-invalid={!!form.formState.errors.weight_kg}
+        <div style={formGroupStyle}>
+          <label htmlFor="body-fat" style={labelStyle}>
+            {t("body_fat_pct")}
+            <span style={labelHintStyle}>{t("optional")}</span>
+          </label>
+          <input
+            id="body-fat"
+            type="number"
+            step="0.1"
+            min="0"
+            max="80"
+            inputMode="decimal"
+            style={inputStyle}
+            className="focus:border-[var(--pp-accent)] transition-colors"
+            {...form.register("body_fat_pct")}
+          />
+        </div>
+
+        <div style={formGroupStyle}>
+          <label htmlFor="measured-at" style={labelStyle}>
+            {t("measured_at")}
+          </label>
+          <div style={inlineRowStyle}>
+            <input
+              id="measured-at"
+              type="datetime-local"
+              style={{ ...inputStyle, flex: 1 }}
+              className="focus:border-[var(--pp-accent)] transition-colors"
+              {...form.register("measured_at", { required: true })}
             />
+            <button
+              type="button"
+              onClick={setNow}
+              style={secondaryBtnStyle}
+              className="hover:text-[var(--pp-accent)] hover:border-[var(--pp-accent)] transition-colors"
+            >
+              {t("now")}
+            </button>
           </div>
+        </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="waist-cm">
-              {t("waist_cm")}{" "}
-              <span className="font-normal text-muted-foreground">
-                {t("optional")}
-              </span>
-            </Label>
-            <Input
-              id="waist-cm"
-              type="number"
-              step="0.1"
-              min="0"
-              inputMode="decimal"
-              {...form.register("waist_cm")}
-            />
-          </div>
+        <button type="submit" disabled={isSaving} style={saveBtnStyle}>
+          {isSaving ? t("saving") : t("save")}
+        </button>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="body-fat">
-              {t("body_fat_pct")}{" "}
-              <span className="font-normal text-muted-foreground">
-                {t("optional")}
-              </span>
-            </Label>
-            <Input
-              id="body-fat"
-              type="number"
-              step="0.1"
-              min="0"
-              max="80"
-              inputMode="decimal"
-              {...form.register("body_fat_pct")}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="measured-at">{t("measured_at")}</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="measured-at"
-                type="datetime-local"
-                {...form.register("measured_at", { required: true })}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={setNow}
-                className="rounded-full"
-              >
-                {t("now")}
-              </Button>
-            </div>
-          </div>
-
-          <Button type="submit" disabled={isSaving} className="rounded-full">
-            {isSaving ? t("saving") : t("save")}
-          </Button>
-
-          {errorMsg && (
-            <p className="text-sm text-destructive" role="alert">
-              {errorMsg}
-            </p>
-          )}
-        </form>
-      </main>
-    </div>
+        {errorMsg && (
+          <p style={errorMessageStyle} role="alert">
+            {errorMsg}
+          </p>
+        )}
+      </form>
+    </LogShell>
   );
 }

@@ -3,20 +3,21 @@
 import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LocaleSwitcher } from "@/components/LocaleSwitcher";
-import { SignOutButton } from "@/components/SignOutButton";
+import { LogShell } from "@/components/LogShell";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import {
+  chipStyle,
+  errorMessageStyle,
+  formGroupStyle,
+  inlineRowStyle,
+  inputStyle,
+  labelHintStyle,
+  labelStyle,
+  saveBtnStyle,
+  secondaryBtnStyle,
+  selectStyle,
+  textareaStyle,
+} from "@/lib/log-form-styles";
 import { addMedicationAction, logDoseAction } from "./actions";
 
 const SITES = [
@@ -62,8 +63,6 @@ function nowLocalDateTime(): string {
 
 export default function LogDosePage() {
   const t = useTranslations("dose");
-  const tApp = useTranslations("app");
-  const tAuth = useTranslations("auth");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
 
@@ -167,215 +166,234 @@ export default function LogDosePage() {
   const hasNoMeds = !isLoadingMeds && meds.length === 0;
 
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-          {tApp("name")}
-        </Link>
-        <div className="flex items-center gap-3">
-          <LocaleSwitcher />
-          <SignOutButton label={tAuth("sign_out")} />
-        </div>
-      </header>
-
-      <main className="flex-1 mx-auto w-full max-w-xl px-6 py-10">
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground"
+    <LogShell backLabel={t("back")} title={t("title")}>
+      {isLoadingMeds ? (
+        <p
+          style={{
+            fontFamily: "var(--pp-font-serif)",
+            fontStyle: "italic",
+            fontSize: "15px",
+            color: "var(--pp-text-secondary)",
+            margin: 0,
+          }}
+        >
+          …
+        </p>
+      ) : hasNoMeds ? (
+        <div
+          style={{
+            background: "var(--pp-surface)",
+            border: "0.5px solid var(--pp-border)",
+            borderRadius: "6px",
+            padding: "1.5rem",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "var(--pp-font-serif)",
+              fontStyle: "italic",
+              fontSize: "20px",
+              color: "var(--pp-text)",
+              margin: "0 0 0.5rem",
+            }}
           >
-            ← {t("back")}
-          </Link>
-        </div>
+            {t("add_first_medication")}
+          </h2>
+          <p
+            style={{
+              fontFamily: "var(--pp-font-serif)",
+              fontSize: "14px",
+              color: "var(--pp-text-secondary)",
+              margin: "0 0 1.5rem",
+              lineHeight: 1.5,
+            }}
+          >
+            {t("add_first_medication_sub")}
+          </p>
 
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8">
-          {t("title")}
-        </h1>
-
-        {isLoadingMeds ? (
-          <div className="text-sm text-muted-foreground">…</div>
-        ) : hasNoMeds ? (
-          <Card className="border-border/60">
-            <CardHeader>
-              <CardTitle className="text-base">
-                {t("add_first_medication")}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {t("add_first_medication_sub")}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={medForm.handleSubmit(onAddMedication)}
-                className="flex flex-col gap-4"
-                noValidate
-              >
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="med-name">{t("medication_name")}</Label>
-                  <Input
-                    id="med-name"
-                    placeholder={t("medication_name_placeholder")}
-                    {...medForm.register("name", { required: true })}
-                    aria-invalid={!!medForm.formState.errors.name}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="med-generic">{t("medication_generic")}</Label>
-                  <select
-                    id="med-generic"
-                    className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-                    {...medForm.register("generic_name", { required: true })}
-                  >
-                    {GENERICS.map((g) => (
-                      <option key={g} value={g}>
-                        {t(`medication_generic_${g}`)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="med-conc">
-                    {t("medication_concentration")}{" "}
-                    <span className="font-normal text-muted-foreground">
-                      {t("medication_concentration_hint")}
-                    </span>
-                  </Label>
-                  <Input
-                    id="med-conc"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    inputMode="decimal"
-                    {...medForm.register("concentration_mg_per_ml")}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isAddingMed}
-                  className="rounded-full"
-                >
-                  {isAddingMed ? t("saving") : t("add_medication")}
-                </Button>
-
-                {errorMsg && (
-                  <p className="text-sm text-destructive" role="alert">
-                    {errorMsg}
-                  </p>
-                )}
-              </form>
-            </CardContent>
-          </Card>
-        ) : (
           <form
-            onSubmit={doseForm.handleSubmit(onSubmitDose)}
-            className="flex flex-col gap-6"
+            onSubmit={medForm.handleSubmit(onAddMedication)}
             noValidate
           >
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="medication">{t("medication")}</Label>
+            <div style={formGroupStyle}>
+              <label htmlFor="med-name" style={labelStyle}>
+                {t("medication_name")}
+              </label>
+              <input
+                id="med-name"
+                placeholder={t("medication_name_placeholder")}
+                style={inputStyle}
+                className="focus:border-[var(--pp-accent)] transition-colors"
+                {...medForm.register("name", { required: true })}
+                aria-invalid={!!medForm.formState.errors.name}
+              />
+            </div>
+
+            <div style={formGroupStyle}>
+              <label htmlFor="med-generic" style={labelStyle}>
+                {t("medication_generic")}
+              </label>
               <select
-                id="medication"
-                className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-                {...doseForm.register("medication_id", { required: true })}
+                id="med-generic"
+                style={selectStyle}
+                className="focus:border-[var(--pp-accent)] transition-colors"
+                {...medForm.register("generic_name", { required: true })}
               >
-                {(meds ?? []).map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                    {m.concentration_mg_per_ml
-                      ? ` — ${m.concentration_mg_per_ml} mg/mL`
-                      : ""}
+                {GENERICS.map((g) => (
+                  <option key={g} value={g}>
+                    {t(`medication_generic_${g}`)}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="dose-mg">{t("dose_mg")}</Label>
-              <Input
-                id="dose-mg"
+            <div style={formGroupStyle}>
+              <label htmlFor="med-conc" style={labelStyle}>
+                {t("medication_concentration")}
+                <span style={labelHintStyle}>
+                  {t("medication_concentration_hint")}
+                </span>
+              </label>
+              <input
+                id="med-conc"
                 type="number"
                 step="0.01"
                 min="0"
                 inputMode="decimal"
-                {...doseForm.register("dose_mg", { required: true })}
-                aria-invalid={!!doseForm.formState.errors.dose_mg}
+                style={inputStyle}
+                className="focus:border-[var(--pp-accent)] transition-colors"
+                {...medForm.register("concentration_mg_per_ml")}
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="taken-at">{t("when")}</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  id="taken-at"
-                  type="datetime-local"
-                  {...doseForm.register("taken_at", { required: true })}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={setNow}
-                  className="rounded-full"
-                >
-                  {t("now")}
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label>{t("injection_site")}</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {SITES.map((s) => {
-                  const isActive = selectedSite === s;
-                  return (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => doseForm.setValue("injection_site", s)}
-                      aria-pressed={isActive}
-                      className={cn(
-                        "rounded-lg border px-3 py-2 text-sm transition-colors",
-                        isActive
-                          ? "border-foreground bg-foreground text-background"
-                          : "border-border hover:bg-accent",
-                      )}
-                    >
-                      {t(`site_${s}`)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="notes">{t("notes")}</Label>
-              <textarea
-                id="notes"
-                rows={3}
-                className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
-                {...doseForm.register("notes")}
-              />
-            </div>
-
-            <Button
+            <button
               type="submit"
-              disabled={isSavingDose}
-              className="rounded-full"
+              disabled={isAddingMed}
+              style={saveBtnStyle}
             >
-              {isSavingDose ? t("saving") : t("save")}
-            </Button>
+              {isAddingMed ? t("saving") : t("add_medication")}
+            </button>
 
             {errorMsg && (
-              <p className="text-sm text-destructive" role="alert">
+              <p style={errorMessageStyle} role="alert">
                 {errorMsg}
               </p>
             )}
           </form>
-        )}
-      </main>
-    </div>
+        </div>
+      ) : (
+        <form onSubmit={doseForm.handleSubmit(onSubmitDose)} noValidate>
+          <div style={formGroupStyle}>
+            <label htmlFor="medication" style={labelStyle}>
+              {t("medication")}
+            </label>
+            <select
+              id="medication"
+              style={selectStyle}
+              className="focus:border-[var(--pp-accent)] transition-colors"
+              {...doseForm.register("medication_id", { required: true })}
+            >
+              {(meds ?? []).map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                  {m.concentration_mg_per_ml
+                    ? ` — ${m.concentration_mg_per_ml} mg/mL`
+                    : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={formGroupStyle}>
+            <label htmlFor="dose-mg" style={labelStyle}>
+              {t("dose_mg")}
+            </label>
+            <input
+              id="dose-mg"
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              style={inputStyle}
+              className="focus:border-[var(--pp-accent)] transition-colors"
+              {...doseForm.register("dose_mg", { required: true })}
+              aria-invalid={!!doseForm.formState.errors.dose_mg}
+            />
+          </div>
+
+          <div style={formGroupStyle}>
+            <label htmlFor="taken-at" style={labelStyle}>
+              {t("when")}
+            </label>
+            <div style={inlineRowStyle}>
+              <input
+                id="taken-at"
+                type="datetime-local"
+                style={{ ...inputStyle, flex: 1 }}
+                className="focus:border-[var(--pp-accent)] transition-colors"
+                {...doseForm.register("taken_at", { required: true })}
+              />
+              <button
+                type="button"
+                onClick={setNow}
+                style={secondaryBtnStyle}
+                className="hover:text-[var(--pp-accent)] hover:border-[var(--pp-accent)] transition-colors"
+              >
+                {t("now")}
+              </button>
+            </div>
+          </div>
+
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>{t("injection_site")}</label>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "0.5rem",
+              }}
+            >
+              {SITES.map((s) => {
+                const isActive = selectedSite === s;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => doseForm.setValue("injection_site", s)}
+                    aria-pressed={isActive}
+                    style={chipStyle(isActive)}
+                  >
+                    {t(`site_${s}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={formGroupStyle}>
+            <label htmlFor="notes" style={labelStyle}>
+              {t("notes")}
+            </label>
+            <textarea
+              id="notes"
+              rows={3}
+              style={textareaStyle}
+              className="focus:border-[var(--pp-accent)] transition-colors"
+              {...doseForm.register("notes")}
+            />
+          </div>
+
+          <button type="submit" disabled={isSavingDose} style={saveBtnStyle}>
+            {isSavingDose ? t("saving") : t("save")}
+          </button>
+
+          {errorMsg && (
+            <p style={errorMessageStyle} role="alert">
+              {errorMsg}
+            </p>
+          )}
+        </form>
+      )}
+    </LogShell>
   );
 }
