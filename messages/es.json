@@ -275,5 +275,18 @@
     "privacy": "Privacidad",
     "terms": "Términos",
     "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
+  },
+  "admin": {
+    "title": "Borradores",
+    "subtitle": "Cola de aprobación de artículos",
+    "empty": "Aún no hay borradores.",
+    "action_approve": "Aprobar",
+    "action_reject": "Rechazar",
+    "action_pending": "Procesando…",
+    "action_error": "Falló la acción. Intenta de nuevo.",
+    "status_pending_review": "Pendiente",
+    "status_approved": "Aprobado",
+    "status_published": "Publicado",
+    "status_rejected": "Rechazado"
   }
 }

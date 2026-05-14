@@ -275,5 +275,18 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "copyright": "© 2026 ooabi LLC. All rights reserved."
+  },
+  "admin": {
+    "title": "Drafts",
+    "subtitle": "Article approval queue",
+    "empty": "No drafts yet.",
+    "action_approve": "Approve",
+    "action_reject": "Reject",
+    "action_pending": "Working…",
+    "action_error": "Action failed. Try again.",
+    "status_pending_review": "Pending",
+    "status_approved": "Approved",
+    "status_published": "Published",
+    "status_rejected": "Rejected"
   }
 }
