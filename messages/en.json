@@ -379,6 +379,16 @@
     "status_pending_review": "Pending",
     "status_approved": "Approved",
     "status_published": "Published",
-    "status_rejected": "Rejected"
+    "status_rejected": "Rejected",
+    "reviews_title": "Reviews",
+    "reviews_subtitle": "Review moderation queue",
+    "reviews_empty": "No reviews yet.",
+    "reviews_status_pending": "Pending",
+    "reviews_status_approved": "Approved",
+    "reviews_status_rejected": "Rejected",
+    "reviews_action_toggle_verified": "Toggle verified",
+    "reviews_verified_yes": "Verified",
+    "reviews_verified_no": "Unverified",
+    "reviews_view_receipt": "View receipt"
   }
 }

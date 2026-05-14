@@ -379,6 +379,16 @@
     "status_pending_review": "Pendiente",
     "status_approved": "Aprobado",
     "status_published": "Publicado",
-    "status_rejected": "Rechazado"
+    "status_rejected": "Rechazado",
+    "reviews_title": "Reseñas",
+    "reviews_subtitle": "Cola de moderación de reseñas",
+    "reviews_empty": "Aún no hay reseñas.",
+    "reviews_status_pending": "Pendiente",
+    "reviews_status_approved": "Aprobado",
+    "reviews_status_rejected": "Rechazado",
+    "reviews_action_toggle_verified": "Alternar verificado",
+    "reviews_verified_yes": "Verificado",
+    "reviews_verified_no": "Sin verificar",
+    "reviews_view_receipt": "Ver recibo"
   }
 }
