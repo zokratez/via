@@ -325,6 +325,24 @@
     "calculator": "Calculadora",
     "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
   },
+  "reviews": {
+    "submit_title": "Tu reseña",
+    "submit_back": "Volver",
+    "submit_display_name": "Tu nombre",
+    "submit_display_name_placeholder": "Sam M.",
+    "submit_rating": "Puntuación",
+    "submit_review_text": "Tu reseña",
+    "submit_review_text_placeholder": "Cuéntanos cómo te ha ido…",
+    "submit_receipt": "Recibo",
+    "submit_receipt_hint": "Opcional · imagen, máx 5 MB",
+    "submit_save": "Enviar reseña",
+    "submit_saving": "Enviando…",
+    "submit_success": "Gracias. Tu reseña será revisada antes de publicarse.",
+    "submit_error_validation": "Revisa los campos. La reseña debe tener al menos 10 caracteres y una puntuación.",
+    "submit_error_file_too_large": "Imagen muy grande. Máximo 5 MB.",
+    "submit_error_invalid_file_type": "Solo se aceptan imágenes.",
+    "submit_error_generic": "Algo salió mal. Intenta de nuevo."
+  },
   "calculator": {
     "seo_title": "Calculadora de péptidos",
     "seo_description": "Calculadora de reconstitución de péptidos. Calcula concentración, volumen e unidades de jeringa de insulina al instante.",

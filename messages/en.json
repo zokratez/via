@@ -325,6 +325,24 @@
     "calculator": "Calculator",
     "copyright": "© 2026 ooabi LLC. All rights reserved."
   },
+  "reviews": {
+    "submit_title": "Your review",
+    "submit_back": "Back",
+    "submit_display_name": "Your name",
+    "submit_display_name_placeholder": "Sam M.",
+    "submit_rating": "Rating",
+    "submit_review_text": "Your review",
+    "submit_review_text_placeholder": "Tell us how it's going…",
+    "submit_receipt": "Receipt",
+    "submit_receipt_hint": "Optional · image, max 5 MB",
+    "submit_save": "Submit review",
+    "submit_saving": "Submitting…",
+    "submit_success": "Thanks. Your review will be reviewed before publishing.",
+    "submit_error_validation": "Check the fields. Review must be at least 10 characters with a rating.",
+    "submit_error_file_too_large": "Image too large. Maximum 5 MB.",
+    "submit_error_invalid_file_type": "Images only.",
+    "submit_error_generic": "Something went wrong. Try again."
+  },
   "calculator": {
     "seo_title": "Peptide Calculator",
     "seo_description": "Peptide reconstitution calculator. Calculate concentration, draw volume, and insulin syringe units instantly.",
