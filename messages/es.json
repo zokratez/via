@@ -277,6 +277,27 @@
     "terms": "Términos",
     "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
   },
+  "calculator": {
+    "seo_title": "Calculadora de péptidos",
+    "seo_description": "Calculadora de reconstitución de péptidos. Calcula concentración, volumen e unidades de jeringa de insulina al instante.",
+    "title": "Calculadora",
+    "subtitle": "Vial, agua, dosis. Te digo cuánto jalar.",
+    "nav_signin": "entrar",
+    "vial_question": "¿Cuánto tiene tu vial?",
+    "bac_question": "¿Cuánta agua bacteriostática le pusiste?",
+    "dose_question": "¿Cuánto quieres por dosis?",
+    "preset_other": "otro",
+    "result_concentration": "Concentración",
+    "result_volume": "Volumen a jalar",
+    "result_units": "Unidades en jeringa de insulina",
+    "result_units_unit": "unidades",
+    "warning_exceeds": "Tu dosis excede 100 unidades — necesitarás más de una jeringa, o reconstituye con menos agua.",
+    "examples_title": "Ejemplos rápidos",
+    "example_1": "Semaglutida 5mg + 1mL de agua, dosis 0.25mg",
+    "example_2": "BPC-157 5mg + 2mL de agua, dosis 250mcg",
+    "example_3": "Retatrutide 10mg + 2mL de agua, dosis 2mg",
+    "disclaimer": "Esto es matemática, no medicina. La dosis la decide tu médico, no una calculadora."
+  },
   "admin": {
     "title": "Borradores",
     "subtitle": "Cola de aprobación de artículos",

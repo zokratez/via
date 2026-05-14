@@ -277,6 +277,27 @@
     "terms": "Terms",
     "copyright": "© 2026 ooabi LLC. All rights reserved."
   },
+  "calculator": {
+    "seo_title": "Peptide Calculator",
+    "seo_description": "Peptide reconstitution calculator. Calculate concentration, draw volume, and insulin syringe units instantly.",
+    "title": "Calculator",
+    "subtitle": "Vial, water, dose. I'll tell you how much to draw.",
+    "nav_signin": "sign in",
+    "vial_question": "What's in your vial?",
+    "bac_question": "How much BAC water did you add?",
+    "dose_question": "How much per dose?",
+    "preset_other": "other",
+    "result_concentration": "Concentration",
+    "result_volume": "Volume to draw",
+    "result_units": "Insulin syringe units",
+    "result_units_unit": "units",
+    "warning_exceeds": "Your dose exceeds 100 units — you'll need more than one syringe, or reconstitute with less water.",
+    "examples_title": "Quick examples",
+    "example_1": "Semaglutide 5mg + 1mL water, 0.25mg dose",
+    "example_2": "BPC-157 5mg + 2mL water, 250mcg dose",
+    "example_3": "Retatrutide 10mg + 2mL water, 2mg dose",
+    "disclaimer": "This is math, not medicine. Your doctor decides the dose, not a calculator."
+  },
   "admin": {
     "title": "Drafts",
     "subtitle": "Article approval queue",
