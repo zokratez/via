@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 
 export async function generateMetadata({
   params,
@@ -108,6 +109,7 @@ export default async function LandingPage({
           <Link href={journalHref} style={navLinkStyle}>
             {t("nav_diario")}
           </Link>
+          <LocaleSwitcher variant="dark" />
           <Link
             href="/auth/sign-in"
             style={{ ...navLinkStyle, color: "var(--pp-accent)" }}

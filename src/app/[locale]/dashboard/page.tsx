@@ -244,6 +244,17 @@ export default async function DashboardPage({
     padding: "1.25rem 0.75rem",
   };
 
+  const primaryActionStyle: React.CSSProperties = {
+    ...actionStyle,
+    background: "var(--pp-accent)",
+    color: "var(--pp-bg)",
+    borderColor: "var(--pp-accent)",
+    fontWeight: 600,
+    fontSize: "12px",
+  };
+
+  const journalHref = locale === "es" ? "/diario" : "/journal";
+
   return (
     <div
       className="flex flex-col flex-1"
@@ -274,6 +285,9 @@ export default async function DashboardPage({
             alignItems: "center",
           }}
         >
+          <Link href={journalHref} style={navLinkStyle}>
+            {t("nav_diario")}
+          </Link>
           {hasStripeSubscription && (
             <ManageSubscriptionLink locale={locale as "es" | "en"} />
           )}
@@ -354,7 +368,7 @@ export default async function DashboardPage({
             <Link
               key={a.href}
               href={a.href}
-              style={actionStyle}
+              style={a.href === "/coach" ? primaryActionStyle : actionStyle}
               className="hover:opacity-80 transition-opacity"
             >
               {a.label}

@@ -42,6 +42,28 @@ export function WeightChart({
         <Tooltip
           formatter={(v: unknown) => [`${v} kg`, ""]}
           labelFormatter={(label: unknown) => fmt(String(label))}
+          contentStyle={{
+            background: "var(--pp-surface)",
+            border: "0.5px solid var(--pp-border)",
+            borderRadius: "4px",
+            padding: "8px 12px",
+            boxShadow: "none",
+          }}
+          labelStyle={{
+            fontFamily: "var(--pp-font-sans)",
+            fontSize: "10px",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--pp-text-secondary)",
+            marginBottom: "4px",
+          }}
+          itemStyle={{
+            fontFamily: "var(--pp-font-serif)",
+            fontSize: "14px",
+            color: "var(--pp-accent)",
+            padding: 0,
+          }}
+          cursor={{ stroke: "var(--pp-text-tertiary)", strokeWidth: 1 }}
         />
         <Line
           type="monotone"

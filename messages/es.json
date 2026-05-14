@@ -133,6 +133,7 @@
     "log_symptom": "Registrar síntoma",
     "ask_coach": "Preguntar al coach",
     "action_coach": "Hablar con Bukowski",
+    "nav_diario": "diario",
     "streak_days": "{count, plural, one {# día seguido} other {# días seguidos}}",
     "weight_this_week": "Esta semana",
     "weight_all_time": "Desde el inicio",
