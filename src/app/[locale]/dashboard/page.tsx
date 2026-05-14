@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
-import { WeightChart } from "@/components/WeightChart";
+import { WeightChart, type WeightPoint } from "@/components/WeightChart";
 import { DoseTimeline, type DosePoint } from "@/components/DoseTimeline";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
@@ -54,7 +54,7 @@ export default async function DashboardPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, subscription_tier")
+    .select("display_name, subscription_tier, goal_weight_kg")
     .eq("id", user!.id)
     .maybeSingle();
 
@@ -72,12 +72,11 @@ export default async function DashboardPage({
 
   const now = new Date();
   const cutoff14 = new Date(now.getTime() - 14 * 86_400_000).toISOString();
-  const cutoff30 = new Date(now.getTime() - 30 * 86_400_000).toISOString();
   const cutoff90 = new Date(now.getTime() - 90 * 86_400_000).toISOString();
 
   const [
     lastDoseRes,
-    weights30Res,
+    weights90Res,
     doses14Res,
     weights14Res,
     symptoms14Res,
@@ -91,8 +90,8 @@ export default async function DashboardPage({
       .maybeSingle(),
     supabase
       .from("weight_entries")
-      .select("measured_at, weight_kg")
-      .gte("measured_at", cutoff30)
+      .select("measured_at, weight_kg, waist_cm")
+      .gte("measured_at", cutoff90)
       .order("measured_at", { ascending: true }),
     supabase.from("doses").select("taken_at").gte("taken_at", cutoff14),
     supabase
@@ -150,23 +149,33 @@ export default async function DashboardPage({
     }
   }
 
-  type WeightRow = { measured_at: string; weight_kg: number | string };
-  const weights30 = ((weights30Res.data ?? []) as WeightRow[]).map((w) => ({
+  type WeightRow = {
+    measured_at: string;
+    weight_kg: number | string;
+    waist_cm: number | string | null;
+  };
+  const weights90 = ((weights90Res.data ?? []) as WeightRow[]).map((w) => ({
     measured_at: w.measured_at,
     weight_kg: Number(w.weight_kg),
+    waist_cm: w.waist_cm === null ? null : Number(w.waist_cm),
   }));
-  const chartData = weights30.map((w) => ({
+  const chartData: WeightPoint[] = weights90.map((w) => ({
     date: w.measured_at,
     weight: w.weight_kg,
+    waist: w.waist_cm,
   }));
+  const goalWeight =
+    profile?.goal_weight_kg === null || profile?.goal_weight_kg === undefined
+      ? null
+      : Number(profile.goal_weight_kg);
 
   let weightLatestStr = t("stat_empty");
   let weightDeltaStr: string | null = null;
-  if (weights30.length > 0) {
-    const latest = weights30[weights30.length - 1];
+  if (weights90.length > 0) {
+    const latest = weights90[weights90.length - 1];
     weightLatestStr = `${latest.weight_kg.toFixed(1)} kg`;
     const sevenDaysAgo = Date.now() - 7 * 86_400_000;
-    const baseline = [...weights30]
+    const baseline = [...weights90]
       .reverse()
       .find((w) => new Date(w.measured_at).getTime() <= sevenDaysAgo);
     if (baseline) {
@@ -430,7 +439,11 @@ export default async function DashboardPage({
                 {t("chart_empty")}
               </p>
             ) : (
-              <WeightChart data={chartData} locale={locale} />
+              <WeightChart
+                data={chartData}
+                locale={locale}
+                goalWeight={goalWeight}
+              />
             )}
           </div>
         </div>
