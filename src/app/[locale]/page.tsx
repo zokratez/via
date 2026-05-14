@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { HomepageReviews } from "@/components/HomepageReviews";
 
 export async function generateMetadata({
   params,
@@ -293,6 +294,9 @@ export default async function LandingPage({
           </p>
         ))}
       </section>
+
+      {/* Verified reviews — only renders if there are approved+verified rows */}
+      <HomepageReviews locale={locale as "es" | "en"} />
 
       <hr style={dividerStyle} />
 
