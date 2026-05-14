@@ -1,26 +1,52 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
+const linkStyle: React.CSSProperties = {
+  fontFamily: "var(--pp-font-sans)",
+  fontSize: "12px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+  textDecoration: "none",
+};
+
 export async function Footer() {
   const t = await getTranslations("footer");
   return (
-    <footer className="border-t border-border/60 px-6 py-6 md:px-10">
-      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-3 text-xs text-muted-foreground sm:flex-row sm:justify-between sm:gap-4">
-        <p>{t("copyright")}</p>
-        <nav className="flex items-center gap-5">
-          <Link
-            href="/privacy"
-            className="hover:text-foreground"
-          >
+    <footer
+      style={{
+        borderTop: "0.5px solid var(--pp-border)",
+        background: "var(--pp-bg)",
+        color: "var(--pp-text-secondary)",
+      }}
+    >
+      <div
+        className="mx-auto"
+        style={{
+          maxWidth: "880px",
+          padding: "2rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <span style={linkStyle}>{t("copyright")}</span>
+        <span
+          style={{
+            display: "flex",
+            gap: "1.5rem",
+            alignItems: "center",
+          }}
+        >
+          <Link href="/privacy" style={linkStyle}>
             {t("privacy")}
           </Link>
-          <Link
-            href="/terms"
-            className="hover:text-foreground"
-          >
+          <Link href="/terms" style={linkStyle}>
             {t("terms")}
           </Link>
-        </nav>
+        </span>
       </div>
     </footer>
   );

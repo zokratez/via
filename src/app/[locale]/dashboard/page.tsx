@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
@@ -187,13 +186,94 @@ export default async function DashboardPage({
     { href: "/coach", label: t("action_coach") },
   ] as const;
 
+  const SERIF = "var(--pp-font-serif)";
+  const SANS = "var(--pp-font-sans)";
+
+  const navLinkStyle: React.CSSProperties = {
+    fontFamily: SANS,
+    fontSize: "12px",
+    letterSpacing: "0.24em",
+    textTransform: "uppercase",
+    color: "var(--pp-text-secondary)",
+    textDecoration: "none",
+  };
+
+  const eyebrowStyle: React.CSSProperties = {
+    fontFamily: SANS,
+    fontSize: "11px",
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "var(--pp-text-secondary)",
+    fontWeight: 500,
+    margin: 0,
+  };
+
+  const cardStyle: React.CSSProperties = {
+    background: "var(--pp-surface)",
+    border: "0.5px solid var(--pp-border)",
+    borderRadius: "6px",
+    padding: "1.25rem",
+  };
+
+  const statValueStyle: React.CSSProperties = {
+    fontFamily: SERIF,
+    fontStyle: "italic",
+    fontSize: "22px",
+    color: "var(--pp-text)",
+    margin: "0.5rem 0 0",
+  };
+
+  const statSubStyle: React.CSSProperties = {
+    fontFamily: SERIF,
+    fontSize: "14px",
+    color: "var(--pp-text-secondary)",
+    margin: "0.25rem 0 0",
+  };
+
+  const actionStyle: React.CSSProperties = {
+    ...cardStyle,
+    textAlign: "center",
+    display: "block",
+    textDecoration: "none",
+    color: "var(--pp-accent)",
+    fontFamily: SANS,
+    fontSize: "11px",
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    fontWeight: 500,
+    padding: "1.25rem 0.75rem",
+  };
+
   return (
-    <div className="flex flex-col flex-1">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
+    <div
+      className="flex flex-col flex-1"
+      style={{
+        background: "var(--pp-bg)",
+        color: "var(--pp-text)",
+        fontFamily: SERIF,
+        minHeight: "100vh",
+      }}
+    >
+      <header
+        className="mx-auto w-full"
+        style={{
+          maxWidth: "880px",
+          padding: "1.5rem 2rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Link href="/dashboard" style={navLinkStyle}>
           {tApp("name")}
         </Link>
-        <div className="flex items-center gap-3">
+        <div
+          style={{
+            display: "flex",
+            gap: "1.5rem",
+            alignItems: "center",
+          }}
+        >
           {hasStripeSubscription && (
             <ManageSubscriptionLink locale={locale as "es" | "en"} />
           )}
@@ -202,93 +282,106 @@ export default async function DashboardPage({
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-3xl px-6 py-10">
+      <main
+        className="flex-1 mx-auto w-full"
+        style={{ maxWidth: "720px", padding: "2.5rem 2rem 5rem" }}
+      >
         {showSavedToast && (
           <div
             role="status"
-            className="mb-6 rounded-lg border border-border/60 bg-accent/40 px-4 py-3 text-sm"
+            style={{
+              marginBottom: "1.5rem",
+              padding: "0.75rem 1rem",
+              border: "0.5px solid var(--pp-accent)",
+              borderRadius: "6px",
+              color: "var(--pp-accent)",
+              fontFamily: SANS,
+              fontSize: "12px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
           >
             {t("toast_saved")}
           </div>
         )}
 
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+        <h1
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "clamp(36px, 6vw, 48px)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.01em",
+            fontWeight: 400,
+            color: "var(--pp-text)",
+            margin: 0,
+          }}
+        >
           {greeting}
         </h1>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <Card className="border-border/60">
-            <CardContent className="py-5">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("stat_last_dose")}
-              </p>
-              <p className="mt-2 text-lg font-medium">{lastDoseStr}</p>
-              {lastDoseSubStr && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {lastDoseSubStr}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+        <div
+          className="grid gap-4 sm:grid-cols-3"
+          style={{ marginTop: "2.5rem" }}
+        >
+          <div style={cardStyle}>
+            <p style={eyebrowStyle}>{t("stat_last_dose")}</p>
+            <p style={statValueStyle}>{lastDoseStr}</p>
+            {lastDoseSubStr && <p style={statSubStyle}>{lastDoseSubStr}</p>}
+          </div>
 
-          <Card className="border-border/60">
-            <CardContent className="py-5">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("stat_weight")}
-              </p>
-              <p className="mt-2 text-lg font-medium">{weightLatestStr}</p>
-              {weightDeltaStr && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {weightDeltaStr}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <div style={cardStyle}>
+            <p style={eyebrowStyle}>{t("stat_weight")}</p>
+            <p style={statValueStyle}>{weightLatestStr}</p>
+            {weightDeltaStr && <p style={statSubStyle}>{weightDeltaStr}</p>}
+          </div>
 
-          <Card className="border-border/60">
-            <CardContent className="py-5">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                {t("stat_streak")}
-              </p>
-              <p className="mt-2 text-lg font-medium">
-                {streakCount === 0
-                  ? t("stat_empty")
-                  : t("streak_days", { count: streakCount })}
-              </p>
-            </CardContent>
-          </Card>
+          <div style={cardStyle}>
+            <p style={eyebrowStyle}>{t("stat_streak")}</p>
+            <p style={statValueStyle}>
+              {streakCount === 0
+                ? t("stat_empty")
+                : t("streak_days", { count: streakCount })}
+            </p>
+          </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div
+          className="grid grid-cols-2 gap-4 md:grid-cols-4"
+          style={{ marginTop: "1.5rem" }}
+        >
           {actions.map((a) => (
-            <Link key={a.href} href={a.href} className="block">
-              <Card className="border-border/60 transition-colors hover:bg-accent/40">
-                <CardContent className="py-6">
-                  <CardTitle className="text-center text-sm font-medium">
-                    {a.label}
-                  </CardTitle>
-                </CardContent>
-              </Card>
+            <Link
+              key={a.href}
+              href={a.href}
+              style={actionStyle}
+              className="hover:opacity-80 transition-opacity"
+            >
+              {a.label}
             </Link>
           ))}
         </div>
 
-        <Card className="mt-8 border-border/60">
-          <CardContent className="py-6">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              {t("chart_weight_title")}
-            </p>
-            <div className="mt-4 text-foreground">
-              {chartData.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  {t("chart_empty")}
-                </p>
-              ) : (
-                <WeightChart data={chartData} locale={locale} />
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div style={{ ...cardStyle, marginTop: "2rem", padding: "1.5rem" }}>
+          <p style={eyebrowStyle}>{t("chart_weight_title")}</p>
+          <div style={{ marginTop: "1rem", color: "var(--pp-accent)" }}>
+            {chartData.length === 0 ? (
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: "15px",
+                  color: "var(--pp-text-secondary)",
+                  margin: 0,
+                }}
+              >
+                {t("chart_empty")}
+              </p>
+            ) : (
+              <WeightChart data={chartData} locale={locale} />
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );

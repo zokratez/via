@@ -681,11 +681,15 @@ export function CoachChat({
                 onKeyDown={onKeyDown}
                 placeholder={t("input_placeholder")}
                 aria-label={t("input_placeholder")}
-                className="flex-1 bg-transparent border-0 outline-none placeholder:italic placeholder:text-[var(--pp-text-tertiary)]"
+                className="flex-1 min-w-0 outline-none placeholder:italic placeholder:text-[var(--pp-text-secondary)] focus:border-[var(--pp-accent)] transition-colors"
                 style={{
                   fontFamily: "var(--pp-font-serif)",
                   fontSize: "18px",
                   color: "var(--pp-text)",
+                  backgroundColor: "var(--pp-surface)",
+                  border: "0.5px solid var(--pp-border)",
+                  borderRadius: "6px",
+                  padding: "14px 16px",
                 }}
               />
               {isStreaming ? (
