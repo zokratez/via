@@ -51,7 +51,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       {children}
       <FooterGate>
-        <Footer />
+        <Footer locale={locale as "es" | "en"} />
       </FooterGate>
     </NextIntlClientProvider>
   );

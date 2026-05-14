@@ -254,6 +254,7 @@ export default async function DashboardPage({
   };
 
   const journalHref = locale === "es" ? "/diario" : "/journal";
+  const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
 
   return (
     <div
@@ -287,6 +288,9 @@ export default async function DashboardPage({
         >
           <Link href={journalHref} style={navLinkStyle}>
             {t("nav_diario")}
+          </Link>
+          <Link href={calculatorHref} style={navLinkStyle}>
+            {t("nav_calculator")}
           </Link>
           {hasStripeSubscription && (
             <ManageSubscriptionLink locale={locale as "es" | "en"} />

@@ -7,11 +7,13 @@
   "home": {
     "nav_brand": "paco peptide",
     "nav_diario": "diario",
+    "nav_calculator": "calculadora",
     "nav_signin": "entrar",
     "diario_empty_state": "Próximos artículos. Bukowski lee a diario.",
     "diario_back": "← volver al diario",
     "diario_read_more": "leer →",
     "footer_diario": "diario",
+    "footer_calculator": "calculadora",
     "seo_home_title": "PACO Peptide — Bukowski sin censura",
     "seo_home_description": "Si ya tienes el vial, esto es para ti. La biblioteca para gente usando GLP-1, péptidos y compuestos relacionados — estudios, dosis, riesgos, traducidos sin agenda.",
     "seo_home_keywords": "péptidos, GLP-1, retatrutide, cagrilintide, semaglutida, tirzepatida, bukowski, paco peptide",
@@ -134,6 +136,7 @@
     "ask_coach": "Preguntar al coach",
     "action_coach": "Hablar con Bukowski",
     "nav_diario": "diario",
+    "nav_calculator": "calculadora",
     "streak_days": "{count, plural, one {# día seguido} other {# días seguidos}}",
     "weight_this_week": "Esta semana",
     "weight_all_time": "Desde el inicio",
@@ -275,6 +278,7 @@
   "footer": {
     "privacy": "Privacidad",
     "terms": "Términos",
+    "calculator": "Calculadora",
     "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
   },
   "calculator": {

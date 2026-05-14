@@ -10,8 +10,10 @@ const linkStyle: React.CSSProperties = {
   textDecoration: "none",
 };
 
-export async function Footer() {
+export async function Footer({ locale }: { locale?: "es" | "en" } = {}) {
   const t = await getTranslations("footer");
+  const calculatorHref =
+    locale === "en" ? "/en/calculator" : "/es/calculadora";
   return (
     <footer
       style={{
@@ -40,6 +42,9 @@ export async function Footer() {
             alignItems: "center",
           }}
         >
+          <Link href={calculatorHref} style={linkStyle}>
+            {t("calculator")}
+          </Link>
           <Link href="/privacy" style={linkStyle}>
             {t("privacy")}
           </Link>

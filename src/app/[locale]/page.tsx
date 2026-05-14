@@ -83,6 +83,7 @@ export default async function LandingPage({
   setRequestLocale(locale);
   const t = await getTranslations("home");
   const journalHref = locale === "es" ? "/diario" : "/journal";
+  const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
 
   return (
     <div
@@ -108,6 +109,9 @@ export default async function LandingPage({
         <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
           <Link href={journalHref} style={navLinkStyle}>
             {t("nav_diario")}
+          </Link>
+          <Link href={calculatorHref} style={navLinkStyle}>
+            {t("nav_calculator")}
           </Link>
           <LocaleSwitcher variant="dark" />
           <Link
@@ -424,6 +428,9 @@ export default async function LandingPage({
         <span style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
           <Link href={journalHref} style={footerLinkStyle}>
             {t("footer_diario")}
+          </Link>
+          <Link href={calculatorHref} style={footerLinkStyle}>
+            {t("footer_calculator")}
           </Link>
           <Link href="/privacy" style={footerLinkStyle}>
             {t("footer_privacy")}
