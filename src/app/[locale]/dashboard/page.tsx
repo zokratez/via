@@ -4,17 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
-import { WeightChart, type WeightPoint } from "@/components/WeightChart";
-import { DoseTimeline, type DosePoint } from "@/components/DoseTimeline";
-import {
-  SymptomChart,
-  type SymptomEntry,
-} from "@/components/SymptomChart";
-import { SleepChart, type SleepEntry } from "@/components/SleepChart";
-import {
-  CoachHistory,
-  type CoachThread,
-} from "@/components/CoachHistory";
+import { type WeightPoint } from "@/components/WeightChart";
+import { type DosePoint } from "@/components/DoseTimeline";
+import { type SymptomEntry } from "@/components/SymptomChart";
+import { type SleepEntry } from "@/components/SleepChart";
+import { type CoachThread } from "@/components/CoachHistory";
+import { DashboardTabs } from "@/components/DashboardTabs";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -509,68 +504,15 @@ export default async function DashboardPage({
         </div>
 
         <div style={{ ...cardStyle, marginTop: "2rem", padding: "1.5rem" }}>
-          <p style={eyebrowStyle}>{t("chart_weight_title")}</p>
-          <div style={{ marginTop: "1rem", color: "var(--pp-accent)" }}>
-            {chartData.length === 0 ? (
-              <p
-                style={{
-                  fontFamily: SERIF,
-                  fontStyle: "italic",
-                  fontSize: "15px",
-                  color: "var(--pp-text-secondary)",
-                  margin: 0,
-                }}
-              >
-                {t("chart_empty")}
-              </p>
-            ) : (
-              <WeightChart
-                data={chartData}
-                locale={locale}
-                goalWeight={goalWeight}
-              />
-            )}
-          </div>
-        </div>
-
-        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
-          <p style={eyebrowStyle}>{t("dose_timeline_title")}</p>
-          <div style={{ marginTop: "1rem" }}>
-            <DoseTimeline
-              doses={dosePoints}
-              locale={locale as "es" | "en"}
-            />
-          </div>
-        </div>
-
-        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
-          <p style={eyebrowStyle}>{t("symptom_chart_title")}</p>
-          <div style={{ marginTop: "1rem" }}>
-            <SymptomChart
-              entries={symptomEntries}
-              locale={locale as "es" | "en"}
-            />
-          </div>
-        </div>
-
-        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
-          <p style={eyebrowStyle}>{t("sleep_chart_title")}</p>
-          <div style={{ marginTop: "1rem" }}>
-            <SleepChart
-              entries={sleepEntries}
-              locale={locale as "es" | "en"}
-            />
-          </div>
-        </div>
-
-        <div style={{ ...cardStyle, marginTop: "1rem", padding: "1.5rem" }}>
-          <p style={eyebrowStyle}>{t("coach_history_title")}</p>
-          <div style={{ marginTop: "1rem" }}>
-            <CoachHistory
-              threads={coachThreads}
-              locale={locale as "es" | "en"}
-            />
-          </div>
+          <DashboardTabs
+            doses={dosePoints}
+            weights={chartData}
+            goalWeight={goalWeight}
+            symptoms={symptomEntries}
+            sleep={sleepEntries}
+            threads={coachThreads}
+            locale={locale as "es" | "en"}
+          />
         </div>
       </main>
     </div>
