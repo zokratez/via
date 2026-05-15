@@ -4,6 +4,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { FooterGate } from "@/components/FooterGate";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { routing } from "@/i18n/routing";
 import { SITE_URL } from "@/lib/seo";
 
@@ -53,6 +54,7 @@ export default async function LocaleLayout({
       <FooterGate>
         <Footer locale={locale as "es" | "en"} />
       </FooterGate>
+      <GlobalSearch />
     </NextIntlClientProvider>
   );
 }

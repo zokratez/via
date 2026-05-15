@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { GlobalSearch } from "@/components/GlobalSearch";
 
 const CHARS_PER_FRAME = 30;
 const JSPDF_CDN =
@@ -517,8 +516,6 @@ export function CoachChat({
             >
               {t("topbar_panel")}
             </Link>
-            <span aria-hidden="true">·</span>
-            <GlobalSearch />
             <span aria-hidden="true">·</span>
             <button
               type="button"

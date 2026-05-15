@@ -429,6 +429,8 @@
     "placeholder": "Busca artículos, dosis, conversaciones…",
     "hint": "Escribe para buscar en todo lo tuyo.",
     "loading": "Buscando…",
+    "listening": "Escuchando…",
+    "mic_label": "Buscar por voz",
     "empty": "Sin resultados.",
     "category_articles": "Diario",
     "category_coach": "Bukowski",

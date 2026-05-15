@@ -429,6 +429,8 @@
     "placeholder": "Search articles, doses, conversations…",
     "hint": "Type to search across everything you've logged.",
     "loading": "Searching…",
+    "listening": "Listening…",
+    "mic_label": "Search by voice",
     "empty": "No results found.",
     "category_articles": "Journal",
     "category_coach": "Bukowski",

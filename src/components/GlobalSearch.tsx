@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 
@@ -18,6 +18,29 @@ type SearchResponse = {
   total: number;
 };
 
+type SpeechRecognitionResultLike = {
+  isFinal: boolean;
+  0: { transcript: string };
+};
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: { length: number } & {
+    [index: number]: SpeechRecognitionResultLike;
+  };
+};
+type SpeechRecognitionInstance = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onresult: ((e: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((e: unknown) => void) | null;
+  onend: (() => void) | null;
+};
+type SpeechRecognitionCtor = new () => SpeechRecognitionInstance;
+
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";
 
@@ -30,11 +53,17 @@ const CATEGORY_ORDER: SearchResult["category"][] = [
   "todos",
 ];
 
-function SearchIcon({ color = "currentColor" }: { color?: string }) {
+function SearchIcon({
+  color = "currentColor",
+  size = 18,
+}: {
+  color?: string;
+  size?: number;
+}) {
   return (
     <svg
-      width="16"
-      height="16"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
@@ -49,11 +78,35 @@ function SearchIcon({ color = "currentColor" }: { color?: string }) {
   );
 }
 
-export function GlobalSearch({
-  variant = "muted",
+function MicIcon({
+  color = "currentColor",
+  size = 18,
+  filled = false,
 }: {
-  variant?: "muted" | "accent";
+  color?: string;
+  size?: number;
+  filled?: boolean;
 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={filled ? color : "none"}
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="3" width="6" height="12" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0" />
+      <line x1="12" y1="18" x2="12" y2="22" />
+    </svg>
+  );
+}
+
+export function GlobalSearch() {
   const t = useTranslations("search");
   const router = useRouter();
   const locale = useLocale();
@@ -61,15 +114,36 @@ export function GlobalSearch({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [listening, setListening] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  const SpeechRecognitionCtor = useMemo<SpeechRecognitionCtor | null>(() => {
+    if (typeof window === "undefined") return null;
+    const w = window as unknown as {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
+    return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+  }, []);
+
+  const speechSupported = SpeechRecognitionCtor !== null;
 
   const closeOverlay = useCallback(() => {
     setOpen(false);
     setQuery("");
     setResults(null);
     if (abortRef.current) abortRef.current.abort();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        /* ignore */
+      }
+    }
+    setListening(false);
   }, []);
 
   useEffect(() => {
@@ -130,6 +204,63 @@ export function GlobalSearch({
     };
   }, [query, locale, open]);
 
+  function startListening() {
+    if (!SpeechRecognitionCtor) return;
+    if (!open) setOpen(true);
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {
+        /* ignore */
+      }
+    }
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = locale === "es" ? "es-MX" : "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.onresult = (e) => {
+      let transcript = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        transcript += e.results[i][0].transcript;
+      }
+      setQuery(transcript);
+    };
+    recognition.onerror = () => {
+      setListening(false);
+    };
+    recognition.onend = () => {
+      setListening(false);
+    };
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+      setListening(true);
+    } catch {
+      setListening(false);
+    }
+  }
+
+  function stopListening() {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        /* ignore */
+      }
+    }
+    setListening(false);
+  }
+
+  function onPillClick() {
+    setOpen(true);
+  }
+
+  function onMicClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (listening) stopListening();
+    else startListening();
+  }
+
   function onResultClick(href: string) {
     closeOverlay();
     router.push(href);
@@ -148,27 +279,90 @@ export function GlobalSearch({
     }
   }
 
-  const iconColor =
-    variant === "accent" ? "var(--pp-accent)" : "var(--pp-text-secondary)";
-
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label={t("open_label")}
+      <div
         style={{
-          background: "transparent",
-          border: "none",
-          padding: "4px",
-          cursor: "pointer",
-          color: iconColor,
-          display: "inline-flex",
-          alignItems: "center",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 1rem",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
+          pointerEvents: "none",
+          zIndex: 90,
         }}
       >
-        <SearchIcon color="var(--pp-accent)" />
-      </button>
+        <button
+          type="button"
+          onClick={onPillClick}
+          aria-label={t("open_label")}
+          style={{
+            pointerEvents: "auto",
+            width: "90%",
+            maxWidth: "540px",
+            background: "rgba(26,22,20,0.7)",
+            WebkitBackdropFilter: "blur(20px)",
+            backdropFilter: "blur(20px)",
+            border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: "9999px",
+            padding: "12px 18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            cursor: "pointer",
+            color: "var(--pp-text-secondary)",
+            fontFamily: SERIF,
+            fontSize: "15px",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
+            transition: "transform 0.15s",
+          }}
+        >
+          <SearchIcon color="var(--pp-accent)" size={18} />
+          <span style={{ flex: 1, textAlign: "left", opacity: 0.7 }}>
+            {t("placeholder")}
+          </span>
+          {speechSupported && (
+            <span
+              role="button"
+              aria-label={t("mic_label")}
+              tabIndex={0}
+              onClick={onMicClick}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (listening) stopListening();
+                  else startListening();
+                }
+              }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "28px",
+                height: "28px",
+                borderRadius: "9999px",
+                background: listening
+                  ? "var(--pp-accent)"
+                  : "transparent",
+                color: listening
+                  ? "var(--pp-bg)"
+                  : "var(--pp-text-secondary)",
+                cursor: "pointer",
+              }}
+            >
+              <MicIcon
+                color="currentColor"
+                size={16}
+                filled={listening}
+              />
+            </span>
+          )}
+        </button>
+      </div>
 
       {open && (
         <div
@@ -180,23 +374,28 @@ export function GlobalSearch({
             position: "fixed",
             inset: 0,
             background: "rgba(0,0,0,0.6)",
+            WebkitBackdropFilter: "blur(8px)",
+            backdropFilter: "blur(8px)",
             zIndex: 1000,
             display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            paddingTop: "10vh",
-            padding: "10vh 1rem 0",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            padding:
+              "max(8vh, env(safe-area-inset-top, 0px)) 1rem env(safe-area-inset-bottom, 0px)",
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "var(--pp-surface)",
-              border: "0.5px solid var(--pp-border)",
-              borderRadius: "8px",
+              background: "rgba(26,22,20,0.85)",
+              WebkitBackdropFilter: "blur(20px)",
+              backdropFilter: "blur(20px)",
+              border: "0.5px solid rgba(255,255,255,0.08)",
+              borderRadius: "16px",
               width: "100%",
               maxWidth: "540px",
-              boxShadow: "0 24px 64px rgba(0,0,0,0.4)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
               overflow: "hidden",
               fontFamily: SERIF,
             }}
@@ -206,11 +405,11 @@ export function GlobalSearch({
                 display: "flex",
                 alignItems: "center",
                 gap: "0.75rem",
-                padding: "0.75rem 1rem",
-                borderBottom: "0.5px solid var(--pp-border)",
+                padding: "0.875rem 1rem",
+                borderBottom: "0.5px solid rgba(255,255,255,0.06)",
               }}
             >
-              <SearchIcon color="var(--pp-text-tertiary)" />
+              <SearchIcon color="var(--pp-accent)" size={18} />
               <input
                 ref={inputRef}
                 type="text"
@@ -228,6 +427,37 @@ export function GlobalSearch({
                   color: "var(--pp-text)",
                 }}
               />
+              {speechSupported && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    listening ? stopListening() : startListening()
+                  }
+                  aria-label={t("mic_label")}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "9999px",
+                    background: listening
+                      ? "var(--pp-accent)"
+                      : "transparent",
+                    color: listening
+                      ? "var(--pp-bg)"
+                      : "var(--pp-text-secondary)",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <MicIcon
+                    color="currentColor"
+                    size={18}
+                    filled={listening}
+                  />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={closeOverlay}
@@ -238,7 +468,7 @@ export function GlobalSearch({
                   letterSpacing: "0.2em",
                   textTransform: "uppercase",
                   background: "transparent",
-                  border: "0.5px solid var(--pp-border)",
+                  border: "0.5px solid rgba(255,255,255,0.12)",
                   color: "var(--pp-text-tertiary)",
                   padding: "4px 8px",
                   borderRadius: "4px",
@@ -266,7 +496,7 @@ export function GlobalSearch({
                     margin: 0,
                   }}
                 >
-                  {t("hint")}
+                  {listening ? t("listening") : t("hint")}
                 </p>
               ) : loading ? (
                 <p
@@ -324,13 +554,14 @@ export function GlobalSearch({
                               textAlign: "left",
                               background: "transparent",
                               border: "none",
-                              borderTop: "0.5px solid var(--pp-border)",
+                              borderTop:
+                                "0.5px solid rgba(255,255,255,0.06)",
                               padding: "0.75rem 1rem",
                               cursor: "pointer",
                               fontFamily: SERIF,
                               color: "var(--pp-text)",
                             }}
-                            className="hover:bg-[var(--pp-bg)]"
+                            className="hover:bg-[rgba(255,255,255,0.04)]"
                           >
                             <div
                               style={{
