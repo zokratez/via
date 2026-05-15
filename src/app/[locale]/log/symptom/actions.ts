@@ -1,8 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 
 const CATEGORIES = [
   "nausea",
@@ -59,6 +61,29 @@ export async function logSymptomAction(formData: FormData) {
   });
 
   if (error) return { error: "db_failed" as const };
+
+  try {
+    const tCal = await getTranslations({
+      locale: parsed.data.locale,
+      namespace: "calendar",
+    });
+    const tSymptom = await getTranslations({
+      locale: parsed.data.locale,
+      namespace: "symptom",
+    });
+    await safeLogCalendarEvent(supabase, {
+      userId: user.id,
+      locale: parsed.data.locale,
+      title: tCal("log_symptom_title", {
+        category: tSymptom(`category_${parsed.data.category}`),
+        severity: parsed.data.severity,
+      }),
+      eventDate: toDateOnly(occurredAt),
+      eventType: "note",
+    });
+  } catch {
+    // Calendar mirror is best-effort; never block symptom log.
+  }
 
   redirect({ href: "/dashboard?ok=symptom", locale: parsed.data.locale });
 }

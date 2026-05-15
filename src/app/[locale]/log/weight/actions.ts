@@ -1,8 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 
 const LOCALES = ["es", "en"] as const;
 
@@ -62,6 +64,24 @@ export async function logWeightAction(formData: FormData) {
   });
 
   if (error) return { error: "db_failed" as const };
+
+  try {
+    const t = await getTranslations({
+      locale: parsed.data.locale,
+      namespace: "calendar",
+    });
+    await safeLogCalendarEvent(supabase, {
+      userId: user.id,
+      locale: parsed.data.locale,
+      title: t("log_weight_title", {
+        kg: parsed.data.weight_kg.toFixed(1),
+      }),
+      eventDate: toDateOnly(measuredAt),
+      eventType: "note",
+    });
+  } catch {
+    // Calendar mirror is best-effort; never block weight log.
+  }
 
   redirect({ href: "/dashboard?ok=weight", locale: parsed.data.locale });
 }

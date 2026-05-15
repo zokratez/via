@@ -1,8 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { safeLogCalendarEvent } from "@/lib/calendar-log";
 
 const LOCALES = ["es", "en"] as const;
 
@@ -50,6 +52,25 @@ export async function logSleepAction(formData: FormData) {
   });
 
   if (error) return { error: "db_failed" as const };
+
+  try {
+    const t = await getTranslations({
+      locale: parsed.data.locale,
+      namespace: "calendar",
+    });
+    await safeLogCalendarEvent(supabase, {
+      userId: user.id,
+      locale: parsed.data.locale,
+      title: t("log_sleep_title", {
+        hours: parsed.data.hours,
+        quality: parsed.data.quality,
+      }),
+      eventDate: parsed.data.slept_at,
+      eventType: "note",
+    });
+  } catch {
+    // Calendar mirror is best-effort; never block sleep log.
+  }
 
   redirect({ href: "/dashboard?ok=sleep", locale: parsed.data.locale });
 }

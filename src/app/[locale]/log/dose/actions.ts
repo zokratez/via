@@ -1,8 +1,10 @@
 "use server";
 
 import { z } from "zod";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 
 const SITES = [
   "abdomen_left",
@@ -63,6 +65,32 @@ export async function logDoseAction(formData: FormData) {
   });
 
   if (error) return { error: "db_failed" as const };
+
+  try {
+    const { data: med } = await supabase
+      .from("medications")
+      .select("name")
+      .eq("id", parsed.data.medication_id)
+      .maybeSingle();
+    const medName = (med?.name as string | undefined) ?? "";
+    const t = await getTranslations({
+      locale: parsed.data.locale,
+      namespace: "calendar",
+    });
+    await safeLogCalendarEvent(supabase, {
+      userId: user.id,
+      locale: parsed.data.locale,
+      title: t("log_dose_title", {
+        name: medName,
+        dose: parsed.data.dose_mg,
+      }),
+      eventDate: toDateOnly(takenAt),
+      eventType: "injection",
+      relatedMedicationId: parsed.data.medication_id,
+    });
+  } catch {
+    // Calendar mirror is best-effort; never block dose log.
+  }
 
   redirect({ href: "/dashboard?ok=dose", locale: parsed.data.locale });
 }

@@ -420,7 +420,11 @@
     "month_sep": "September",
     "month_oct": "October",
     "month_nov": "November",
-    "month_dec": "December"
+    "month_dec": "December",
+    "log_dose_title": "{name} — {dose} mg",
+    "log_weight_title": "Weight: {kg} kg",
+    "log_symptom_title": "Symptom: {category} (severity {severity}/5)",
+    "log_sleep_title": "Sleep: {hours} h (quality {quality}/5)"
   },
   "search": {
     "open_label": "Open search",
