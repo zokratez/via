@@ -306,6 +306,7 @@ export default async function DashboardPage({
     { href: "/log/weight", label: t("log_weight") },
     { href: "/log/symptom", label: t("log_symptom") },
     { href: "/log/sleep", label: t("log_sleep") },
+    { href: "/calendar", label: t("action_calendar") },
     { href: "/coach", label: t("action_coach") },
   ] as const;
 
@@ -414,6 +415,9 @@ export default async function DashboardPage({
           </Link>
           <Link href={calculatorHref} style={navLinkStyle}>
             {t("nav_calculator")}
+          </Link>
+          <Link href="/calendar" style={navLinkStyle}>
+            {t("nav_calendar")}
           </Link>
           {hasStripeSubscription && (
             <ManageSubscriptionLink locale={locale as "es" | "en"} />
