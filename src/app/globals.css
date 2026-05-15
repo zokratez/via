@@ -199,6 +199,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Reserve room at the bottom for the fixed search pill so it
+       never overlaps page content or the footer. */
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
   }
   html {
     @apply font-sans;

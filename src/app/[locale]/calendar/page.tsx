@@ -156,6 +156,14 @@ export default async function CalendarPage({
         className="flex-1 mx-auto w-full"
         style={{ maxWidth: "720px", padding: "2rem 2rem 5rem" }}
       >
+        <Link
+          href="/dashboard"
+          style={{ ...navLinkStyle, display: "inline-block", marginBottom: "1.5rem" }}
+          className="hover:text-[var(--pp-accent)]"
+        >
+          ← {t("nav_dashboard")}
+        </Link>
+
         <h1
           style={{
             fontFamily: SERIF,
