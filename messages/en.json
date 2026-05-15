@@ -127,7 +127,13 @@
     "question_starting_weight": "Today's weight?",
     "skip": "Skip",
     "next": "Next",
-    "finish": "Done"
+    "finish": "Done",
+    "title": "Welcome to PACO Peptide",
+    "subtitle": "Four steps to get started. Take them at your pace.",
+    "step_dose": "Log your first dose",
+    "step_weight": "Record your weight",
+    "step_coach": "Talk to Bukowski",
+    "step_journal": "Explore the journal"
   },
   "dashboard": {
     "greeting_morning": "Good morning, {name}",

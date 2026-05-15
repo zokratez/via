@@ -14,6 +14,7 @@ import {
   AlertBanner,
   type MedicationWithLastDose,
 } from "@/components/AlertBanner";
+import { WelcomeOverlay } from "@/components/WelcomeOverlay";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -104,6 +105,8 @@ export default async function DashboardPage({
     threadsRes,
     medsForAlertsRes,
     lastDosePerMedRes,
+    anyWeightRes,
+    anyCoachMsgRes,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -157,6 +160,17 @@ export default async function DashboardPage({
       .from("doses")
       .select("medication_id, taken_at")
       .order("taken_at", { ascending: false }),
+    supabase
+      .from("weight_entries")
+      .select("id")
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("coach_messages")
+      .select("id")
+      .eq("role", "user")
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -331,6 +345,10 @@ export default async function DashboardPage({
     generic_name: m.generic_name,
     last_dose_at: lastDoseByMed.get(m.id) ?? null,
   }));
+
+  const hasDose = lastDose !== null;
+  const hasWeight = (anyWeightRes.data as { id: string } | null) !== null;
+  const hasCoach = (anyCoachMsgRes.data as { id: string } | null) !== null;
 
   const days = new Set<string>();
   for (const r of (doses14Res.data ?? []) as { taken_at: string }[]) {
@@ -597,6 +615,13 @@ export default async function DashboardPage({
           />
         </div>
       </main>
+
+      <WelcomeOverlay
+        hasDose={hasDose}
+        hasWeight={hasWeight}
+        hasCoach={hasCoach}
+        journalHref={journalHref}
+      />
     </div>
   );
 }
