@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
 import { CalendarView } from "@/components/CalendarView";
+import { TodoList, type Todo } from "@/components/TodoList";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
 function parseYearMonth(value: string | undefined): {
@@ -55,7 +56,7 @@ export default async function CalendarPage({
     nextMonthDate.getUTCMonth() + 1,
   ).padStart(2, "0")}-01`;
 
-  const [eventsRes, medsRes] = await Promise.all([
+  const [eventsRes, medsRes, todosRes] = await Promise.all([
     supabase
       .from("calendar_events")
       .select(
@@ -70,6 +71,10 @@ export default async function CalendarPage({
       .select("id, name")
       .eq("is_active", true)
       .order("created_at", { ascending: true }),
+    supabase
+      .from("todos")
+      .select("id, title, completed, due_date, priority")
+      .order("created_at", { ascending: false }),
   ]);
 
   const t = await getTranslations("calendar");
@@ -89,6 +94,13 @@ export default async function CalendarPage({
   const meds = ((medsRes.data ?? []) as { id: string; name: string }[]).map(
     (m) => ({ id: m.id, name: m.name }),
   );
+  const todos = ((todosRes.data ?? []) as Todo[]).map((todo) => ({
+    id: todo.id,
+    title: todo.title,
+    completed: todo.completed,
+    due_date: todo.due_date,
+    priority: Number(todo.priority),
+  }));
 
   const SERIF = "var(--pp-font-serif)";
   const SANS = "var(--pp-font-sans)";
@@ -167,6 +179,8 @@ export default async function CalendarPage({
           medications={meds}
           locale={locale as "es" | "en"}
         />
+
+        <TodoList todos={todos} locale={locale as "es" | "en"} />
       </main>
     </div>
   );

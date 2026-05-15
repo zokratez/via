@@ -71,6 +71,106 @@ export async function addCalendarEventAction(formData: FormData) {
   return { ok: true as const };
 }
 
+const todoSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  due_date: z
+    .union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+    .optional(),
+  priority: z.coerce.number().int().min(1).max(3),
+  locale: z.enum(LOCALES),
+});
+
+export async function addTodoAction(formData: FormData) {
+  const raw = {
+    title: formData.get("title"),
+    due_date: formData.get("due_date") ?? undefined,
+    priority: formData.get("priority") ?? "2",
+    locale: formData.get("locale"),
+  };
+  const parsed = todoSchema.safeParse(raw);
+  if (!parsed.success) return { error: "validation_failed" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "unauthenticated" as const };
+
+  const dueDate =
+    parsed.data.due_date && parsed.data.due_date.length > 0
+      ? parsed.data.due_date
+      : null;
+
+  const { error } = await supabase.from("todos").insert({
+    user_id: user.id,
+    title: parsed.data.title,
+    due_date: dueDate,
+    priority: parsed.data.priority,
+  });
+
+  if (error) return { error: "db_failed" as const };
+
+  revalidatePath(`/${parsed.data.locale}/calendar`);
+  return { ok: true as const };
+}
+
+const toggleSchema = z.object({
+  id: z.string().uuid(),
+  completed: z.enum(["true", "false"]),
+  locale: z.enum(LOCALES),
+});
+
+export async function toggleTodoAction(formData: FormData) {
+  const parsed = toggleSchema.safeParse({
+    id: formData.get("id"),
+    completed: formData.get("completed"),
+    locale: formData.get("locale"),
+  });
+  if (!parsed.success) return { error: "validation_failed" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "unauthenticated" as const };
+
+  const { error } = await supabase
+    .from("todos")
+    .update({ completed: parsed.data.completed === "true" })
+    .eq("id", parsed.data.id)
+    .eq("user_id", user.id);
+
+  if (error) return { error: "db_failed" as const };
+
+  revalidatePath(`/${parsed.data.locale}/calendar`);
+  return { ok: true as const };
+}
+
+export async function deleteTodoAction(formData: FormData) {
+  const parsed = deleteSchema.safeParse({
+    id: formData.get("id"),
+    locale: formData.get("locale"),
+  });
+  if (!parsed.success) return { error: "validation_failed" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "unauthenticated" as const };
+
+  const { error } = await supabase
+    .from("todos")
+    .delete()
+    .eq("id", parsed.data.id)
+    .eq("user_id", user.id);
+
+  if (error) return { error: "db_failed" as const };
+
+  revalidatePath(`/${parsed.data.locale}/calendar`);
+  return { ok: true as const };
+}
+
 const deleteSchema = z.object({
   id: z.string().uuid(),
   locale: z.enum(LOCALES),

@@ -414,6 +414,20 @@
     "month_nov": "Noviembre",
     "month_dec": "Diciembre"
   },
+  "todo": {
+    "section_title": "Pendientes",
+    "add_placeholder": "Nueva tarea…",
+    "due_date": "Fecha límite",
+    "priority": "Prioridad",
+    "priority_high": "Alta",
+    "priority_medium": "Media",
+    "priority_low": "Baja",
+    "add": "Agregar",
+    "adding": "Agregando…",
+    "delete": "Eliminar",
+    "empty": "No tienes tareas pendientes.",
+    "validation_failed": "Revisa los campos"
+  },
   "admin": {
     "title": "Borradores",
     "subtitle": "Cola de aprobación de artículos",

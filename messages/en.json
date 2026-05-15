@@ -414,6 +414,20 @@
     "month_nov": "November",
     "month_dec": "December"
   },
+  "todo": {
+    "section_title": "To-do",
+    "add_placeholder": "New task…",
+    "due_date": "Due date",
+    "priority": "Priority",
+    "priority_high": "High",
+    "priority_medium": "Medium",
+    "priority_low": "Low",
+    "add": "Add",
+    "adding": "Adding…",
+    "delete": "Delete",
+    "empty": "No tasks yet.",
+    "validation_failed": "Check the fields"
+  },
   "admin": {
     "title": "Drafts",
     "subtitle": "Article approval queue",
