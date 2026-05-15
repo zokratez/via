@@ -10,6 +10,10 @@ import { type SymptomEntry } from "@/components/SymptomChart";
 import { type SleepEntry } from "@/components/SleepChart";
 import { type CoachThread } from "@/components/CoachHistory";
 import { DashboardTabs } from "@/components/DashboardTabs";
+import {
+  AlertBanner,
+  type MedicationWithLastDose,
+} from "@/components/AlertBanner";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -88,6 +92,8 @@ export default async function DashboardPage({
     symptoms90Res,
     sleep90Res,
     threadsRes,
+    medsForAlertsRes,
+    lastDosePerMedRes,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -133,6 +139,14 @@ export default async function DashboardPage({
       )
       .order("updated_at", { ascending: false })
       .limit(50),
+    supabase
+      .from("medications")
+      .select("id, name, generic_name")
+      .eq("is_active", true),
+    supabase
+      .from("doses")
+      .select("medication_id, taken_at")
+      .order("taken_at", { ascending: false }),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -288,6 +302,25 @@ export default async function DashboardPage({
       };
     },
   );
+
+  type MedRow = { id: string; name: string; generic_name: string | null };
+  const medsForAlerts = (medsForAlertsRes.data ?? []) as MedRow[];
+  const lastDoseByMed = new Map<string, string>();
+  for (const r of (lastDosePerMedRes.data ?? []) as {
+    medication_id: string | null;
+    taken_at: string;
+  }[]) {
+    if (!r.medication_id) continue;
+    if (!lastDoseByMed.has(r.medication_id)) {
+      lastDoseByMed.set(r.medication_id, r.taken_at);
+    }
+  }
+  const alertMedications: MedicationWithLastDose[] = medsForAlerts.map((m) => ({
+    id: m.id,
+    name: m.name,
+    generic_name: m.generic_name,
+    last_dose_at: lastDoseByMed.get(m.id) ?? null,
+  }));
 
   const days = new Set<string>();
   for (const r of (doses14Res.data ?? []) as { taken_at: string }[]) {
@@ -464,6 +497,11 @@ export default async function DashboardPage({
         >
           {greeting}
         </h1>
+
+        <AlertBanner
+          medications={alertMedications}
+          locale={locale as "es" | "en"}
+        />
 
         <div
           className="grid gap-4 sm:grid-cols-3"

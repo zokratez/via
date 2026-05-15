@@ -370,6 +370,14 @@
     "example_3": "Retatrutide 10mg + 2mL de agua, dosis 2mg",
     "disclaimer": "Esto es matemática, no medicina. La dosis la decide tu médico, no una calculadora."
   },
+  "alerts": {
+    "tomorrow": "Mañana toca inyección",
+    "today": "Inyección hoy",
+    "overdue": "{count, plural, one {Te atrasaste # día} other {Te atrasaste # días}}",
+    "last_dose": "Última: {date}",
+    "next_dose": "Siguiente: {date}",
+    "log_dose_cta": "Registrar"
+  },
   "calendar": {
     "title": "Calendario",
     "nav_dashboard": "panel",
