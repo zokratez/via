@@ -433,6 +433,7 @@
     "close_label": "Close search",
     "dialog_label": "Global search",
     "placeholder": "Search articles, doses, conversations…",
+    "placeholder_short": "Search",
     "hint": "Type to search across everything you've logged.",
     "loading": "Searching…",
     "listening": "Listening…",

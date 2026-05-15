@@ -255,12 +255,6 @@ export function GlobalSearch() {
     setOpen(true);
   }
 
-  function onMicClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    if (listening) stopListening();
-    else startListening();
-  }
-
   function onResultClick(href: string) {
     closeOverlay();
     router.push(href);
@@ -284,13 +278,11 @@ export function GlobalSearch() {
       <div
         style={{
           position: "fixed",
-          bottom: 0,
           left: 0,
           right: 0,
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 60px)",
           display: "flex",
           justifyContent: "center",
-          padding: "0 1rem",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
           pointerEvents: "none",
           zIndex: 90,
         }}
@@ -301,66 +293,27 @@ export function GlobalSearch() {
           aria-label={t("open_label")}
           style={{
             pointerEvents: "auto",
-            width: "90%",
-            maxWidth: "540px",
-            background: "rgba(26,22,20,0.7)",
+            width: "180px",
+            height: "36px",
+            background: "rgba(255,255,255,0.08)",
             WebkitBackdropFilter: "blur(20px)",
             backdropFilter: "blur(20px)",
-            border: "0.5px solid rgba(255,255,255,0.08)",
-            borderRadius: "9999px",
-            padding: "12px 18px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "18px",
+            padding: "0 12px",
             display: "flex",
             alignItems: "center",
-            gap: "0.75rem",
+            justifyContent: "center",
+            gap: "6px",
             cursor: "pointer",
-            color: "var(--pp-text-secondary)",
-            fontFamily: SERIF,
-            fontSize: "15px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.35)",
-            transition: "transform 0.15s",
+            fontFamily: SANS,
+            fontSize: "12px",
+            color: "rgba(255,255,255,0.3)",
+            boxShadow: "none",
           }}
         >
-          <SearchIcon color="var(--pp-accent)" size={18} />
-          <span style={{ flex: 1, textAlign: "left", opacity: 0.7 }}>
-            {t("placeholder")}
-          </span>
-          {speechSupported && (
-            <span
-              role="button"
-              aria-label={t("mic_label")}
-              tabIndex={0}
-              onClick={onMicClick}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (listening) stopListening();
-                  else startListening();
-                }
-              }}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "28px",
-                height: "28px",
-                borderRadius: "9999px",
-                background: listening
-                  ? "var(--pp-accent)"
-                  : "transparent",
-                color: listening
-                  ? "var(--pp-bg)"
-                  : "var(--pp-text-secondary)",
-                cursor: "pointer",
-              }}
-            >
-              <MicIcon
-                color="currentColor"
-                size={16}
-                filled={listening}
-              />
-            </span>
-          )}
+          <SearchIcon color="rgba(255,255,255,0.4)" size={12} />
+          <span>{t("placeholder_short")}</span>
         </button>
       </div>
 

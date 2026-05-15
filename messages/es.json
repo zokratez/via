@@ -433,6 +433,7 @@
     "close_label": "Cerrar búsqueda",
     "dialog_label": "Búsqueda global",
     "placeholder": "Busca artículos, dosis, conversaciones…",
+    "placeholder_short": "Buscar",
     "hint": "Escribe para buscar en todo lo tuyo.",
     "loading": "Buscando…",
     "listening": "Escuchando…",

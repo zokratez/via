@@ -199,9 +199,10 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Reserve room at the bottom for the fixed search pill so it
-       never overlaps page content or the footer. */
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
+    /* Reserve room at the bottom so the fixed glass search pill
+       (positioned 60px above the safe area, 36px tall) never sits
+       over page content or footer links. */
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
   }
   html {
     @apply font-sans;
