@@ -186,7 +186,8 @@
     "coach_history_role_assistant": "Bukowski",
     "coach_history_questions_asked": "preguntas tuyas",
     "coach_history_asked_n": "Preguntado {count} veces",
-    "manage_subscription": "Administrar suscripción"
+    "manage_subscription": "Administrar suscripción",
+    "leave_review": "Deja una reseña →"
   },
   "dose": {
     "title": "Registrar dosis",
@@ -329,6 +330,7 @@
     "privacy": "Privacidad",
     "terms": "Términos",
     "calculator": "Calculadora",
+    "reviews": "Reseñas",
     "copyright": "© 2026 ooabi LLC. Todos los derechos reservados."
   },
   "reviews": {

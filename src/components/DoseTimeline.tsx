@@ -203,6 +203,8 @@ export function DoseTimeline({
             name={generic}
             data={points}
             fill={COLORS_BY_GENERIC[generic] ?? FALLBACK_COLOR}
+            isAnimationActive
+            animationDuration={600}
           />
         ))}
       </ScatterChart>

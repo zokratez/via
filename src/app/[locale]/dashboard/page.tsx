@@ -9,7 +9,7 @@ import { type DosePoint } from "@/components/DoseTimeline";
 import { type SymptomEntry } from "@/components/SymptomChart";
 import { type SleepEntry } from "@/components/SleepChart";
 import { type CoachThread } from "@/components/CoachHistory";
-import { DashboardTabs } from "@/components/DashboardTabs";
+import { DashboardTabs, type TabKey } from "@/components/DashboardTabs";
 import {
   AlertBanner,
   type MedicationWithLastDose,
@@ -44,13 +44,23 @@ export default async function DashboardPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ ok?: string }>;
+  searchParams: Promise<{ ok?: string; tab?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const sp = await searchParams;
   const showSavedToast =
     sp.ok === "dose" || sp.ok === "weight" || sp.ok === "symptom";
+  const VALID_TABS: readonly TabKey[] = [
+    "doses",
+    "weight",
+    "symptoms",
+    "sleep",
+    "coach",
+  ];
+  const initialTab = (VALID_TABS as readonly string[]).includes(sp.tab ?? "")
+    ? (sp.tab as TabKey)
+    : undefined;
 
   const supabase = await createClient();
   const {
@@ -507,26 +517,38 @@ export default async function DashboardPage({
           className="grid gap-4 sm:grid-cols-3"
           style={{ marginTop: "2.5rem" }}
         >
-          <div style={cardStyle}>
+          <Link
+            href="/dashboard?tab=doses#dashboard-tabs"
+            style={{ ...cardStyle, animationDelay: "0s" }}
+            className="pp-stat-card pp-fade-up"
+          >
             <p style={eyebrowStyle}>{t("stat_last_dose")}</p>
             <p style={statValueStyle}>{lastDoseStr}</p>
             {lastDoseSubStr && <p style={statSubStyle}>{lastDoseSubStr}</p>}
-          </div>
+          </Link>
 
-          <div style={cardStyle}>
+          <Link
+            href="/dashboard?tab=weight#dashboard-tabs"
+            style={{ ...cardStyle, animationDelay: "0.1s" }}
+            className="pp-stat-card pp-fade-up"
+          >
             <p style={eyebrowStyle}>{t("stat_weight")}</p>
             <p style={statValueStyle}>{weightLatestStr}</p>
             {weightDeltaStr && <p style={statSubStyle}>{weightDeltaStr}</p>}
-          </div>
+          </Link>
 
-          <div style={cardStyle}>
+          <Link
+            href="/dashboard?tab=doses#dashboard-tabs"
+            style={{ ...cardStyle, animationDelay: "0.2s" }}
+            className="pp-stat-card pp-fade-up"
+          >
             <p style={eyebrowStyle}>{t("stat_streak")}</p>
             <p style={statValueStyle}>
               {streakCount === 0
                 ? t("stat_empty")
                 : t("streak_days", { count: streakCount })}
             </p>
-          </div>
+          </Link>
         </div>
 
         <div
@@ -545,6 +567,23 @@ export default async function DashboardPage({
           ))}
         </div>
 
+        <div style={{ marginTop: "1rem", textAlign: "center" }}>
+          <Link
+            href="/reviews/submit"
+            style={{
+              fontFamily: SANS,
+              fontSize: "12px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "var(--pp-accent)",
+              textDecoration: "none",
+            }}
+            className="hover:underline"
+          >
+            {t("leave_review")}
+          </Link>
+        </div>
+
         <div style={{ ...cardStyle, marginTop: "2rem", padding: "1.5rem" }}>
           <DashboardTabs
             doses={dosePoints}
@@ -554,6 +593,7 @@ export default async function DashboardPage({
             sleep={sleepEntries}
             threads={coachThreads}
             locale={locale as "es" | "en"}
+            initialTab={initialTab}
           />
         </div>
       </main>

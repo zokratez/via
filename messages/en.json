@@ -186,7 +186,8 @@
     "coach_history_role_assistant": "Bukowski",
     "coach_history_questions_asked": "questions from you",
     "coach_history_asked_n": "Asked {count} times",
-    "manage_subscription": "Manage subscription"
+    "manage_subscription": "Manage subscription",
+    "leave_review": "Leave a review →"
   },
   "dose": {
     "title": "Log dose",
@@ -329,6 +330,7 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "calculator": "Calculator",
+    "reviews": "Reviews",
     "copyright": "© 2026 ooabi LLC. All rights reserved."
   },
   "reviews": {

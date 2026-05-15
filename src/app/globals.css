@@ -127,6 +127,38 @@
   text-decoration: underline;
 }
 
+@keyframes pp-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pp-fade-up {
+  opacity: 0;
+  animation: pp-fade-up 0.45s ease-out forwards;
+}
+
+.pp-stat-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease-out, border-color 0.18s ease-out;
+  cursor: pointer;
+}
+.pp-stat-card:hover {
+  border-color: var(--pp-accent) !important;
+  transform: scale(1.02);
+}
+.pp-stat-card:active {
+  opacity: 0.85;
+  transform: scale(0.99);
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

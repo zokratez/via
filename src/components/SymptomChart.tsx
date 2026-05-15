@@ -250,7 +250,9 @@ export function SymptomChart({
               dataKey={cat}
               stackId="symptoms"
               fill={COLORS[cat]}
-              isAnimationActive={false}
+              isAnimationActive
+              animationDuration={600}
+              animationEasing="ease-out"
             />
           ))}
         </BarChart>

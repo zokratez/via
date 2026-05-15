@@ -272,7 +272,12 @@ export function SleepChart({
             content={<TooltipContent />}
             cursor={{ fill: "var(--pp-text-tertiary)", opacity: 0.08 }}
           />
-          <Bar dataKey="hours" isAnimationActive={false}>
+          <Bar
+            dataKey="hours"
+            isAnimationActive
+            animationDuration={600}
+            animationEasing="ease-out"
+          >
             {points.map((p, i) => (
               <Cell
                 key={i}

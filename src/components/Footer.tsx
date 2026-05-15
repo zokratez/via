@@ -45,6 +45,9 @@ export async function Footer({ locale }: { locale?: "es" | "en" } = {}) {
           <Link href={calculatorHref} style={linkStyle}>
             {t("calculator")}
           </Link>
+          <Link href="/reviews/submit" style={linkStyle}>
+            {t("reviews")}
+          </Link>
           <Link href="/privacy" style={linkStyle}>
             {t("privacy")}
           </Link>

@@ -72,7 +72,20 @@ export function WeightChart({
   const filtered = useMemo(() => {
     if (data.length === 0) return [] as WeightPoint[];
     const cutoffMs = Date.now() - range * 86_400_000;
-    return data.filter((p) => new Date(p.date).getTime() >= cutoffMs);
+    const inRange = data.filter(
+      (p) => new Date(p.date).getTime() >= cutoffMs,
+    );
+    // Collapse multiple entries on the same calendar day to the most
+    // recent one. Input is sorted ascending by date, so the later
+    // entry overwrites earlier ones.
+    const byDay = new Map<string, WeightPoint>();
+    for (const p of inRange) {
+      const dayKey = new Date(p.date).toISOString().slice(0, 10);
+      byDay.set(dayKey, p);
+    }
+    return Array.from(byDay.values()).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
   }, [data, range]);
 
   const hasWaist = filtered.some((p) => p.waist !== null);
@@ -289,7 +302,9 @@ export function WeightChart({
             fill="url(#weightGrad)"
             dot={{ r: 3, fill: "var(--pp-accent)" }}
             activeDot={{ r: 5 }}
-            isAnimationActive={false}
+            isAnimationActive
+            animationDuration={800}
+            animationEasing="ease-in-out"
           />
           {hasWaist && (
             <Line
@@ -299,7 +314,9 @@ export function WeightChart({
               strokeWidth={1.5}
               strokeDasharray="3 3"
               dot={false}
-              isAnimationActive={false}
+              isAnimationActive
+              animationDuration={800}
+              animationEasing="ease-in-out"
               connectNulls
             />
           )}

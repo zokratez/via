@@ -14,7 +14,7 @@ import {
   type CoachThread,
 } from "@/components/CoachHistory";
 
-type TabKey = "doses" | "weight" | "symptoms" | "sleep" | "coach";
+export type TabKey = "doses" | "weight" | "symptoms" | "sleep" | "coach";
 const TABS: readonly TabKey[] = [
   "doses",
   "weight",
@@ -33,6 +33,7 @@ export function DashboardTabs({
   sleep,
   threads,
   locale,
+  initialTab,
 }: {
   doses: DosePoint[];
   weights: WeightPoint[];
@@ -41,12 +42,13 @@ export function DashboardTabs({
   sleep: SleepEntry[];
   threads: CoachThread[];
   locale: "es" | "en";
+  initialTab?: TabKey;
 }) {
   const t = useTranslations("dashboard");
-  const [active, setActive] = useState<TabKey>("doses");
+  const [active, setActive] = useState<TabKey>(initialTab ?? "doses");
 
   return (
-    <div>
+    <div id="dashboard-tabs">
       <div
         role="tablist"
         style={{
