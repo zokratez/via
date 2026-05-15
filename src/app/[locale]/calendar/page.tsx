@@ -3,6 +3,7 @@ import { Link, redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { CalendarView } from "@/components/CalendarView";
 import { TodoList, type Todo } from "@/components/TodoList";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
@@ -147,6 +148,7 @@ export default async function CalendarPage({
           <Link href="/dashboard" style={navLinkStyle}>
             {t("nav_dashboard")}
           </Link>
+          <GlobalSearch />
           <LocaleSwitcher />
           <SignOutButton label={tAuth("sign_out")} />
         </div>

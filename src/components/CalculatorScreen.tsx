@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { PeptideCalculator } from "@/components/PeptideCalculator";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";
@@ -44,6 +45,7 @@ export async function CalculatorScreen({ locale }: { locale: "es" | "en" }) {
         <span
           style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}
         >
+          <GlobalSearch />
           <LocaleSwitcher variant="dark" />
           <Link
             href="/auth/sign-in"

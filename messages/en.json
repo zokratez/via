@@ -422,6 +422,21 @@
     "month_nov": "November",
     "month_dec": "December"
   },
+  "search": {
+    "open_label": "Open search",
+    "close_label": "Close search",
+    "dialog_label": "Global search",
+    "placeholder": "Search articles, doses, conversations…",
+    "hint": "Type to search across everything you've logged.",
+    "loading": "Searching…",
+    "empty": "No results found.",
+    "category_articles": "Journal",
+    "category_coach": "Bukowski",
+    "category_doses": "Doses",
+    "category_weight": "Weight",
+    "category_calendar": "Calendar",
+    "category_todos": "To-do"
+  },
   "todo": {
     "section_title": "To-do",
     "add_placeholder": "New task…",

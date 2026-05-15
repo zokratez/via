@@ -6,6 +6,7 @@ import { buildMetadata, SITE_URL, type SeoLocale } from "@/lib/seo";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { HomepageReviews } from "@/components/HomepageReviews";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export async function generateMetadata({
   params,
@@ -114,6 +115,7 @@ export default async function LandingPage({
           <Link href={calculatorHref} style={navLinkStyle}>
             {t("nav_calculator")}
           </Link>
+          <GlobalSearch />
           <LocaleSwitcher variant="dark" />
           <Link
             href="/auth/sign-in"

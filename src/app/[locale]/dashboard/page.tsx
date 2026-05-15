@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { ManageSubscriptionLink } from "@/components/ManageSubscriptionLink";
 import { SignOutButton } from "@/components/SignOutButton";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import { type WeightPoint } from "@/components/WeightChart";
 import { type DosePoint } from "@/components/DoseTimeline";
 import { type SymptomEntry } from "@/components/SymptomChart";
@@ -452,6 +453,7 @@ export default async function DashboardPage({
           <Link href="/calendar" style={navLinkStyle}>
             {t("nav_calendar")}
           </Link>
+          <GlobalSearch />
           {hasStripeSubscription && (
             <ManageSubscriptionLink locale={locale as "es" | "en"} />
           )}

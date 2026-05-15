@@ -422,6 +422,21 @@
     "month_nov": "Noviembre",
     "month_dec": "Diciembre"
   },
+  "search": {
+    "open_label": "Abrir búsqueda",
+    "close_label": "Cerrar búsqueda",
+    "dialog_label": "Búsqueda global",
+    "placeholder": "Busca artículos, dosis, conversaciones…",
+    "hint": "Escribe para buscar en todo lo tuyo.",
+    "loading": "Buscando…",
+    "empty": "Sin resultados.",
+    "category_articles": "Diario",
+    "category_coach": "Bukowski",
+    "category_doses": "Dosis",
+    "category_weight": "Peso",
+    "category_calendar": "Calendario",
+    "category_todos": "Pendientes"
+  },
   "todo": {
     "section_title": "Pendientes",
     "add_placeholder": "Nueva tarea…",
