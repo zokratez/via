@@ -1,0 +1,25 @@
+{
+  "name": "PACO Peptide",
+  "short_name": "PACO",
+  "description": "Tu copiloto en tu camino con GLP-1",
+  "start_url": "/es",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1614",
+  "theme_color": "#c9966b",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
