@@ -50,7 +50,7 @@ export default function RootLayout({
           <Script
             defer
             data-domain="pacopeptide.com"
-            src="https://plausible.io/js/script.js"
+            src="https://plausible.io/js/pa-DKTBhZaM7J34Vshl5XWrN.js"
             strategy="afterInteractive"
           />
         )}
