@@ -115,10 +115,27 @@ export function GlobalSearch() {
   const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolling(true);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      scrollTimeoutRef.current = setTimeout(() => {
+        setScrolling(false);
+      }, 200);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, []);
 
   const SpeechRecognitionCtor = useMemo<SpeechRecognitionCtor | null>(() => {
     if (typeof window === "undefined") return null;
@@ -280,11 +297,13 @@ export function GlobalSearch() {
           position: "fixed",
           left: 0,
           right: 0,
-          bottom: "calc(env(safe-area-inset-bottom, 0px) + 60px)",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)",
           display: "flex",
           justifyContent: "center",
           pointerEvents: "none",
           zIndex: 90,
+          opacity: scrolling ? 0.3 : 1,
+          transition: "opacity 0.2s ease-out",
         }}
       >
         <button

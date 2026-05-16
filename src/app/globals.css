@@ -197,12 +197,17 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
   body {
     @apply bg-background text-foreground;
     /* Reserve room at the bottom so the fixed glass search pill
-       (positioned 60px above the safe area, 36px tall) never sits
+       (positioned 80px above the safe area, 36px tall) never sits
        over page content or footer links. */
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 104px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 124px);
   }
   html {
     @apply font-sans;
