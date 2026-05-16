@@ -318,26 +318,27 @@ export function GlobalSearch() {
           aria-label={t("open_label")}
           style={{
             pointerEvents: "auto",
-            width: "180px",
-            height: "36px",
-            background: "rgba(255,255,255,0.08)",
-            WebkitBackdropFilter: "blur(20px)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "18px",
-            padding: "0 12px",
+            width: "200px",
+            height: "40px",
+            background: "rgba(255,255,255,0.10)",
+            WebkitBackdropFilter: "blur(12px) saturate(180%)",
+            backdropFilter: "blur(12px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.18)",
+            borderRadius: "999px",
+            padding: "0 14px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "6px",
+            gap: "8px",
             cursor: "pointer",
             fontFamily: SANS,
-            fontSize: "12px",
-            color: "rgba(255,255,255,0.3)",
-            boxShadow: "none",
+            fontSize: "13px",
+            color: "rgba(255,255,255,0.55)",
+            boxShadow:
+              "inset 0 1px 1px rgba(255,255,255,0.25), inset 0 -1px 1px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.25)",
           }}
         >
-          <SearchIcon color="rgba(255,255,255,0.4)" size={12} />
+          <SearchIcon color="rgba(255,255,255,0.55)" size={13} />
           <span>{t("placeholder_short")}</span>
         </button>
       </div>
