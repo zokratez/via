@@ -303,7 +303,7 @@ export function GlobalSearch() {
           position: "fixed",
           left: 0,
           right: 0,
-          bottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
           display: "flex",
           justifyContent: "center",
           pointerEvents: "none",
