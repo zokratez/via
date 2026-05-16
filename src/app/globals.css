@@ -204,6 +204,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Dark background so the bottom padding strip (below the footer)
+       matches the editorial theme instead of showing white on iOS. */
+    background-color: var(--pp-bg);
     /* Reserve room at the bottom so the fixed glass search pill
        (positioned 80px above the safe area, 36px tall) never sits
        over page content or footer links. */

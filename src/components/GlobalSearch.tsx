@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+
+const AUTH_PATH_RE = /^\/(es|en)\/(dashboard|log|coach|calendar|admin)(\/.*)?$/;
 
 type SearchResult = {
   category: "articles" | "coach" | "doses" | "weight" | "calendar" | "todos";
@@ -110,6 +113,7 @@ export function GlobalSearch() {
   const t = useTranslations("search");
   const router = useRouter();
   const locale = useLocale();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResponse | null>(null);
@@ -289,6 +293,8 @@ export function GlobalSearch() {
       }
     }
   }
+
+  if (AUTH_PATH_RE.test(pathname)) return null;
 
   return (
     <>
