@@ -50,10 +50,12 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      {children}
-      <FooterGate>
-        <Footer locale={locale as "es" | "en"} />
-      </FooterGate>
+      <div style={{ overflowX: "hidden", width: "100%" }}>
+        {children}
+        <FooterGate>
+          <Footer locale={locale as "es" | "en"} />
+        </FooterGate>
+      </div>
       <GlobalSearch />
     </NextIntlClientProvider>
   );
