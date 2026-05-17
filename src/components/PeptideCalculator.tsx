@@ -25,6 +25,11 @@ function trim(n: number, max = 4): string {
   return (Math.round(n * factor) / factor).toString();
 }
 
+function parsePositive(s: string): number {
+  const n = Number(s);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
 const sectionStyle: React.CSSProperties = { marginBottom: "2rem" };
 
 const labelStyle: React.CSSProperties = {
@@ -161,20 +166,16 @@ export function PeptideCalculator() {
 
   function setVialFromCustom(s: string) {
     setVialCustom(s);
-    const n = Number(s);
-    if (Number.isFinite(n) && n > 0) setVialMg(n);
+    setVialMg(parsePositive(s));
   }
   function setBacFromCustom(s: string) {
     setBacCustom(s);
-    const n = Number(s);
-    if (Number.isFinite(n) && n > 0) setBacMl(n);
+    setBacMl(parsePositive(s));
   }
   function setDoseFromCustom(s: string, unit: DoseUnit) {
     setDoseCustom(s);
-    const n = Number(s);
-    if (Number.isFinite(n) && n > 0) {
-      setDoseMg(unit === "mcg" ? n / 1000 : n);
-    }
+    const n = parsePositive(s);
+    setDoseMg(unit === "mcg" ? n / 1000 : n);
   }
 
   function loadExample(opts: { vialMg: number; bacMl: number; doseMg: number }) {
@@ -202,7 +203,10 @@ export function PeptideCalculator() {
           ))}
           <button
             type="button"
-            onClick={() => setVialMode("custom")}
+            onClick={() => {
+              setVialMode("custom");
+              setVialMg(parsePositive(vialCustom));
+            }}
             style={chipStyle(vialMode === "custom")}
           >
             {t("preset_other")}
@@ -237,7 +241,10 @@ export function PeptideCalculator() {
           ))}
           <button
             type="button"
-            onClick={() => setBacMode("custom")}
+            onClick={() => {
+              setBacMode("custom");
+              setBacMl(parsePositive(bacCustom));
+            }}
             style={chipStyle(bacMode === "custom")}
           >
             {t("preset_other")}
@@ -272,7 +279,10 @@ export function PeptideCalculator() {
           ))}
           <button
             type="button"
-            onClick={() => setDoseMode("custom")}
+            onClick={() => {
+              setDoseMode("custom");
+              setDoseFromCustom(doseCustom, doseCustomUnit);
+            }}
             style={chipStyle(doseMode === "custom")}
           >
             {t("preset_other")}
