@@ -442,13 +442,15 @@ function SyringeSvg({ fillPct }: { fillPct: number }) {
           fill="var(--pp-accent)"
         />
       )}
-      {[0.25, 0.5, 0.75].map((p) => {
+      {Array.from({ length: 10 }, (_, i) => (i + 1) * 10).map((unit) => {
+        const p = unit / 100;
         const x = 20 + p * 320;
+        const isMajor = unit % 50 === 0 || unit === 100;
         return (
-          <g key={p}>
+          <g key={unit}>
             <line
               x1={x}
-              y1="20"
+              y1={isMajor ? "16" : "20"}
               x2={x}
               y2="25"
               stroke="var(--pp-text-tertiary)"
@@ -456,13 +458,13 @@ function SyringeSvg({ fillPct }: { fillPct: number }) {
             />
             <text
               x={x}
-              y="14"
+              y={isMajor ? "12" : "16"}
               fontSize="9"
               fill="var(--pp-text-tertiary)"
               fontFamily="var(--pp-font-sans)"
               textAnchor="middle"
             >
-              {Math.round(p * 100)}
+              {unit}
             </text>
           </g>
         );
