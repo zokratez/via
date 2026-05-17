@@ -316,6 +316,7 @@ export function GlobalSearch() {
           type="button"
           onClick={onPillClick}
           aria-label={t("open_label")}
+          className="pp-global-search-pill"
           style={{
             pointerEvents: "auto",
             width: "200px",
