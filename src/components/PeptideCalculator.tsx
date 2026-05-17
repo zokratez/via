@@ -414,52 +414,60 @@ export function PeptideCalculator() {
 }
 
 function SyringeSvg({ fillPct }: { fillPct: number }) {
-  const fillW = Math.max(0, Math.min(1, fillPct)) * 320;
+  const barrelX = 50;
+  const barrelW = 300;
+  const fillW = Math.max(0, Math.min(1, fillPct)) * barrelW;
   return (
     <svg
-      viewBox="0 0 400 80"
+      viewBox="0 0 430 112"
       width="100%"
       role="img"
-      aria-label="syringe fill illustration"
-      style={{ maxWidth: "400px", display: "block" }}
+      aria-label="100 unit insulin syringe fill illustration"
+      style={{ maxWidth: "520px", display: "block" }}
     >
-      <rect x="0" y="32" width="20" height="16" fill="var(--pp-text-tertiary)" />
       <rect
-        x="20"
-        y="25"
-        width="320"
-        height="30"
+        x="18"
+        y="33"
+        width="32"
+        height="18"
+        fill="var(--pp-text-tertiary)"
+      />
+      <rect
+        x={barrelX}
+        y="24"
+        width={barrelW}
+        height="36"
         fill="var(--pp-bg)"
         stroke="var(--pp-border)"
         strokeWidth="1"
       />
       {fillW > 0 && (
         <rect
-          x="20"
-          y="27"
+          x={barrelX}
+          y="26"
           width={fillW}
-          height="26"
+          height="32"
           fill="var(--pp-accent)"
         />
       )}
       {Array.from({ length: 10 }, (_, i) => (i + 1) * 10).map((unit) => {
         const p = unit / 100;
-        const x = 20 + p * 320;
+        const x = barrelX + p * barrelW;
         const isMajor = unit % 50 === 0 || unit === 100;
         return (
           <g key={unit}>
             <line
               x1={x}
-              y1={isMajor ? "16" : "20"}
+              y1="60"
               x2={x}
-              y2="25"
+              y2={isMajor ? "75" : "70"}
               stroke="var(--pp-text-tertiary)"
               strokeWidth="1"
             />
             <text
               x={x}
-              y={isMajor ? "12" : "16"}
-              fontSize="9"
+              y="92"
+              fontSize="11"
               fill="var(--pp-text-tertiary)"
               fontFamily="var(--pp-font-sans)"
               textAnchor="middle"
@@ -470,15 +478,15 @@ function SyringeSvg({ fillPct }: { fillPct: number }) {
         );
       })}
       <line
-        x1="340"
-        y1="40"
-        x2="395"
-        y2="40"
+        x1="350"
+        y1="42"
+        x2="420"
+        y2="42"
         stroke="var(--pp-text-tertiary)"
         strokeWidth="2"
       />
       <polygon
-        points="395,38 400,40 395,42"
+        points="420,39 428,42 420,45"
         fill="var(--pp-text-tertiary)"
       />
     </svg>
