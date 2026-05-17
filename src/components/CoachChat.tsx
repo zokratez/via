@@ -82,21 +82,25 @@ type Props = {
   locale: Locale;
   initialQuotaRemaining: number;
   isPro: boolean;
+  initialThreadId?: string | null;
+  initialMessages?: Message[];
 };
 
 export function CoachChat({
   locale,
   initialQuotaRemaining,
   isPro,
+  initialThreadId = null,
+  initialMessages = [],
 }: Props) {
   const t = useTranslations("coach");
   const tPaywall = useTranslations("paywall");
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
-  const [threadId, setThreadId] = useState<string | null>(null);
+  const [threadId, setThreadId] = useState<string | null>(initialThreadId);
   const [quotaRemaining, setQuotaRemaining] = useState<number>(
     isPro ? Number.POSITIVE_INFINITY : initialQuotaRemaining,
   );

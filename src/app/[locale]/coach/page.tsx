@@ -8,6 +8,14 @@ import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
 const FREE_TIER_DAILY_LIMIT = 3;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type InitialMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+};
 
 function todayInMexicoCity(): string {
   const fmt = new Intl.DateTimeFormat("en-CA", {
@@ -24,7 +32,7 @@ export default async function CoachPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ upgraded?: string }>;
+  searchParams: Promise<{ upgraded?: string; thread?: string }>;
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
@@ -57,6 +65,10 @@ export default async function CoachPage({
   });
 
   const isPro = isActiveSubscriber(tier);
+  const requestedThreadId =
+    typeof sp.thread === "string" && UUID_RE.test(sp.thread)
+      ? sp.thread
+      : null;
 
   let initialQuotaRemaining = FREE_TIER_DAILY_LIMIT;
   if (!isPro) {
@@ -71,11 +83,48 @@ export default async function CoachPage({
     initialQuotaRemaining = Math.max(0, FREE_TIER_DAILY_LIMIT - used);
   }
 
+  let initialThreadId: string | null = null;
+  let initialMessages: InitialMessage[] = [];
+  if (requestedThreadId) {
+    const { data: thread } = await supabase
+      .from("coach_threads")
+      .select("id")
+      .eq("id", requestedThreadId)
+      .eq("user_id", user!.id)
+      .maybeSingle();
+
+    if (thread) {
+      const { data: rows } = await supabase
+        .from("coach_messages")
+        .select("id, role, content, created_at")
+        .eq("thread_id", requestedThreadId)
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: true });
+
+      initialThreadId = thread.id;
+      initialMessages = ((rows ?? []) as Array<{
+        id: string;
+        role: string;
+        content: string;
+      }>)
+        .filter((m): m is InitialMessage =>
+          m.role === "user" || m.role === "assistant",
+        )
+        .map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+        }));
+    }
+  }
+
   return (
     <CoachChat
       locale={locale as "es" | "en"}
       isPro={isPro}
       initialQuotaRemaining={initialQuotaRemaining}
+      initialThreadId={initialThreadId}
+      initialMessages={initialMessages}
     />
   );
 }
