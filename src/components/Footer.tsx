@@ -12,8 +12,7 @@ const linkStyle: React.CSSProperties = {
 
 export async function Footer({ locale }: { locale?: "es" | "en" } = {}) {
   const t = await getTranslations("footer");
-  const calculatorHref =
-    locale === "en" ? "/en/calculator" : "/es/calculadora";
+  const calculatorHref = locale === "en" ? "/calculator" : "/calculadora";
   return (
     <footer
       style={{

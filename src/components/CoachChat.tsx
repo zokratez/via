@@ -62,6 +62,13 @@ async function loadJsPdf(): Promise<JsPDFCtor> {
   return after.jspdf.jsPDF;
 }
 
+function plainTextForPdf(content: string): string {
+  return content
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/\[(.*?)\]\((.*?)\)/g, "$1");
+}
+
 type Locale = "es" | "en";
 
 type Message = {
@@ -405,7 +412,7 @@ export function CoachChat({
         doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
         doc.setTextColor(40, 40, 40);
-        const lines = doc.splitTextToSize(m.content, contentW);
+        const lines = doc.splitTextToSize(plainTextForPdf(m.content), contentW);
         for (const ln of lines) {
           ensureSpace(lineHeight);
           doc.text(ln, margin, y);
