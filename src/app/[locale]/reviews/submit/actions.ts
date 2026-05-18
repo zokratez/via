@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getReviewsAdminClient } from "@/lib/reviews/admin-client";
 
 const LOCALES = ["es", "en"] as const;
 const MAX_RECEIPT_SIZE = 5 * 1024 * 1024;
@@ -41,6 +42,7 @@ export async function submitReviewAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const admin = getReviewsAdminClient();
 
   let receiptUrl: string | null = null;
   const file = formData.get("receipt");
@@ -54,7 +56,7 @@ export async function submitReviewAction(
     const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
     const safeExt = /^[a-z0-9]+$/.test(ext) ? ext : "jpg";
     const path = `${crypto.randomUUID()}.${safeExt}`;
-    const { error: uploadErr } = await supabase.storage
+    const { error: uploadErr } = await admin.storage
       .from("receipts")
       .upload(path, file, {
         contentType: file.type,
@@ -70,12 +72,14 @@ export async function submitReviewAction(
     receiptUrl = pub.publicUrl;
   }
 
-  const { error } = await supabase.from("user_reviews").insert({
+  const { error } = await admin.from("user_reviews").insert({
     user_id: user?.id ?? null,
     display_name: parsed.data.display_name,
     rating: parsed.data.rating,
     review_text: parsed.data.review_text,
     receipt_image_url: receiptUrl,
+    status: "pending",
+    verified: false,
     locale: parsed.data.locale,
   });
 
