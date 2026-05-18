@@ -52,17 +52,17 @@ You are responsible for all activity in your account.
 
 ## 4. PACO Peptide Pro subscription
 
-### Plan and price
+### Plans and prices
 
-PACO Peptide Pro costs **$9.99 USD per month**, billed monthly. The price may change; we will notify you by email at least 30 days in advance.
+PACO Peptide Pro is available for **$79 USD per year** or **$9.99 USD per month**, depending on the plan you select at checkout. Prices may change; we will notify you by email at least 30 days in advance.
 
 ### Automatic renewal
 
-Your subscription renews automatically each month until you cancel. You can cancel at any time from "Manage subscription" in your account.
+Your subscription renews automatically at the end of each monthly or annual billing period until you cancel. You can cancel at any time from "Manage subscription" in your account.
 
 ### Cancellation
 
-If you cancel, you keep Pro access until the end of your paid billing period. We do not refund partial payments for months already billed, unless required by applicable law.
+If you cancel, you keep Pro access until the end of your paid billing period. We do not refund partial payments for billing periods already charged, unless required by applicable law.
 
 ### Payment processing
 

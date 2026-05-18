@@ -52,17 +52,17 @@ Eres responsable de toda actividad en tu cuenta.
 
 ## 4. Suscripción PACO Peptide Pro
 
-### Plan y precio
+### Planes y precios
 
-PACO Peptide Pro cuesta **$9.99 USD por mes**, facturado mensualmente. El precio puede cambiar; te avisaremos por correo con al menos 30 días de anticipación.
+PACO Peptide Pro está disponible por **$79 USD al año** o **$9.99 USD por mes**, según el plan que selecciones al pagar. Los precios pueden cambiar; te avisaremos por correo con al menos 30 días de anticipación.
 
 ### Renovación automática
 
-Tu suscripción se renueva automáticamente cada mes hasta que la canceles. Puedes cancelar en cualquier momento desde "Administrar suscripción" en tu cuenta.
+Tu suscripción se renueva automáticamente al final de cada periodo de facturación mensual o anual hasta que la canceles. Puedes cancelar en cualquier momento desde "Administrar suscripción" en tu cuenta.
 
 ### Cancelación
 
-Si cancelas, mantienes acceso Pro hasta el final del periodo de facturación pagado. No reembolsamos pagos parciales por meses ya facturados, salvo que la ley aplicable lo requiera.
+Si cancelas, mantienes acceso Pro hasta el final del periodo de facturación pagado. No reembolsamos pagos parciales por periodos de facturación ya cobrados, salvo que la ley aplicable lo requiera.
 
 ### Procesamiento de pagos
 
