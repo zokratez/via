@@ -109,6 +109,13 @@ function MicIcon({
   );
 }
 
+function plainTextPreview(content: string): string {
+  return content
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/\[(.*?)\]\((.*?)\)/g, "$1");
+}
+
 export function GlobalSearch() {
   const t = useTranslations("search");
   const router = useRouter();
@@ -552,7 +559,7 @@ export function GlobalSearch() {
                                 whiteSpace: "nowrap",
                               }}
                             >
-                              {r.title}
+                              {plainTextPreview(r.title)}
                             </div>
                             {(r.preview || r.date) && (
                               <div
@@ -575,7 +582,7 @@ export function GlobalSearch() {
                                       minWidth: 0,
                                     }}
                                   >
-                                    {r.preview}
+                                    {plainTextPreview(r.preview)}
                                   </span>
                                 )}
                                 {r.date && <span>{r.date.slice(0, 10)}</span>}

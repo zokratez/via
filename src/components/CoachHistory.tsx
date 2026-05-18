@@ -35,6 +35,13 @@ function truncate(s: string, n: number): string {
   return s.length > n ? `${s.slice(0, n).trimEnd()}…` : s;
 }
 
+function plainTextPreview(content: string): string {
+  return content
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/\[(.*?)\]\((.*?)\)/g, "$1");
+}
+
 export function CoachHistory({
   threads,
   locale,
@@ -287,7 +294,7 @@ export function CoachHistory({
                               whiteSpace: "pre-wrap",
                             }}
                           >
-                            {m.content}
+                            {plainTextPreview(m.content)}
                           </p>
                         </div>
                       ))}
