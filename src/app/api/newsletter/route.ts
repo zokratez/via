@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +11,17 @@ function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },
+  });
+}
+
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error("Supabase service-role env vars missing");
+  }
+  return createSupabaseAdmin(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 }
 
@@ -39,7 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   const normalized = email.trim().toLowerCase();
-  const supabase = await createClient();
+  const supabase = getAdminClient();
   const { error } = await supabase
     .from("newsletter_signups")
     .insert({ email: normalized, locale });

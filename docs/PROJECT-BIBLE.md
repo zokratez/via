@@ -89,7 +89,7 @@
 | RSS feeds | /es/feed.xml + /en/feed.xml, auto-discovery in head |
 | hreflang | Alternates on all pages |
 | Social | @pacopeptide on X, Instagram, TikTok (claimed Day 12) |
-| Newsletter | Email capture on homepage, newsletter_signups table, anon insert RLS |
+| Newsletter | Email capture on homepage, server-validated insert into newsletter_signups |
 
 ### Admin
 | Feature | Detail |

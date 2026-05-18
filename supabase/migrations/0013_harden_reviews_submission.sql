@@ -6,3 +6,7 @@
 drop policy if exists "user_reviews_public_insert" on public.user_reviews;
 
 drop policy if exists "receipts_public_insert" on storage.objects;
+
+-- Newsletter submissions also go through /api/newsletter so the app can
+-- normalize email, validate locale, and absorb duplicate inserts.
+drop policy if exists "newsletter_signups_public_insert" on public.newsletter_signups;
