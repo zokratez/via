@@ -45,7 +45,9 @@ export async function POST(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return jsonResponse(401, { error: "unauthorized" });
-  if (!isAdmin(user.email)) return jsonResponse(403, { error: "forbidden" });
+  if (!(await isAdmin(user.email))) {
+    return jsonResponse(403, { error: "forbidden" });
+  }
 
   const admin = getReviewsAdminClient();
 

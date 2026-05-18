@@ -60,7 +60,7 @@ export default async function AdminReviewsPage({
   if (!user) {
     redirect({ href: "/auth/sign-in", locale });
   }
-  if (!isAdmin(user!.email)) {
+  if (!(await isAdmin(user!.email))) {
     redirect({ href: "/dashboard", locale });
   }
 

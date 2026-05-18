@@ -43,7 +43,7 @@ export async function POST(
   if (!user) {
     return jsonResponse(401, { error: "unauthorized" });
   }
-  if (!isAdmin(user.email)) {
+  if (!(await isAdmin(user.email))) {
     return jsonResponse(403, { error: "forbidden" });
   }
 
