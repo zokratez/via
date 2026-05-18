@@ -147,6 +147,7 @@ export async function POST(req: NextRequest) {
       .from("coach_threads")
       .select("id")
       .eq("id", incomingThreadId)
+      .eq("user_id", user.id)
       .maybeSingle();
     if (existing) threadIdToUse = existing.id;
   }

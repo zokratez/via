@@ -14,7 +14,7 @@ The goal is defense-in-depth: the system prompt tells Bukowski how to refuse, an
 
 ```ts
 export type GuardrailHit = {
-  category: 'crisis' | 'dose_advice' | 'vendor_question' | 'reconstitution' | 'expired_med';
+  category: 'crisis' | 'dose_advice' | 'vendor_question' | 'reconstitution' | 'expired_med' | 'referral_request';
   cannedResponseKey: string; // i18n key in messages/{locale}.json under coach.canned
 };
 
