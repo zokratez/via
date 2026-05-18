@@ -42,6 +42,10 @@ const nextConfig: NextConfig = {
         source,
         headers: noStoreHeaders,
       })),
+      {
+        source: "/api/:path*",
+        headers: noStoreHeaders,
+      },
     ];
   },
 };
