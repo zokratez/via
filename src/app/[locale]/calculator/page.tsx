@@ -41,6 +41,9 @@ export default async function CalculatorPage({
   if (!hasLocale(routing.locales, locale)) {
     redirect({ href: "/", locale: routing.defaultLocale });
   }
+  if (locale === "es") {
+    redirect({ href: "/calculadora", locale: "es" });
+  }
   setRequestLocale(locale);
 
   return <CalculatorScreen locale={locale as "es" | "en"} />;

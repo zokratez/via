@@ -51,12 +51,46 @@ export async function POST(req: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const lowerQuery = query.toLowerCase();
+
+  const groups: Record<string, SearchResult[]> = {
+    articles: [],
+    coach: [],
+    doses: [],
+    weight: [],
+    calendar: [],
+    todos: [],
+  };
+
+  // Articles are public and file-based, so logged-out visitors can still
+  // search the Diario/Journal instead of seeing a misleading empty state.
+  const articles = await loadArticles(locale);
+  for (const a of articles) {
+    if (
+      a.title.toLowerCase().includes(lowerQuery) ||
+      a.summary.toLowerCase().includes(lowerQuery)
+    ) {
+      const journalRoot = locale === "es" ? "/diario" : "/journal";
+      groups.articles.push({
+        category: "articles",
+        id: a.slug,
+        title: a.title,
+        preview: a.summary,
+        date: a.date,
+        href: `${journalRoot}/${a.slug}`,
+      });
+      if (groups.articles.length >= 10) break;
+    }
+  }
+
   if (!user) {
-    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    return NextResponse.json({
+      groups,
+      total: groups.articles.length,
+    } satisfies SearchResponse);
   }
 
   const ilike = `%${escapeIlike(query)}%`;
-  const lowerQuery = query.toLowerCase();
 
   const [coachRes, dosesRes, weightRes, calendarRes, todosRes] =
     await Promise.all([
@@ -95,35 +129,6 @@ export async function POST(req: Request) {
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
-
-  const groups: Record<string, SearchResult[]> = {
-    articles: [],
-    coach: [],
-    doses: [],
-    weight: [],
-    calendar: [],
-    todos: [],
-  };
-
-  // Articles: file-based, so filter in memory.
-  const articles = await loadArticles(locale);
-  for (const a of articles) {
-    if (
-      a.title.toLowerCase().includes(lowerQuery) ||
-      a.summary.toLowerCase().includes(lowerQuery)
-    ) {
-      const journalRoot = locale === "es" ? "/diario" : "/journal";
-      groups.articles.push({
-        category: "articles",
-        id: a.slug,
-        title: a.title,
-        preview: a.summary,
-        date: a.date,
-        href: `${journalRoot}/${a.slug}`,
-      });
-      if (groups.articles.length >= 10) break;
-    }
-  }
 
   type CoachRow = {
     id: string;

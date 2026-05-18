@@ -3,23 +3,26 @@
  *
  * The durable allowlist lives in public.admin_users and is read only
  * through the service-role key from server-side admin gates. The static
- * fallback keeps the operator from being locked out during migrations or
- * env outages; remove it after domain admin accounts are verified.
+ * fallback is environment-driven only, so personal email addresses do not
+ * get baked into the repository.
  */
 
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
-
-const FALLBACK_ADMIN_EMAILS: readonly string[] = [
-  "tortillabarllc@gmail.com",
-];
 
 function normalizeEmail(email: string | null | undefined): string | null {
   if (!email) return null;
   return email.trim().toLowerCase();
 }
 
+function fallbackAdminEmails(): string[] {
+  return (process.env.ADMIN_FALLBACK_EMAILS ?? "")
+    .split(",")
+    .map((email) => normalizeEmail(email))
+    .filter((email): email is string => email !== null);
+}
+
 function isFallbackAdmin(email: string): boolean {
-  return FALLBACK_ADMIN_EMAILS.includes(email);
+  return fallbackAdminEmails().includes(email);
 }
 
 export async function isAdmin(
