@@ -14,6 +14,23 @@ const securityHeaders = [
   },
 ];
 
+const noStoreHeaders = [
+  { key: "Cache-Control", value: "private, no-store, max-age=0" },
+];
+
+const protectedRouteHeaders = [
+  "/:locale(es|en)/admin",
+  "/:locale(es|en)/admin/:path*",
+  "/:locale(es|en)/calendar",
+  "/:locale(es|en)/calendar/:path*",
+  "/:locale(es|en)/coach",
+  "/:locale(es|en)/coach/:path*",
+  "/:locale(es|en)/dashboard",
+  "/:locale(es|en)/dashboard/:path*",
+  "/:locale(es|en)/log",
+  "/:locale(es|en)/log/:path*",
+];
+
 const nextConfig: NextConfig = {
   async headers() {
     return [
@@ -21,6 +38,10 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
+      ...protectedRouteHeaders.map((source) => ({
+        source,
+        headers: noStoreHeaders,
+      })),
     ];
   },
 };

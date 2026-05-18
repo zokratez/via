@@ -4,13 +4,14 @@
  * Strategy:
  *   - Static assets (Next.js _next/static/, public files): cache-first.
  *   - API routes (/api/*): network-first, no caching.
- *   - HTML navigations: network-first with offline fallback to last
+ *   - Public HTML navigations: network-first with offline fallback to last
  *     cached version of the requested URL.
+ *   - Private HTML navigations: network-only. Never cache user data.
  *
  * Bump CACHE_VERSION whenever the static-asset cache shape changes.
  */
 
-const CACHE_VERSION = "pp-v1";
+const CACHE_VERSION = "pp-v2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const PAGES_CACHE = `${CACHE_VERSION}-pages`;
 
@@ -59,6 +60,12 @@ function isApi(url) {
   return url.pathname.startsWith("/api/");
 }
 
+function isPrivatePage(url) {
+  return /^\/(es|en)\/(admin|calendar|coach|dashboard|log)(\/|$)/.test(
+    url.pathname,
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
@@ -67,6 +74,11 @@ self.addEventListener("fetch", (event) => {
 
   if (isApi(url)) {
     // Network-only for API. Don't cache user-specific JSON.
+    return;
+  }
+
+  if (isPrivatePage(url)) {
+    // Network-only for authenticated pages. Don't cache health, coach, or admin data.
     return;
   }
 
