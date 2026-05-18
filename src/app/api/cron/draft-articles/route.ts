@@ -14,6 +14,7 @@
 
 import { NextRequest } from "next/server";
 import { draftArticlesFromResearch } from "@/lib/drafters/article-drafter";
+import { isAuthorizedCronRequest } from "@/lib/cron-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,13 +31,7 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    console.error("[cron/draft-articles] CRON_SECRET not set");
-    return false;
-  }
-  const header = req.headers.get("authorization");
-  return header === `Bearer ${secret}`;
+  return isAuthorizedCronRequest(req, "[cron/draft-articles]");
 }
 
 async function handle(req: NextRequest): Promise<Response> {

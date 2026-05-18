@@ -22,6 +22,7 @@
 import { NextRequest } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { ACTIVE_TIERS } from "@/lib/subscription";
+import { isAuthorizedCronRequest } from "@/lib/cron-auth";
 import { getResend, FROM_EMAIL } from "@/lib/email/resend";
 
 export const runtime = "nodejs";
@@ -51,12 +52,7 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 function authorized(req: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    console.error("[cron/send-reminders] CRON_SECRET not set");
-    return false;
-  }
-  return req.headers.get("authorization") === `Bearer ${secret}`;
+  return isAuthorizedCronRequest(req, "[cron/send-reminders]");
 }
 
 function getAdminClient() {
