@@ -20,7 +20,6 @@ create index if not exists admin_users_active_idx
 
 insert into public.admin_users (email, active, label)
 values
-  ('tortillabarllc@gmail.com', true, 'temporary gmail break-glass admin'),
   ('admin@pacopeptide.com', true, 'primary domain admin'),
   ('sam@pacopeptide.com', true, 'owner domain admin')
 on conflict (email) do update

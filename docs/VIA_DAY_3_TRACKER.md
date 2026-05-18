@@ -206,7 +206,7 @@ Open Claude Code. Paste this prompt verbatim into a new conversation.
 - Guardrails: no dose advice, no vendor recs, crisis redirect
 - All in Supabase, all attributed properly, all auto-deploys
 
-**Next: Day 4 — Stripe + paywall.** Pro tier ($9.99/mo, $59/yr) unlocks unlimited Bukowski. Webhook updates `profiles.subscription_tier`. This is the gnarliest day of the build — block 3 hours.
+**Next: Day 4 — Stripe + paywall.** Pro tier ($9.99/mo, $79/yr) unlocks unlimited Bukowski. Webhook updates `profiles.subscription_tier`. This is the gnarliest day of the build — block 3 hours.
 
 ---
 

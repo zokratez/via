@@ -53,7 +53,7 @@ Goal: paying customers by Day 10. Launch-ready MVP by Day 7.
 
 ## Day 5 — Friday: Payments + paywall
 
-- [ ] Stripe products: `pro_monthly` ($9.99), `pro_annual` ($59)
+- [ ] Stripe products: `pro_monthly` ($9.99), `pro_annual` ($79)
 - [ ] `/es/pro` and `/en/pro` paywall pages
 - [ ] Stripe Checkout server action
 - [ ] Webhook endpoint at `/api/webhooks/stripe` — update `profiles.subscription_tier` + `subscription_expires_at`

@@ -95,7 +95,7 @@
 | Feature | Detail |
 |---|---|
 | Route | /[locale]/admin/drafts |
-| Auth | Hardcoded admin email allowlist (tortillabarllc@gmail.com) |
+| Auth | Database-backed admin allowlist (`public.admin_users`) with optional env break-glass fallback |
 | Actions | Approve / Reject pending_review drafts |
 | Defensive | Status filter prevents double-actioning (409 if already actioned) |
 

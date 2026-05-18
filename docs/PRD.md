@@ -35,7 +35,7 @@ The first Spanish-first companion app for the millions of people on GLP-1 medica
 - Side effect log (5 categories, 1-5 severity)
 - AI coach (Claude Sonnet 4.6, guardrailed, Spanish-first)
 - Free tier: 3 coach queries/day
-- Pro tier: $9.99/mo or $59/yr, unlimited coach + PDF export
+- Pro tier: $9.99/mo or $79/yr, unlimited coach + PDF export
 - Privacy policy + ToS + disclaimer footer
 
 ## Explicitly out of scope for MVP
