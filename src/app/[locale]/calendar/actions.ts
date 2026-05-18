@@ -54,6 +54,16 @@ export async function addCalendarEventAction(formData: FormData) {
       ? parsed.data.related_medication_id
       : null;
 
+  if (medicationId) {
+    const { data: medication } = await supabase
+      .from("medications")
+      .select("id")
+      .eq("id", medicationId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!medication) return { error: "validation_failed" as const };
+  }
+
   const { error } = await supabase.from("calendar_events").insert({
     user_id: user.id,
     title: parsed.data.title,

@@ -55,9 +55,17 @@ export async function logDoseAction(formData: FormData) {
       ? parsed.data.notes
       : null;
 
+  const { data: medication } = await supabase
+    .from("medications")
+    .select("id, name")
+    .eq("id", parsed.data.medication_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!medication) return { error: "validation_failed" as const };
+
   const { error } = await supabase.from("doses").insert({
     user_id: user.id,
-    medication_id: parsed.data.medication_id,
+    medication_id: medication.id,
     taken_at: takenAt.toISOString(),
     dose_mg: parsed.data.dose_mg,
     injection_site: parsed.data.injection_site ?? null,
@@ -67,12 +75,7 @@ export async function logDoseAction(formData: FormData) {
   if (error) return { error: "db_failed" as const };
 
   try {
-    const { data: med } = await supabase
-      .from("medications")
-      .select("name")
-      .eq("id", parsed.data.medication_id)
-      .maybeSingle();
-    const medName = (med?.name as string | undefined) ?? "";
+    const medName = (medication.name as string | undefined) ?? "";
     const t = await getTranslations({
       locale: parsed.data.locale,
       namespace: "calendar",
@@ -86,7 +89,7 @@ export async function logDoseAction(formData: FormData) {
       }),
       eventDate: toDateOnly(takenAt),
       eventType: "injection",
-      relatedMedicationId: parsed.data.medication_id,
+      relatedMedicationId: medication.id,
     });
   } catch {
     // Calendar mirror is best-effort; never block dose log.
