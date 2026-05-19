@@ -51,7 +51,10 @@ export default async function DashboardPage({
   setRequestLocale(locale);
   const sp = await searchParams;
   const showSavedToast =
-    sp.ok === "dose" || sp.ok === "weight" || sp.ok === "symptom";
+    sp.ok === "dose" ||
+    sp.ok === "weight" ||
+    sp.ok === "symptom" ||
+    sp.ok === "sleep";
   const VALID_TABS: readonly TabKey[] = [
     "doses",
     "weight",
