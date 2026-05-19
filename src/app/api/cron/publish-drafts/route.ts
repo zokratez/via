@@ -1,7 +1,7 @@
 /**
  * POST/GET /api/cron/publish-drafts
  *
- * Triggered by Vercel cron every 4 hours (see vercel.json). Picks up
+ * Triggered by Vercel cron daily at 14:00 UTC (see vercel.json). Picks up
  * article_drafts where status='approved' (manually approved by Sam in
  * Supabase SQL editor) and publishes them to the repo via GitHub Git
  * Data API in a single atomic commit.

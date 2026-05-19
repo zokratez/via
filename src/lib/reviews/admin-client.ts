@@ -1,9 +1,10 @@
 /**
  * Service-role Supabase client for the user_reviews surface.
  *
- * user_reviews has RLS with INSERT-only public policies; SELECT/
- * UPDATE/DELETE are blocked from anon and authenticated. This
- * module provides the service-role client used by:
+ * user_reviews is moderated server-side only. Public clients cannot
+ * insert directly; submissions go through the review server action,
+ * and SELECT/UPDATE/DELETE are blocked from anon and authenticated.
+ * This module provides the service-role client used by:
  *  - The homepage display section (filters approved+verified)
  *  - The /admin/reviews moderation page (full CRUD)
  *
