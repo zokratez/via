@@ -75,6 +75,24 @@ const ctaButtonStyle: React.CSSProperties = {
   textDecoration: "none",
 };
 
+const ctaAsideStyle: React.CSSProperties = {
+  fontFamily: SERIF,
+  fontStyle: "italic",
+  fontSize: "15px",
+  color: "var(--pp-text-secondary)",
+};
+
+const trustPillStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "11px",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase",
+  color: "var(--pp-text-secondary)",
+  border: "0.5px solid var(--pp-border)",
+  borderRadius: "999px",
+  padding: "8px 12px",
+};
+
 export default async function LandingPage({
   params,
 }: {
@@ -154,6 +172,18 @@ export default async function LandingPage({
           style={{
             fontFamily: SERIF,
             fontStyle: "italic",
+            fontSize: "clamp(22px, 3.5vw, 30px)",
+            lineHeight: 1.25,
+            color: "var(--pp-accent)",
+            margin: "1.5rem 0 0",
+          }}
+        >
+          {t("hero_subtitle")}
+        </p>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
             fontSize: "clamp(40px, 6.5vw, 56px)",
             lineHeight: 1.05,
             letterSpacing: "-0.01em",
@@ -181,10 +211,39 @@ export default async function LandingPage({
             </p>
           ),
         )}
-        <div style={{ marginTop: "3rem" }}>
+        <div
+          style={{
+            marginTop: "3rem",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
+            alignItems: "center",
+          }}
+        >
           <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
             {t("hero_cta_primary")}
           </Link>
+          <span style={ctaAsideStyle}>{t("hero_cta_aside")}</span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.75rem",
+            marginTop: "1.5rem",
+          }}
+        >
+          {(
+            [
+              "hero_trust_trial",
+              "hero_trust_cancel",
+              "hero_trust_no_sales",
+            ] as const
+          ).map((key) => (
+            <span key={key} style={trustPillStyle}>
+              {t(key)}
+            </span>
+          ))}
         </div>
       </section>
 
@@ -234,6 +293,11 @@ export default async function LandingPage({
           </span>
           {t("demo_answer")}
         </p>
+        <div style={{ marginTop: "2rem" }}>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
+            {t("demo_cta")}
+          </Link>
+        </div>
       </section>
 
       <hr style={dividerStyle} />
@@ -293,6 +357,67 @@ export default async function LandingPage({
             {t(key)}
           </p>
         ))}
+      </section>
+
+      <hr style={dividerStyle} />
+
+      {/* Pro value */}
+      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "0 2rem" }}>
+        <p style={{ ...eyebrowStyle, marginBottom: "1.5rem" }}>
+          {t("pro_eyebrow")}
+        </p>
+        <h2
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: "clamp(34px, 6vw, 48px)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.01em",
+            fontWeight: 400,
+            color: "var(--pp-text)",
+            margin: "0 0 2rem",
+          }}
+        >
+          {t("pro_title")}
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "1rem",
+          }}
+        >
+          {(["pro_feature_1", "pro_feature_2", "pro_feature_3", "pro_feature_4"] as const).map(
+            (key) => (
+              <div
+                key={key}
+                style={{
+                  background: "var(--pp-surface)",
+                  border: "0.5px solid var(--pp-border)",
+                  borderRadius: "8px",
+                  padding: "1.25rem",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: SERIF,
+                    fontSize: "16px",
+                    lineHeight: 1.65,
+                    color: "#e8ddc8",
+                    margin: 0,
+                  }}
+                >
+                  {t(key)}
+                </p>
+              </div>
+            ),
+          )}
+        </div>
+        <div style={{ marginTop: "2rem" }}>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
+            {t("pro_cta")}
+          </Link>
+        </div>
       </section>
 
       {/* Verified reviews — only renders if there are approved+verified rows */}
@@ -357,6 +482,17 @@ export default async function LandingPage({
             {t("pricing_annual_cta")}
           </Link>
         </div>
+        <p
+          style={{
+            fontFamily: SERIF,
+            fontSize: "16px",
+            lineHeight: 1.6,
+            color: "var(--pp-text-secondary)",
+            margin: "1.25rem 0 0",
+          }}
+        >
+          {t("pricing_detail")}
+        </p>
 
         {/* Monthly alt — quieter, separated by hairline */}
         <div

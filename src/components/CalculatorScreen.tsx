@@ -15,6 +15,20 @@ const navLinkStyle: React.CSSProperties = {
   textDecoration: "none",
 };
 
+const ctaButtonStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  background: "var(--pp-accent)",
+  color: "var(--pp-bg)",
+  padding: "13px 22px",
+  borderRadius: "4px",
+  display: "inline-block",
+  textDecoration: "none",
+};
+
 export async function CalculatorScreen({ locale }: { locale: "es" | "en" }) {
   const t = await getTranslations({ locale, namespace: "calculator" });
   const tHome = await getTranslations({ locale, namespace: "home" });
@@ -89,6 +103,44 @@ export async function CalculatorScreen({ locale }: { locale: "es" | "en" }) {
         </p>
 
         <PeptideCalculator />
+
+        <section
+          style={{
+            marginTop: "3rem",
+            background: "var(--pp-surface)",
+            border: "0.5px solid var(--pp-border)",
+            borderRadius: "10px",
+            padding: "1.5rem",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "clamp(26px, 5vw, 34px)",
+              lineHeight: 1.1,
+              fontWeight: 400,
+              color: "var(--pp-text)",
+              margin: 0,
+            }}
+          >
+            {t("pro_cta_title")}
+          </h2>
+          <p
+            style={{
+              fontFamily: SERIF,
+              fontSize: "16px",
+              lineHeight: 1.65,
+              color: "var(--pp-text-secondary)",
+              margin: "1rem 0 1.25rem",
+            }}
+          >
+            {t("pro_cta_body")}
+          </p>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
+            {t("pro_cta_button")}
+          </Link>
+        </section>
       </main>
     </div>
   );

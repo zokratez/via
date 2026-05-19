@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useLocale, useTranslations } from "next-intl";
@@ -122,12 +122,21 @@ const bottomLinkStyle: React.CSSProperties = {
   margin: 0,
 };
 
+const planCardStyle: React.CSSProperties = {
+  background: "var(--pp-surface)",
+  border: "0.5px solid var(--pp-border)",
+  borderRadius: "8px",
+  padding: "1rem",
+  textAlign: "center",
+};
+
 const credentialsSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
 type FormValues = { email: string; password: string };
+type PlanIntent = "annual" | "monthly" | null;
 
 export default function SignUpPage() {
   const t = useTranslations("auth");
@@ -137,6 +146,14 @@ export default function SignUpPage() {
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showEmail, setShowEmail] = useState(false);
+  const [plan, setPlan] = useState<PlanIntent>(null);
+
+  useEffect(() => {
+    const planParam = new URLSearchParams(window.location.search).get("plan");
+    if (planParam === "monthly" || planParam === "annual") {
+      setPlan(planParam);
+    }
+  }, []);
 
   const {
     register,
@@ -233,6 +250,37 @@ export default function SignUpPage() {
           }}
         >
           <h1 style={mastStyle}>{t("sign_up_mast")}</h1>
+
+          {plan && (
+            <div style={planCardStyle}>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  fontSize: "12px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "var(--pp-accent)",
+                  margin: 0,
+                }}
+              >
+                {plan === "annual"
+                  ? t("plan_annual_summary")
+                  : t("plan_monthly_summary")}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: "15px",
+                  lineHeight: 1.5,
+                  color: "var(--pp-text-secondary)",
+                  margin: "0.75rem 0 0",
+                }}
+              >
+                {t("plan_trial_note")}
+              </p>
+            </div>
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <button

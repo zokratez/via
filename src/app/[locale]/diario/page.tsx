@@ -78,6 +78,20 @@ const readMoreStyle: React.CSSProperties = {
   display: "inline-block",
 };
 
+const ctaButtonStyle: React.CSSProperties = {
+  fontFamily: SANS,
+  fontSize: "12px",
+  letterSpacing: "0.22em",
+  textTransform: "uppercase",
+  fontWeight: 500,
+  background: "var(--pp-accent)",
+  color: "var(--pp-bg)",
+  padding: "13px 22px",
+  borderRadius: "4px",
+  display: "inline-block",
+  textDecoration: "none",
+};
+
 const emptyStateStyle: React.CSSProperties = {
   fontFamily: SERIF,
   fontStyle: "italic",
@@ -195,6 +209,44 @@ export default async function DiarioIndexPage({
             </article>
           ))
         )}
+
+        <section
+          style={{
+            marginTop: "4rem",
+            background: "var(--pp-surface)",
+            border: "0.5px solid var(--pp-border)",
+            borderRadius: "10px",
+            padding: "1.5rem",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "clamp(26px, 5vw, 34px)",
+              lineHeight: 1.1,
+              fontWeight: 400,
+              color: "var(--pp-text)",
+              margin: 0,
+            }}
+          >
+            {t("journal_cta_title")}
+          </h2>
+          <p
+            style={{
+              fontFamily: SERIF,
+              fontSize: "16px",
+              lineHeight: 1.65,
+              color: "var(--pp-text-secondary)",
+              margin: "1rem 0 1.25rem",
+            }}
+          >
+            {t("journal_cta_body")}
+          </p>
+          <Link href="/auth/sign-up?plan=annual" style={ctaButtonStyle}>
+            {t("journal_cta_button")}
+          </Link>
+        </section>
       </main>
     </div>
   );
