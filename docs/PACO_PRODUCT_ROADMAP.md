@@ -12,7 +12,7 @@ PACO is launch-ready for the original web SaaS checklist: public routes, protect
 - Colorful weekly rhythm graph: complete.
 - Premium hover/tap motion for dashboard cards, action buttons, and graph cells: in progress.
 - Mobile bottom navigation: next recommended flow improvement.
-- Single daily check-in flow: next recommended habit improvement.
+- Single daily check-in flow: first-pass guided hub complete.
 
 ## Next Core Feature: Daily Check-In
 

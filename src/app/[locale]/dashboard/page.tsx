@@ -378,19 +378,19 @@ export default async function DashboardPage({
   const nextAction =
     !hasWeight
       ? {
-          href: "/log/weight",
+          href: "/check-in",
           label: t("today_next_weight"),
           detail: t("today_next_weight_detail"),
         }
       : lastSleepDate !== todayKey
         ? {
-            href: "/log/sleep",
+            href: "/check-in",
             label: t("today_next_sleep"),
             detail: t("today_next_sleep_detail"),
           }
         : latestWeightDate !== todayKey
           ? {
-              href: "/log/weight",
+              href: "/check-in",
               label: t("today_next_checkin"),
               detail: t("today_next_checkin_detail"),
             }
@@ -452,11 +452,11 @@ export default async function DashboardPage({
   );
 
   const actions = [
+    { href: "/check-in", label: t("action_checkin") },
     { href: "/log/dose", label: t("log_dose") },
     { href: "/log/weight", label: t("log_weight") },
     { href: "/log/symptom", label: t("log_symptom") },
     { href: "/log/sleep", label: t("log_sleep") },
-    { href: "/calendar", label: t("action_calendar") },
     { href: "/coach", label: t("action_coach") },
   ] as const;
 
