@@ -844,8 +844,10 @@ export default async function DashboardPage({
               aria-label={t("rhythm_title")}
             >
               {rhythmDays.map((day) => (
-                <div
+                <Link
                   key={day.key}
+                  href={`/calendar?ym=${day.key.slice(0, 7)}&d=${day.key}`}
+                  className="pp-rhythm-day"
                   style={{
                     minHeight: "76px",
                     borderRadius: "9px",
@@ -860,6 +862,7 @@ export default async function DashboardPage({
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: "0.45rem",
+                    color: "inherit",
                   }}
                 >
                   <span
@@ -882,25 +885,29 @@ export default async function DashboardPage({
                   >
                     <span
                       title={t("today_tile_dose")}
+                      className="pp-rhythm-dot"
                       style={rhythmDotStyle(day.dose, metricAccents.dose)}
                     />
                     <span
                       title={t("today_tile_sleep")}
+                      className="pp-rhythm-dot"
                       style={rhythmDotStyle(day.sleep, metricAccents.sleep)}
                     />
                     <span
                       title={t("stat_weight")}
+                      className="pp-rhythm-dot"
                       style={rhythmDotStyle(day.weight, "var(--pp-accent)")}
                     />
                     <span
                       title={t("today_tile_symptoms")}
+                      className="pp-rhythm-dot"
                       style={rhythmDotStyle(
                         day.symptoms > 0,
                         metricAccents.symptoms,
                       )}
                     />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
@@ -909,20 +916,38 @@ export default async function DashboardPage({
               style={{ marginTop: "0.8rem" }}
             >
               {[
-                { label: t("today_tile_dose"), color: metricAccents.dose },
-                { label: t("today_tile_sleep"), color: metricAccents.sleep },
-                { label: t("stat_weight"), color: "var(--pp-accent)" },
                 {
+                  href: "/dashboard?tab=doses#dashboard-tabs",
+                  label: t("today_tile_dose"),
+                  color: metricAccents.dose,
+                },
+                {
+                  href: "/dashboard?tab=sleep#dashboard-tabs",
+                  label: t("today_tile_sleep"),
+                  color: metricAccents.sleep,
+                },
+                {
+                  href: "/dashboard?tab=weight#dashboard-tabs",
+                  label: t("stat_weight"),
+                  color: "var(--pp-accent)",
+                },
+                {
+                  href: "/dashboard?tab=symptoms#dashboard-tabs",
                   label: t("today_tile_symptoms"),
                   color: metricAccents.symptoms,
                 },
               ].map((item) => (
-                <div
+                <Link
                   key={item.label}
+                  href={item.href}
+                  className="pp-rhythm-day"
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "0.45rem",
+                    padding: "0.35rem 0.45rem",
+                    borderRadius: "999px",
+                    border: "0.5px solid transparent",
                     fontFamily: SANS,
                     fontSize: "10px",
                     letterSpacing: "0.14em",
@@ -930,9 +955,12 @@ export default async function DashboardPage({
                     color: "var(--pp-text-tertiary)",
                   }}
                 >
-                  <span style={rhythmDotStyle(true, item.color)} />
+                  <span
+                    className="pp-rhythm-dot"
+                    style={rhythmDotStyle(true, item.color)}
+                  />
                   {item.label}
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -941,13 +969,21 @@ export default async function DashboardPage({
             className="grid gap-3 sm:grid-cols-3"
             style={{ marginTop: "1rem" }}
           >
-            <Link href="/calendar" style={actionStyle}>
+            <Link href="/calendar" style={actionStyle} className="pp-action-card">
               {t("today_jump_calendar")}
             </Link>
-            <Link href={calculatorHref} style={actionStyle}>
+            <Link
+              href={calculatorHref}
+              style={actionStyle}
+              className="pp-action-card"
+            >
               {t("today_jump_calculator")}
             </Link>
-            <Link href={journalHref} style={actionStyle}>
+            <Link
+              href={journalHref}
+              style={actionStyle}
+              className="pp-action-card"
+            >
               {t("today_jump_journal")}
             </Link>
           </div>
@@ -1000,7 +1036,7 @@ export default async function DashboardPage({
               key={a.href}
               href={a.href}
               style={a.href === "/coach" ? primaryActionStyle : actionStyle}
-              className="hover:opacity-80 transition-opacity"
+              className="pp-action-card"
             >
               {a.label}
             </Link>
