@@ -353,6 +353,53 @@ export default async function DashboardPage({
   const hasWeight = (anyWeightRes.data as { id: string } | null) !== null;
   const hasCoach = (anyCoachMsgRes.data as { id: string } | null) !== null;
 
+  const todayKey = now.toISOString().slice(0, 10);
+  const cutoff7Time = now.getTime() - 7 * 86_400_000;
+  const recentSleep = sleepEntries.filter(
+    (s) => new Date(s.slept_at).getTime() >= cutoff7Time,
+  );
+  const averageSleepHours =
+    recentSleep.length > 0
+      ? recentSleep.reduce((sum, s) => sum + s.hours, 0) / recentSleep.length
+      : null;
+  const symptomCount14 = (symptoms14Res.data ?? []).length;
+  const coachQuestionCount = coachThreads.reduce(
+    (sum, thread) =>
+      sum + thread.messages.filter((message) => message.role === "user").length,
+    0,
+  );
+  const latestWeightDate =
+    weights90.length > 0 ? weights90[weights90.length - 1].measured_at : null;
+  const lastSleepDate =
+    sleepEntries.length > 0
+      ? sleepEntries[sleepEntries.length - 1].slept_at
+      : null;
+
+  const nextAction =
+    !hasWeight
+      ? {
+          href: "/log/weight",
+          label: t("today_next_weight"),
+          detail: t("today_next_weight_detail"),
+        }
+      : lastSleepDate !== todayKey
+        ? {
+            href: "/log/sleep",
+            label: t("today_next_sleep"),
+            detail: t("today_next_sleep_detail"),
+          }
+        : latestWeightDate !== todayKey
+          ? {
+              href: "/log/weight",
+              label: t("today_next_checkin"),
+              detail: t("today_next_checkin_detail"),
+            }
+          : {
+              href: "/coach",
+              label: t("today_next_coach"),
+              detail: t("today_next_coach_detail"),
+            };
+
   const days = new Set<string>();
   for (const r of (doses14Res.data ?? []) as { taken_at: string }[]) {
     days.add(r.taken_at.slice(0, 10));
@@ -444,6 +491,31 @@ export default async function DashboardPage({
   const journalHref = locale === "es" ? "/diario" : "/journal";
   const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
 
+  const commandTileStyle: React.CSSProperties = {
+    border: "0.5px solid rgba(201, 150, 107, 0.22)",
+    borderRadius: "10px",
+    padding: "0.9rem",
+    background: "rgba(26, 22, 20, 0.5)",
+    minHeight: "92px",
+  };
+
+  const commandValueStyle: React.CSSProperties = {
+    fontFamily: SERIF,
+    fontStyle: "italic",
+    color: "var(--pp-text)",
+    fontSize: "22px",
+    lineHeight: 1.1,
+    margin: "0.35rem 0 0",
+  };
+
+  const commandSubStyle: React.CSSProperties = {
+    fontFamily: SANS,
+    color: "var(--pp-text-tertiary)",
+    fontSize: "11px",
+    lineHeight: 1.5,
+    margin: "0.35rem 0 0",
+  };
+
   return (
     <div
       className="flex flex-col flex-1"
@@ -533,6 +605,140 @@ export default async function DashboardPage({
           medications={alertMedications}
           locale={locale as "es" | "en"}
         />
+
+        <section
+          style={{
+            ...cardStyle,
+            marginTop: "2.25rem",
+            padding: "1rem",
+            background:
+              "linear-gradient(135deg, rgba(201, 150, 107, 0.12), rgba(34, 28, 25, 0.96) 42%, rgba(26, 22, 20, 0.98))",
+            borderColor: "rgba(201, 150, 107, 0.28)",
+          }}
+          className="pp-fade-up"
+          aria-label={t("today_title")}
+        >
+          <div
+            className="grid gap-4 md:grid-cols-[1.1fr_0.9fr]"
+            style={{ alignItems: "stretch" }}
+          >
+            <div>
+              <p style={eyebrowStyle}>{t("today_eyebrow")}</p>
+              <h2
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: "clamp(30px, 7vw, 44px)",
+                  lineHeight: 1,
+                  letterSpacing: "-0.02em",
+                  fontWeight: 400,
+                  color: "var(--pp-text)",
+                  margin: "0.65rem 0 0",
+                }}
+              >
+                {t("today_title")}
+              </h2>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "17px",
+                  lineHeight: 1.55,
+                  margin: "0.9rem 0 0",
+                }}
+              >
+                {t("today_body")}
+              </p>
+            </div>
+
+            <Link
+              href={nextAction.href}
+              style={{
+                ...commandTileStyle,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                textDecoration: "none",
+                borderColor: "rgba(201, 150, 107, 0.55)",
+              }}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_next_label")}</p>
+              <div>
+                <p style={{ ...commandValueStyle, color: "var(--pp-accent)" }}>
+                  {nextAction.label}
+                </p>
+                <p style={commandSubStyle}>{nextAction.detail}</p>
+              </div>
+            </Link>
+          </div>
+
+          <div
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            style={{ marginTop: "1rem" }}
+          >
+            <Link
+              href="/dashboard?tab=doses#dashboard-tabs"
+              style={{ ...commandTileStyle, textDecoration: "none" }}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_dose")}</p>
+              <p style={commandValueStyle}>{lastDoseStr}</p>
+              <p style={commandSubStyle}>
+                {lastDoseSubStr ?? t("today_tile_dose_empty")}
+              </p>
+            </Link>
+
+            <Link
+              href="/dashboard?tab=sleep#dashboard-tabs"
+              style={{ ...commandTileStyle, textDecoration: "none" }}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_sleep")}</p>
+              <p style={commandValueStyle}>
+                {averageSleepHours === null
+                  ? t("stat_empty")
+                  : `${averageSleepHours.toFixed(1)} h`}
+              </p>
+              <p style={commandSubStyle}>{t("today_tile_sleep_sub")}</p>
+            </Link>
+
+            <Link
+              href="/dashboard?tab=symptoms#dashboard-tabs"
+              style={{ ...commandTileStyle, textDecoration: "none" }}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_symptoms")}</p>
+              <p style={commandValueStyle}>{symptomCount14}</p>
+              <p style={commandSubStyle}>{t("today_tile_symptoms_sub")}</p>
+            </Link>
+
+            <Link
+              href="/dashboard?tab=coach#dashboard-tabs"
+              style={{ ...commandTileStyle, textDecoration: "none" }}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_coach")}</p>
+              <p style={commandValueStyle}>{coachQuestionCount}</p>
+              <p style={commandSubStyle}>{t("today_tile_coach_sub")}</p>
+            </Link>
+          </div>
+
+          <div
+            className="grid gap-3 sm:grid-cols-3"
+            style={{ marginTop: "1rem" }}
+          >
+            <Link href="/calendar" style={actionStyle}>
+              {t("today_jump_calendar")}
+            </Link>
+            <Link href={calculatorHref} style={actionStyle}>
+              {t("today_jump_calculator")}
+            </Link>
+            <Link href={journalHref} style={actionStyle}>
+              {t("today_jump_journal")}
+            </Link>
+          </div>
+        </section>
 
         <div
           className="grid gap-4 sm:grid-cols-3"
