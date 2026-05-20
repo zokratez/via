@@ -412,6 +412,45 @@ export default async function DashboardPage({
   }
   const streakCount = days.size;
 
+  const makeDayKey = (daysAgo: number) => {
+    const date = new Date(now);
+    date.setDate(date.getDate() - daysAgo);
+    return date.toISOString().slice(0, 10);
+  };
+  const rhythmDays = Array.from({ length: 7 }, (_, index) => {
+    const daysAgo = 6 - index;
+    const key = makeDayKey(daysAgo);
+    return {
+      key,
+      label:
+        daysAgo === 0
+          ? t("rhythm_today")
+          : new Intl.DateTimeFormat(locale, { weekday: "short" }).format(
+              new Date(`${key}T12:00:00`),
+            ),
+      dose: ((doses14Res.data ?? []) as { taken_at: string }[]).some((r) =>
+        r.taken_at.startsWith(key),
+      ),
+      weight: ((weights14Res.data ?? []) as { measured_at: string }[]).some(
+        (r) => r.measured_at.startsWith(key),
+      ),
+      symptoms: (
+        (symptoms14Res.data ?? []) as { occurred_at: string }[]
+      ).filter((r) => r.occurred_at.startsWith(key)).length,
+      sleep: sleepEntries.some((s) => s.slept_at.startsWith(key)),
+    };
+  });
+  const rhythmTotals = rhythmDays.reduce(
+    (totals, day) => {
+      totals.dose += day.dose ? 1 : 0;
+      totals.weight += day.weight ? 1 : 0;
+      totals.symptoms += day.symptoms;
+      totals.sleep += day.sleep ? 1 : 0;
+      return totals;
+    },
+    { dose: 0, weight: 0, symptoms: 0, sleep: 0 },
+  );
+
   const actions = [
     { href: "/log/dose", label: t("log_dose") },
     { href: "/log/weight", label: t("log_weight") },
@@ -515,6 +554,35 @@ export default async function DashboardPage({
     lineHeight: 1.5,
     margin: "0.35rem 0 0",
   };
+
+  const metricAccents = {
+    dose: "#f0a15f",
+    sleep: "#7db9ff",
+    symptoms: "#ef7b8a",
+    coach: "#88d39f",
+  } as const;
+
+  const colorTileStyle = (
+    color: string,
+    backgroundAlpha = "0.08",
+  ): React.CSSProperties => ({
+    ...commandTileStyle,
+    textDecoration: "none",
+    borderColor: `${color}66`,
+    background: `linear-gradient(145deg, color-mix(in srgb, ${color} ${Number(backgroundAlpha) * 100}%, transparent), rgba(26, 22, 20, 0.62))`,
+    boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 16px 36px color-mix(in srgb, ${color} 8%, transparent)`,
+  });
+
+  const rhythmDotStyle = (
+    active: boolean,
+    color: string,
+  ): React.CSSProperties => ({
+    width: "9px",
+    height: "9px",
+    borderRadius: "999px",
+    background: active ? color : "rgba(244, 237, 224, 0.12)",
+    boxShadow: active ? `0 0 16px ${color}80` : "none",
+  });
 
   return (
     <div
@@ -679,11 +747,13 @@ export default async function DashboardPage({
           >
             <Link
               href="/dashboard?tab=doses#dashboard-tabs"
-              style={{ ...commandTileStyle, textDecoration: "none" }}
+              style={colorTileStyle(metricAccents.dose)}
               className="pp-stat-card"
             >
               <p style={eyebrowStyle}>{t("today_tile_dose")}</p>
-              <p style={commandValueStyle}>{lastDoseStr}</p>
+              <p style={{ ...commandValueStyle, color: metricAccents.dose }}>
+                {lastDoseStr}
+              </p>
               <p style={commandSubStyle}>
                 {lastDoseSubStr ?? t("today_tile_dose_empty")}
               </p>
@@ -691,11 +761,11 @@ export default async function DashboardPage({
 
             <Link
               href="/dashboard?tab=sleep#dashboard-tabs"
-              style={{ ...commandTileStyle, textDecoration: "none" }}
+              style={colorTileStyle(metricAccents.sleep)}
               className="pp-stat-card"
             >
               <p style={eyebrowStyle}>{t("today_tile_sleep")}</p>
-              <p style={commandValueStyle}>
+              <p style={{ ...commandValueStyle, color: metricAccents.sleep }}>
                 {averageSleepHours === null
                   ? t("stat_empty")
                   : `${averageSleepHours.toFixed(1)} h`}
@@ -705,23 +775,166 @@ export default async function DashboardPage({
 
             <Link
               href="/dashboard?tab=symptoms#dashboard-tabs"
-              style={{ ...commandTileStyle, textDecoration: "none" }}
+              style={colorTileStyle(metricAccents.symptoms)}
               className="pp-stat-card"
             >
               <p style={eyebrowStyle}>{t("today_tile_symptoms")}</p>
-              <p style={commandValueStyle}>{symptomCount14}</p>
+              <p
+                style={{ ...commandValueStyle, color: metricAccents.symptoms }}
+              >
+                {symptomCount14}
+              </p>
               <p style={commandSubStyle}>{t("today_tile_symptoms_sub")}</p>
             </Link>
 
             <Link
               href="/dashboard?tab=coach#dashboard-tabs"
-              style={{ ...commandTileStyle, textDecoration: "none" }}
+              style={colorTileStyle(metricAccents.coach)}
               className="pp-stat-card"
             >
               <p style={eyebrowStyle}>{t("today_tile_coach")}</p>
-              <p style={commandValueStyle}>{coachQuestionCount}</p>
+              <p style={{ ...commandValueStyle, color: metricAccents.coach }}>
+                {coachQuestionCount}
+              </p>
               <p style={commandSubStyle}>{t("today_tile_coach_sub")}</p>
             </Link>
+          </div>
+
+          <div
+            style={{
+              marginTop: "1rem",
+              border: "0.5px solid rgba(244, 237, 224, 0.09)",
+              borderRadius: "10px",
+              padding: "0.95rem",
+              background: "rgba(8, 6, 5, 0.28)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "1rem",
+                alignItems: "center",
+                marginBottom: "0.8rem",
+              }}
+            >
+              <p style={eyebrowStyle}>{t("rhythm_title")}</p>
+              <p
+                style={{
+                  ...commandSubStyle,
+                  margin: 0,
+                  color: "var(--pp-text-secondary)",
+                }}
+              >
+                {t("rhythm_summary", {
+                  dose: rhythmTotals.dose,
+                  weight: rhythmTotals.weight,
+                  sleep: rhythmTotals.sleep,
+                  symptoms: rhythmTotals.symptoms,
+                })}
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+                gap: "0.45rem",
+              }}
+              aria-label={t("rhythm_title")}
+            >
+              {rhythmDays.map((day) => (
+                <div
+                  key={day.key}
+                  style={{
+                    minHeight: "76px",
+                    borderRadius: "9px",
+                    padding: "0.55rem 0.35rem",
+                    background:
+                      day.dose || day.weight || day.sleep || day.symptoms > 0
+                        ? "rgba(244, 237, 224, 0.055)"
+                        : "rgba(244, 237, 224, 0.025)",
+                    border: "0.5px solid rgba(244, 237, 224, 0.07)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.45rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: SANS,
+                      fontSize: "9px",
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      color: "var(--pp-text-secondary)",
+                    }}
+                  >
+                    {day.label}
+                  </span>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: "0.32rem",
+                    }}
+                  >
+                    <span
+                      title={t("today_tile_dose")}
+                      style={rhythmDotStyle(day.dose, metricAccents.dose)}
+                    />
+                    <span
+                      title={t("today_tile_sleep")}
+                      style={rhythmDotStyle(day.sleep, metricAccents.sleep)}
+                    />
+                    <span
+                      title={t("stat_weight")}
+                      style={rhythmDotStyle(day.weight, "var(--pp-accent)")}
+                    />
+                    <span
+                      title={t("today_tile_symptoms")}
+                      style={rhythmDotStyle(
+                        day.symptoms > 0,
+                        metricAccents.symptoms,
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className="grid gap-2 sm:grid-cols-4"
+              style={{ marginTop: "0.8rem" }}
+            >
+              {[
+                { label: t("today_tile_dose"), color: metricAccents.dose },
+                { label: t("today_tile_sleep"), color: metricAccents.sleep },
+                { label: t("stat_weight"), color: "var(--pp-accent)" },
+                {
+                  label: t("today_tile_symptoms"),
+                  color: metricAccents.symptoms,
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.45rem",
+                    fontFamily: SANS,
+                    fontSize: "10px",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "var(--pp-text-tertiary)",
+                  }}
+                >
+                  <span style={rhythmDotStyle(true, item.color)} />
+                  {item.label}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div
