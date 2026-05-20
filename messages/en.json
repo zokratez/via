@@ -4,6 +4,14 @@
     "tagline": "Your copilot on your GLP-1 journey",
     "description": "Track your doses, your weight, and how you feel. Get clear answers, in Spanish, without bullshit."
   },
+  "mobile_nav": {
+    "label": "Primary navigation",
+    "dashboard": "Panel",
+    "checkin": "Check-in",
+    "coach": "Coach",
+    "calculator": "Calc",
+    "search": "Search"
+  },
   "home": {
     "nav_brand": "paco peptide",
     "nav_diario": "journal",

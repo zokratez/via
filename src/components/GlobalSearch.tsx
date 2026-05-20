@@ -193,6 +193,14 @@ export function GlobalSearch() {
   }, [open]);
 
   useEffect(() => {
+    function onOpenSearch() {
+      setOpen(true);
+    }
+    window.addEventListener("paco:open-search", onOpenSearch);
+    return () => window.removeEventListener("paco:open-search", onOpenSearch);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     const trimmed = query.trim();
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -301,55 +309,57 @@ export function GlobalSearch() {
     }
   }
 
-  if (AUTH_PATH_RE.test(pathname)) return null;
+  const showFloatingPill = !AUTH_PATH_RE.test(pathname);
 
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
-          display: "flex",
-          justifyContent: "center",
-          pointerEvents: "none",
-          zIndex: 90,
-          opacity: scrolling ? 0.3 : 1,
-          transition: "opacity 0.2s ease-out",
-        }}
-      >
-        <button
-          type="button"
-          onClick={onPillClick}
-          aria-label={t("open_label")}
-          className="pp-global-search-pill"
+      {showFloatingPill && (
+        <div
           style={{
-            pointerEvents: "auto",
-            width: "200px",
-            height: "40px",
-            background: "rgba(255,255,255,0.10)",
-            WebkitBackdropFilter: "blur(12px) saturate(180%)",
-            backdropFilter: "blur(12px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: "999px",
-            padding: "0 14px",
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
-            gap: "8px",
-            cursor: "pointer",
-            fontFamily: SANS,
-            fontSize: "13px",
-            color: "rgba(255,255,255,0.55)",
-            boxShadow:
-              "inset 0 1px 1px rgba(255,255,255,0.25), inset 0 -1px 1px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.25)",
+            pointerEvents: "none",
+            zIndex: 90,
+            opacity: scrolling ? 0.3 : 1,
+            transition: "opacity 0.2s ease-out",
           }}
         >
-          <SearchIcon color="rgba(255,255,255,0.55)" size={13} />
-          <span>{t("placeholder_short")}</span>
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={onPillClick}
+            aria-label={t("open_label")}
+            className="pp-global-search-pill"
+            style={{
+              pointerEvents: "auto",
+              width: "200px",
+              height: "40px",
+              background: "rgba(255,255,255,0.10)",
+              WebkitBackdropFilter: "blur(12px) saturate(180%)",
+              backdropFilter: "blur(12px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.18)",
+              borderRadius: "999px",
+              padding: "0 14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              cursor: "pointer",
+              fontFamily: SANS,
+              fontSize: "13px",
+              color: "rgba(255,255,255,0.55)",
+              boxShadow:
+                "inset 0 1px 1px rgba(255,255,255,0.25), inset 0 -1px 1px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.25)",
+            }}
+          >
+            <SearchIcon color="rgba(255,255,255,0.55)" size={13} />
+            <span>{t("placeholder_short")}</span>
+          </button>
+        </div>
+      )}
 
       {open && (
         <div
