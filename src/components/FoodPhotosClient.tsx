@@ -742,25 +742,44 @@ export function FoodPhotosClient({
               },
             ] satisfies NutritionField[]
           ).map((field) => (
-            <input
+            <label
               key={field.label}
-              type="number"
-              min="0"
-              step={field.step}
-              value={field.value}
-              onChange={(e) => field.setValue(e.target.value)}
-              placeholder={field.label}
-              aria-label={field.label}
               style={{
-                width: "100%",
-                background: "rgba(26, 22, 20, 0.82)",
-                border: "0.5px solid var(--pp-border)",
-                borderRadius: "8px",
-                color: "var(--pp-text)",
+                display: "block",
                 fontFamily: SANS,
-                padding: "0.8rem",
               }}
-            />
+            >
+              <span
+                style={{
+                  display: "block",
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.16em",
+                  marginBottom: "0.35rem",
+                  textTransform: "uppercase",
+                }}
+              >
+                {field.label}
+              </span>
+              <input
+                type="number"
+                min="0"
+                step={field.step}
+                value={field.value}
+                onChange={(e) => field.setValue(e.target.value)}
+                placeholder={field.label}
+                aria-label={field.label}
+                style={{
+                  width: "100%",
+                  background: "rgba(26, 22, 20, 0.82)",
+                  border: "0.5px solid var(--pp-border)",
+                  borderRadius: "8px",
+                  color: "var(--pp-text)",
+                  fontFamily: SANS,
+                  padding: "0.8rem",
+                }}
+              />
+            </label>
           ))}
         </div>
 
@@ -825,6 +844,71 @@ export function FoodPhotosClient({
                 confidence: t(`confidence_${estimate.confidence}`),
               })}
             </p>
+            <div
+              className="grid gap-2 sm:grid-cols-4"
+              style={{ marginTop: "0.75rem" }}
+            >
+              {[
+                {
+                  label: t("calories"),
+                  value:
+                    estimate.calories === null ? "—" : `${estimate.calories}`,
+                  color: "#d6a06f",
+                },
+                {
+                  label: t("protein"),
+                  value:
+                    estimate.protein_g === null ? "—" : `${estimate.protein_g}g`,
+                  color: "#88d39f",
+                },
+                {
+                  label: t("carbs"),
+                  value:
+                    estimate.carbs_g === null ? "—" : `${estimate.carbs_g}g`,
+                  color: "#d6a06f",
+                },
+                {
+                  label: t("fat"),
+                  value: estimate.fat_g === null ? "—" : `${estimate.fat_g}g`,
+                  color: "#b58cff",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    border: "0.5px solid rgba(255,255,255,0.08)",
+                    borderRadius: "9px",
+                    padding: "0.65rem",
+                    background: "rgba(255,255,255,0.035)",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontFamily: SANS,
+                      color: "var(--pp-text-tertiary)",
+                      fontSize: "9px",
+                      letterSpacing: "0.14em",
+                      margin: 0,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: SERIF,
+                      color: item.color,
+                      fontSize: "20px",
+                      fontStyle: "italic",
+                      lineHeight: 1,
+                      margin: "0.35rem 0 0",
+                    }}
+                  >
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
             <p
               style={{
                 fontFamily: SERIF,
@@ -1047,25 +1131,46 @@ export function FoodPhotosClient({
                                   step: "0.1",
                                 },
                               ].map((field) => (
-                                <input
+                                <label
                                   key={field.label}
-                                  type="number"
-                                  min="0"
-                                  step={field.step}
-                                  value={field.value}
-                                  onChange={(e) => field.setValue(e.target.value)}
-                                  placeholder={field.label}
-                                  aria-label={field.label}
                                   style={{
-                                    width: "100%",
-                                    background: "rgba(26, 22, 20, 0.82)",
-                                    border: "0.5px solid var(--pp-border)",
-                                    borderRadius: "8px",
-                                    color: "var(--pp-text)",
+                                    display: "block",
                                     fontFamily: SANS,
-                                    padding: "0.7rem",
                                   }}
-                                />
+                                >
+                                  <span
+                                    style={{
+                                      display: "block",
+                                      color: "var(--pp-text-tertiary)",
+                                      fontSize: "9px",
+                                      letterSpacing: "0.14em",
+                                      marginBottom: "0.3rem",
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    {field.label}
+                                  </span>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step={field.step}
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.setValue(e.target.value)
+                                    }
+                                    placeholder={field.label}
+                                    aria-label={field.label}
+                                    style={{
+                                      width: "100%",
+                                      background: "rgba(26, 22, 20, 0.82)",
+                                      border: "0.5px solid var(--pp-border)",
+                                      borderRadius: "8px",
+                                      color: "var(--pp-text)",
+                                      fontFamily: SANS,
+                                      padding: "0.7rem",
+                                    }}
+                                  />
+                                </label>
                               ))}
                             </div>
                             <div
