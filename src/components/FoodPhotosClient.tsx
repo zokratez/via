@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
@@ -34,6 +34,13 @@ type FoodEstimate = {
   confidence: "low" | "medium" | "high";
   uncertainty: string;
 };
+type NutritionTotals = {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  mealsWithNutrition: number;
+};
 
 function fileExtension(file: File): string {
   if (file.type === "image/png") return "png";
@@ -48,10 +55,52 @@ function nowLocalDateTime(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function toLocalDateTimeInput(value: string): string {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return nowLocalDateTime();
+  d.setSeconds(0, 0);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function optionalNumber(value: string): number | null {
   if (value.trim().length === 0) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function sumNutrition(items: FoodPhoto[]): NutritionTotals {
+  return items.reduce<NutritionTotals>(
+    (acc, item) => {
+      const hasNutrition =
+        item.calories_estimate !== null ||
+        item.protein_g !== null ||
+        item.carbs_g !== null ||
+        item.fat_g !== null;
+      return {
+        calories: acc.calories + (item.calories_estimate ?? 0),
+        protein: acc.protein + (item.protein_g ?? 0),
+        carbs: acc.carbs + (item.carbs_g ?? 0),
+        fat: acc.fat + (item.fat_g ?? 0),
+        mealsWithNutrition: acc.mealsWithNutrition + (hasNutrition ? 1 : 0),
+      };
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0, mealsWithNutrition: 0 },
+  );
+}
+
+function sameLocalDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function formatNumber(value: number, fractionDigits = 0): string {
+  return new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
 }
 
 export function FoodPhotosClient({
@@ -71,9 +120,86 @@ export function FoodPhotosClient({
   const [fat, setFat] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [estimate, setEstimate] = useState<FoodEstimate | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editMealType, setEditMealType] = useState<MealType>("meal");
+  const [editEatenAt, setEditEatenAt] = useState(nowLocalDateTime());
+  const [editDescription, setEditDescription] = useState("");
+  const [editCalories, setEditCalories] = useState("");
+  const [editProtein, setEditProtein] = useState("");
+  const [editCarbs, setEditCarbs] = useState("");
+  const [editFat, setEditFat] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isAnalyzing, startAnalyze] = useTransition();
+  const today = useMemo(() => new Date(), []);
+  const todayPhotos = useMemo(
+    () => photos.filter((photo) => sameLocalDay(new Date(photo.eaten_at), today)),
+    [photos, today],
+  );
+  const sevenDayPhotos = useMemo(() => {
+    const start = new Date(today);
+    start.setDate(start.getDate() - 6);
+    start.setHours(0, 0, 0, 0);
+    return photos.filter((photo) => new Date(photo.eaten_at) >= start);
+  }, [photos, today]);
+  const todayTotals = useMemo(() => sumNutrition(todayPhotos), [todayPhotos]);
+  const sevenDayTotals = useMemo(() => sumNutrition(sevenDayPhotos), [sevenDayPhotos]);
+  const groupedPhotos = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(locale, {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+    return photos.reduce<
+      Array<{
+        key: string;
+        label: string;
+        totals: NutritionTotals;
+        items: FoodPhoto[];
+      }>
+    >((groups, photo) => {
+      const date = new Date(photo.eaten_at);
+      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      const existing = groups.find((group) => group.key === key);
+      if (existing) {
+        existing.items.push(photo);
+        existing.totals = sumNutrition(existing.items);
+        return groups;
+      }
+      groups.push({
+        key,
+        label: formatter.format(date),
+        totals: sumNutrition([photo]),
+        items: [photo],
+      });
+      return groups;
+    }, []);
+  }, [photos, locale]);
+
+  const macroTotal = todayTotals.protein + todayTotals.carbs + todayTotals.fat;
+  const macroSegments =
+    macroTotal > 0
+      ? [
+          {
+            label: t("protein"),
+            value: todayTotals.protein,
+            color: "#88d39f",
+            width: (todayTotals.protein / macroTotal) * 100,
+          },
+          {
+            label: t("carbs"),
+            value: todayTotals.carbs,
+            color: "#d6a06f",
+            width: (todayTotals.carbs / macroTotal) * 100,
+          },
+          {
+            label: t("fat"),
+            value: todayTotals.fat,
+            color: "#b58cff",
+            width: (todayTotals.fat / macroTotal) * 100,
+          },
+        ]
+      : [];
 
   async function refreshPhotos(userId: string) {
     const supabase = createClient();
@@ -242,11 +368,255 @@ export function FoodPhotosClient({
     });
   }
 
+  function startEditing(photo: FoodPhoto) {
+    setEditingId(photo.id);
+    setEditMealType(
+      MEAL_TYPES.includes(photo.meal_type as MealType)
+        ? (photo.meal_type as MealType)
+        : "meal",
+    );
+    setEditEatenAt(toLocalDateTimeInput(photo.eaten_at));
+    setEditDescription(photo.description ?? "");
+    setEditCalories(photo.calories_estimate === null ? "" : String(photo.calories_estimate));
+    setEditProtein(photo.protein_g === null ? "" : String(photo.protein_g));
+    setEditCarbs(photo.carbs_g === null ? "" : String(photo.carbs_g));
+    setEditFat(photo.fat_g === null ? "" : String(photo.fat_g));
+    setMessage(null);
+  }
+
+  async function onUpdate(photo: FoodPhoto) {
+    setMessage(null);
+    startTransition(async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setMessage(t("error_auth"));
+        return;
+      }
+      const updated = await supabase
+        .from("food_photos")
+        .update({
+          eaten_at: new Date(editEatenAt).toISOString(),
+          meal_type: editMealType,
+          description:
+            editDescription.trim().length > 0 ? editDescription.trim() : null,
+          calories_estimate: optionalNumber(editCalories),
+          protein_g: optionalNumber(editProtein),
+          carbs_g: optionalNumber(editCarbs),
+          fat_g: optionalNumber(editFat),
+        })
+        .eq("id", photo.id);
+      if (updated.error) {
+        setMessage(t("error_update"));
+        return;
+      }
+      setEditingId(null);
+      setMessage(t("updated"));
+      await refreshPhotos(user.id);
+    });
+  }
+
   const SANS = "var(--pp-font-sans)";
   const SERIF = "var(--pp-font-serif)";
 
   return (
     <div>
+      <section
+        className="pp-fade-up"
+        style={{
+          border: "0.5px solid rgba(214, 160, 111, 0.36)",
+          borderRadius: "16px",
+          padding: "1rem",
+          marginBottom: "1rem",
+          background:
+            "radial-gradient(circle at 18% 0%, rgba(214, 160, 111, 0.2), transparent 32%), linear-gradient(135deg, rgba(30, 24, 21, 0.98), rgba(15, 12, 10, 0.92))",
+        }}
+      >
+        <div
+          className="grid gap-3 sm:grid-cols-4"
+          style={{ alignItems: "stretch" }}
+        >
+          {[
+            {
+              label: t("today_calories"),
+              value: `${formatNumber(todayTotals.calories)} kcal`,
+              color: "#d6a06f",
+            },
+            {
+              label: t("today_protein"),
+              value: `${formatNumber(todayTotals.protein, 1)}g`,
+              color: "#88d39f",
+            },
+            {
+              label: t("today_carbs"),
+              value: `${formatNumber(todayTotals.carbs, 1)}g`,
+              color: "#d6a06f",
+            },
+            {
+              label: t("today_fat"),
+              value: `${formatNumber(todayTotals.fat, 1)}g`,
+              color: "#b58cff",
+            },
+          ].map((metric) => (
+            <div
+              key={metric.label}
+              className="pp-stat-card"
+              style={{
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: "12px",
+                padding: "0.9rem",
+                background: "rgba(8, 6, 5, 0.28)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {metric.label}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: metric.color,
+                  fontSize: "clamp(26px, 7vw, 40px)",
+                  fontStyle: "italic",
+                  lineHeight: 1,
+                  margin: "0.55rem 0 0",
+                }}
+              >
+                {metric.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: "1rem",
+            border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            padding: "0.9rem",
+            background: "rgba(8, 6, 5, 0.22)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {t("macro_rhythm")}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                  margin: "0.35rem 0 0",
+                }}
+              >
+                {t("dashboard_hint", {
+                  meals: todayPhotos.length,
+                  seven: sevenDayPhotos.length,
+                })}
+              </p>
+            </div>
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "#d6a06f",
+                fontSize: "11px",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {t("seven_day_total", {
+                calories: formatNumber(sevenDayTotals.calories),
+              })}
+            </p>
+          </div>
+
+          <div
+            aria-label={t("macro_rhythm")}
+            style={{
+              height: "14px",
+              borderRadius: "999px",
+              overflow: "hidden",
+              marginTop: "0.85rem",
+              background: "rgba(255,255,255,0.06)",
+              display: "flex",
+              boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.08)",
+            }}
+          >
+            {macroSegments.length === 0 ? (
+              <div
+                style={{
+                  width: "100%",
+                  background:
+                    "linear-gradient(90deg, rgba(136,211,159,0.12), rgba(214,160,111,0.14), rgba(181,140,255,0.12))",
+                }}
+              />
+            ) : (
+              macroSegments.map((segment) => (
+                <div
+                  key={segment.label}
+                  title={`${segment.label}: ${formatNumber(segment.value, 1)}g`}
+                  style={{
+                    width: `${segment.width}%`,
+                    background: segment.color,
+                    minWidth: segment.width > 0 ? "6px" : 0,
+                  }}
+                />
+              ))
+            )}
+          </div>
+
+          <div
+            className="grid gap-2 sm:grid-cols-3"
+            style={{ marginTop: "0.8rem" }}
+          >
+            {macroSegments.map((segment) => (
+              <p
+                key={segment.label}
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "11px",
+                  margin: 0,
+                }}
+              >
+                <span style={{ color: segment.color }}>●</span> {segment.label}:{" "}
+                {formatNumber(segment.value, 1)}g
+              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <form
         onSubmit={onUpload}
         style={{
@@ -507,7 +877,7 @@ export function FoodPhotosClient({
         )}
       </form>
 
-      <div className="grid gap-3 sm:grid-cols-2" style={{ marginTop: "1rem" }}>
+      <div style={{ marginTop: "1.25rem" }}>
         {photos.length === 0 ? (
           <p
             style={{
@@ -523,100 +893,330 @@ export function FoodPhotosClient({
             {t("empty")}
           </p>
         ) : (
-          photos.map((photo) => (
-            <article
-              key={photo.id}
-              className="pp-stat-card"
-              style={{
-                border: "0.5px solid var(--pp-border)",
-                borderRadius: "12px",
-                overflow: "hidden",
-                background: "var(--pp-surface)",
-              }}
-            >
-              {photo.signedUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={photo.signedUrl}
-                  alt={t("photo_alt", { meal: t(`meal_${photo.meal_type}`) })}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    aspectRatio: "4 / 3",
-                    objectFit: "cover",
-                    background: "rgba(0,0,0,0.2)",
-                  }}
-                />
-              ) : (
-                <div style={{ aspectRatio: "4 / 3" }} />
-              )}
-              <div style={{ padding: "0.85rem" }}>
-                <p
+          groupedPhotos.map((group) => (
+            <section key={group.key} style={{ marginBottom: "1rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                  alignItems: "baseline",
+                  marginBottom: "0.6rem",
+                }}
+              >
+                <h2
                   style={{
                     fontFamily: SANS,
-                    color: "#88d39f",
+                    color: "var(--pp-text-secondary)",
                     fontSize: "11px",
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.2em",
                     textTransform: "uppercase",
                     margin: 0,
                   }}
                 >
-                  {t(`meal_${photo.meal_type}`)} ·{" "}
-                  {new Intl.DateTimeFormat(locale, {
-                    dateStyle: "medium",
-                  }).format(new Date(photo.eaten_at))}
-                </p>
-                {photo.description && (
-                  <p
-                    style={{
-                      fontFamily: SERIF,
-                      color: "var(--pp-text-secondary)",
-                      fontSize: "14px",
-                      margin: "0.55rem 0 0",
-                    }}
-                  >
-                    {photo.description}
-                  </p>
-                )}
-                {(photo.calories_estimate !== null ||
-                  photo.protein_g !== null ||
-                  photo.carbs_g !== null ||
-                  photo.fat_g !== null) && (
-                  <p
-                    style={{
-                      fontFamily: SANS,
-                      color: "var(--pp-text-tertiary)",
-                      fontSize: "11px",
-                      lineHeight: 1.6,
-                      margin: "0.55rem 0 0",
-                    }}
-                  >
-                    {photo.calories_estimate ?? "—"} kcal · P{" "}
-                    {photo.protein_g ?? "—"} · C {photo.carbs_g ?? "—"} · F{" "}
-                    {photo.fat_g ?? "—"}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  onClick={() => onDelete(photo)}
-                  disabled={isPending}
+                  {group.label}
+                </h2>
+                <p
                   style={{
-                    marginTop: "0.75rem",
-                    background: "transparent",
-                    border: "none",
-                    color: "var(--pp-text-tertiary)",
                     fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
                     fontSize: "11px",
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
-                    padding: 0,
+                    margin: 0,
                   }}
                 >
-                  {t("delete")}
-                </button>
+                  {formatNumber(group.totals.calories)} kcal ·{" "}
+                  {group.items.length} {t("meals")}
+                </p>
               </div>
-            </article>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {group.items.map((photo) => {
+                  const isEditing = editingId === photo.id;
+                  return (
+                    <article
+                      key={photo.id}
+                      className="pp-stat-card"
+                      style={{
+                        border: "0.5px solid var(--pp-border)",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        background: "var(--pp-surface)",
+                      }}
+                    >
+                      {photo.signedUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={photo.signedUrl}
+                          alt={t("photo_alt", {
+                            meal: t(`meal_${photo.meal_type}`),
+                          })}
+                          style={{
+                            display: "block",
+                            width: "100%",
+                            aspectRatio: "4 / 3",
+                            objectFit: "cover",
+                            background: "rgba(0,0,0,0.2)",
+                          }}
+                        />
+                      ) : (
+                        <div style={{ aspectRatio: "4 / 3" }} />
+                      )}
+                      <div style={{ padding: "0.85rem" }}>
+                        {isEditing ? (
+                          <div>
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              <select
+                                value={editMealType}
+                                onChange={(e) =>
+                                  setEditMealType(e.target.value as MealType)
+                                }
+                                aria-label={t("meal_type")}
+                                style={{
+                                  width: "100%",
+                                  background: "rgba(26, 22, 20, 0.82)",
+                                  border: "0.5px solid var(--pp-border)",
+                                  borderRadius: "8px",
+                                  color: "var(--pp-text)",
+                                  fontFamily: SANS,
+                                  padding: "0.7rem",
+                                }}
+                              >
+                                {MEAL_TYPES.map((item) => (
+                                  <option key={item} value={item}>
+                                    {t(`meal_${item}`)}
+                                  </option>
+                                ))}
+                              </select>
+                              <input
+                                type="datetime-local"
+                                value={editEatenAt}
+                                onChange={(e) => setEditEatenAt(e.target.value)}
+                                aria-label={t("eaten_at")}
+                                style={{
+                                  width: "100%",
+                                  background: "rgba(26, 22, 20, 0.82)",
+                                  border: "0.5px solid var(--pp-border)",
+                                  borderRadius: "8px",
+                                  color: "var(--pp-text)",
+                                  fontFamily: SANS,
+                                  padding: "0.7rem",
+                                }}
+                              />
+                            </div>
+                            <textarea
+                              value={editDescription}
+                              onChange={(e) => setEditDescription(e.target.value)}
+                              rows={3}
+                              style={{
+                                width: "100%",
+                                marginTop: "0.7rem",
+                                background: "rgba(26, 22, 20, 0.82)",
+                                border: "0.5px solid var(--pp-border)",
+                                borderRadius: "8px",
+                                color: "var(--pp-text)",
+                                fontFamily: SERIF,
+                                padding: "0.75rem",
+                              }}
+                            />
+                            <div
+                              className="grid gap-2 sm:grid-cols-4"
+                              style={{ marginTop: "0.7rem" }}
+                            >
+                              {[
+                                {
+                                  value: editCalories,
+                                  setValue: setEditCalories,
+                                  label: t("calories"),
+                                  step: "1",
+                                },
+                                {
+                                  value: editProtein,
+                                  setValue: setEditProtein,
+                                  label: t("protein"),
+                                  step: "0.1",
+                                },
+                                {
+                                  value: editCarbs,
+                                  setValue: setEditCarbs,
+                                  label: t("carbs"),
+                                  step: "0.1",
+                                },
+                                {
+                                  value: editFat,
+                                  setValue: setEditFat,
+                                  label: t("fat"),
+                                  step: "0.1",
+                                },
+                              ].map((field) => (
+                                <input
+                                  key={field.label}
+                                  type="number"
+                                  min="0"
+                                  step={field.step}
+                                  value={field.value}
+                                  onChange={(e) => field.setValue(e.target.value)}
+                                  placeholder={field.label}
+                                  aria-label={field.label}
+                                  style={{
+                                    width: "100%",
+                                    background: "rgba(26, 22, 20, 0.82)",
+                                    border: "0.5px solid var(--pp-border)",
+                                    borderRadius: "8px",
+                                    color: "var(--pp-text)",
+                                    fontFamily: SANS,
+                                    padding: "0.7rem",
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "0.8rem",
+                                marginTop: "0.8rem",
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => onUpdate(photo)}
+                                disabled={isPending}
+                                style={{
+                                  background: "#88d39f",
+                                  border: "0.5px solid #88d39f",
+                                  borderRadius: "999px",
+                                  color: "var(--pp-bg)",
+                                  fontFamily: SANS,
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                  letterSpacing: "0.14em",
+                                  textTransform: "uppercase",
+                                  cursor: "pointer",
+                                  padding: "0.65rem 0.9rem",
+                                }}
+                              >
+                                {t("update")}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingId(null)}
+                                disabled={isPending}
+                                style={{
+                                  background: "transparent",
+                                  border: "0.5px solid var(--pp-border)",
+                                  borderRadius: "999px",
+                                  color: "var(--pp-text-secondary)",
+                                  fontFamily: SANS,
+                                  fontSize: "11px",
+                                  letterSpacing: "0.14em",
+                                  textTransform: "uppercase",
+                                  cursor: "pointer",
+                                  padding: "0.65rem 0.9rem",
+                                }}
+                              >
+                                {t("cancel")}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <p
+                              style={{
+                                fontFamily: SANS,
+                                color: "#88d39f",
+                                fontSize: "11px",
+                                letterSpacing: "0.16em",
+                                textTransform: "uppercase",
+                                margin: 0,
+                              }}
+                            >
+                              {t(`meal_${photo.meal_type}`)} ·{" "}
+                              {new Intl.DateTimeFormat(locale, {
+                                timeStyle: "short",
+                              }).format(new Date(photo.eaten_at))}
+                            </p>
+                            {photo.description && (
+                              <p
+                                style={{
+                                  fontFamily: SERIF,
+                                  color: "var(--pp-text-secondary)",
+                                  fontSize: "14px",
+                                  margin: "0.55rem 0 0",
+                                }}
+                              >
+                                {photo.description}
+                              </p>
+                            )}
+                            {(photo.calories_estimate !== null ||
+                              photo.protein_g !== null ||
+                              photo.carbs_g !== null ||
+                              photo.fat_g !== null) && (
+                              <p
+                                style={{
+                                  fontFamily: SANS,
+                                  color: "var(--pp-text-tertiary)",
+                                  fontSize: "11px",
+                                  lineHeight: 1.6,
+                                  margin: "0.55rem 0 0",
+                                }}
+                              >
+                                {photo.calories_estimate ?? "—"} kcal · P{" "}
+                                {photo.protein_g ?? "—"} · C{" "}
+                                {photo.carbs_g ?? "—"} · F {photo.fat_g ?? "—"}
+                              </p>
+                            )}
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "1rem",
+                                flexWrap: "wrap",
+                                marginTop: "0.75rem",
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => startEditing(photo)}
+                                disabled={isPending}
+                                style={{
+                                  background: "transparent",
+                                  border: "none",
+                                  color: "#d6a06f",
+                                  fontFamily: SANS,
+                                  fontSize: "11px",
+                                  letterSpacing: "0.16em",
+                                  textTransform: "uppercase",
+                                  cursor: "pointer",
+                                  padding: 0,
+                                }}
+                              >
+                                {t("edit")}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onDelete(photo)}
+                                disabled={isPending}
+                                style={{
+                                  background: "transparent",
+                                  border: "none",
+                                  color: "var(--pp-text-tertiary)",
+                                  fontFamily: SANS,
+                                  fontSize: "11px",
+                                  letterSpacing: "0.16em",
+                                  textTransform: "uppercase",
+                                  cursor: "pointer",
+                                  padding: 0,
+                                }}
+                              >
+                                {t("delete")}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
           ))
         )}
       </div>
