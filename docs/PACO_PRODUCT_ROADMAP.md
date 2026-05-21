@@ -57,7 +57,7 @@ What it should avoid:
 
 ## Food Calories And Macros
 
-Status: private food logging, manual macro entry, AI meal photo scan, and AI text-description estimates are implemented. Future barcode/native-depth work can feed the same `food_photos` log.
+Status: private food logging, manual macro entry, AI meal photo scan, AI text-description estimates, barcode lookup, and repeat saved meals are implemented. Future native-depth work can feed the same `food_photos` log.
 
 Safe product framing:
 AI estimates food calories and macros from photos with confidence ranges. The user can edit the estimate before saving.
@@ -72,11 +72,11 @@ Completed behavior:
 - Photo optional: users can save a meal with only notes/macros.
 - AI photo estimate fills editable calories, protein, carbs, and fat.
 - AI text estimate works when the user describes the meal without a photo.
+- Barcode lookup fills editable packaged-food nutrition from Open Food Facts.
 - Saved meals can be repeated into today as private manual entries.
 - Daily totals, 7-day rhythm, and dashboard food signal all use the same saved entries.
 
 Next nutrition upgrades:
-- Barcode scan for packaged foods.
 - Better portion prompts when confidence is low.
 
 ## Future Feature: Native Depth-Assisted Portions
