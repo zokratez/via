@@ -305,6 +305,14 @@
     "meal_snack": "Snack",
     "eaten_at": "Time",
     "description_placeholder": "Describe the plate, portions, sauces, drinks, or anything you want to remember…",
+    "barcode": "Barcode lookup",
+    "barcode_placeholder": "Type UPC/EAN number",
+    "barcode_lookup": "Lookup",
+    "barcode_lookup_loading": "Looking…",
+    "barcode_hint": "For packaged food, type the barcode. PACO fills editable nutrition from Open Food Facts when available.",
+    "barcode_found": "Barcode found. Review the nutrition before saving.",
+    "barcode_found_detail": "Filled from {source}. Serving: {serving}.",
+    "barcode_serving_unknown": "serving not listed",
     "calories": "kcal",
     "protein": "Protein",
     "carbs": "Carbs",
@@ -364,7 +372,10 @@
     "error_update": "Could not update the food.",
     "error_delete": "Could not delete the food.",
     "error_analyze": "Could not analyze the meal. You can fill the data manually.",
-    "error_analyze_context": "Add a photo or describe the meal before asking PACO to estimate macros."
+    "error_analyze_context": "Add a photo or describe the meal before asking PACO to estimate macros.",
+    "error_barcode_required": "Type a barcode first.",
+    "error_barcode_not_found": "No product found for that barcode. You can still enter it manually.",
+    "error_barcode": "Could not look up that barcode. You can still enter it manually."
   },
   "progress": {
     "nav_checkin": "check-in",

@@ -305,6 +305,14 @@
     "meal_snack": "Snack",
     "eaten_at": "Hora",
     "description_placeholder": "Describe el plato, porciones, salsas, bebidas o lo que quieras recordar…",
+    "barcode": "Buscar código de barras",
+    "barcode_placeholder": "Escribe UPC/EAN",
+    "barcode_lookup": "Buscar",
+    "barcode_lookup_loading": "Buscando…",
+    "barcode_hint": "Para comida empaquetada, escribe el código. PACO llena nutrición editable desde Open Food Facts cuando exista.",
+    "barcode_found": "Código encontrado. Revisa la nutrición antes de guardar.",
+    "barcode_found_detail": "Datos de {source}. Porción: {serving}.",
+    "barcode_serving_unknown": "porción no listada",
     "calories": "kcal",
     "protein": "Proteína",
     "carbs": "Carbs",
@@ -364,7 +372,10 @@
     "error_update": "No se pudo actualizar la comida.",
     "error_delete": "No se pudo borrar la comida.",
     "error_analyze": "No se pudo analizar la comida. Puedes llenar los datos manualmente.",
-    "error_analyze_context": "Agrega una foto o describe la comida antes de pedirle a PACO que estime macros."
+    "error_analyze_context": "Agrega una foto o describe la comida antes de pedirle a PACO que estime macros.",
+    "error_barcode_required": "Escribe un código primero.",
+    "error_barcode_not_found": "No encontramos producto para ese código. Igual puedes llenarlo manualmente.",
+    "error_barcode": "No se pudo buscar ese código. Igual puedes llenarlo manualmente."
   },
   "progress": {
     "nav_checkin": "check-in",

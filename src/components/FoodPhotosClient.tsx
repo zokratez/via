@@ -34,6 +34,16 @@ type FoodEstimate = {
   confidence: "low" | "medium" | "high";
   uncertainty: string;
 };
+type BarcodeProduct = {
+  barcode: string;
+  description: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  source: string;
+  serving_size: string | null;
+};
 type NutritionTotals = {
   calories: number;
   protein: number;
@@ -122,8 +132,10 @@ export function FoodPhotosClient({
   const [protein, setProtein] = useState("");
   const [carbs, setCarbs] = useState("");
   const [fat, setFat] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [estimate, setEstimate] = useState<FoodEstimate | null>(null);
+  const [barcodeProduct, setBarcodeProduct] = useState<BarcodeProduct | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editMealType, setEditMealType] = useState<MealType>("meal");
   const [editEatenAt, setEditEatenAt] = useState(nowLocalDateTime());
@@ -135,6 +147,7 @@ export function FoodPhotosClient({
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isAnalyzing, startAnalyze] = useTransition();
+  const [isLookingUpBarcode, startBarcodeLookup] = useTransition();
   const today = useMemo(() => new Date(), []);
   const todayPhotos = useMemo(
     () => photos.filter((photo) => sameLocalDay(new Date(photo.eaten_at), today)),
@@ -370,11 +383,60 @@ export function FoodPhotosClient({
       setProtein("");
       setCarbs("");
       setFat("");
+      setBarcode("");
       setEstimate(null);
+      setBarcodeProduct(null);
       setMealType("meal");
       setEatenAt(nowLocalDateTime());
       setMessage(t("saved"));
       await refreshPhotos(user.id);
+    });
+  }
+
+  async function onBarcodeLookup() {
+    setMessage(null);
+    setBarcodeProduct(null);
+    const normalized = barcode.replace(/\D/g, "");
+    if (!normalized) {
+      setMessage(t("error_barcode_required"));
+      return;
+    }
+
+    startBarcodeLookup(async () => {
+      const res = await fetch("/api/food/barcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ barcode: normalized, locale }),
+      });
+      if (res.status === 404) {
+        setMessage(t("error_barcode_not_found"));
+        return;
+      }
+      if (!res.ok) {
+        setMessage(t("error_barcode"));
+        return;
+      }
+      const payload = (await res.json()) as { product?: BarcodeProduct };
+      if (!payload.product) {
+        setMessage(t("error_barcode"));
+        return;
+      }
+      setBarcodeProduct(payload.product);
+      setBarcode(normalized);
+      setDescription(payload.product.description);
+      if (payload.product.calories !== null) {
+        setCalories(String(payload.product.calories));
+      }
+      if (payload.product.protein_g !== null) {
+        setProtein(String(payload.product.protein_g));
+      }
+      if (payload.product.carbs_g !== null) {
+        setCarbs(String(payload.product.carbs_g));
+      }
+      if (payload.product.fat_g !== null) {
+        setFat(String(payload.product.fat_g));
+      }
+      setMessage(t("barcode_found"));
     });
   }
 
@@ -983,6 +1045,91 @@ export function FoodPhotosClient({
             fontSize: "13px",
           }}
         />
+
+        <div
+          style={{
+            border: "0.5px solid rgba(214, 160, 111, 0.24)",
+            borderRadius: "12px",
+            padding: "0.9rem",
+            marginTop: "1rem",
+            background: "rgba(8, 6, 5, 0.24)",
+          }}
+        >
+          <label
+            htmlFor="food-barcode"
+            style={{
+              display: "block",
+              fontFamily: SANS,
+              color: "var(--pp-text-tertiary)",
+              fontSize: "10px",
+              letterSpacing: "0.16em",
+              marginBottom: "0.45rem",
+              textTransform: "uppercase",
+            }}
+          >
+            {t("barcode")}
+          </label>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <input
+              id="food-barcode"
+              type="text"
+              inputMode="numeric"
+              value={barcode}
+              onChange={(e) => {
+                setBarcode(e.target.value);
+                setBarcodeProduct(null);
+              }}
+              placeholder={t("barcode_placeholder")}
+              style={{
+                width: "100%",
+                background: "rgba(26, 22, 20, 0.82)",
+                border: "0.5px solid var(--pp-border)",
+                borderRadius: "999px",
+                color: "var(--pp-text)",
+                fontFamily: SANS,
+                padding: "0.85rem 1rem",
+              }}
+            />
+            <button
+              type="button"
+              onClick={onBarcodeLookup}
+              disabled={isPending || isLookingUpBarcode}
+              className="pp-action-card"
+              style={{
+                border: "0.5px solid rgba(214, 160, 111, 0.66)",
+                borderRadius: "999px",
+                background: "rgba(214, 160, 111, 0.12)",
+                color: "#d6a06f",
+                fontFamily: SANS,
+                fontSize: "11px",
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                padding: "0.85rem 1rem",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {isLookingUpBarcode ? t("barcode_lookup_loading") : t("barcode_lookup")}
+            </button>
+          </div>
+          <p
+            style={{
+              fontFamily: SANS,
+              color: "var(--pp-text-tertiary)",
+              fontSize: "11px",
+              lineHeight: 1.55,
+              margin: "0.65rem 0 0",
+            }}
+          >
+            {barcodeProduct
+              ? t("barcode_found_detail", {
+                  source: barcodeProduct.source,
+                  serving: barcodeProduct.serving_size ?? t("barcode_serving_unknown"),
+                })
+              : t("barcode_hint")}
+          </p>
+        </div>
 
         <div className="grid gap-3 sm:grid-cols-2" style={{ marginTop: "1rem" }}>
           <select
