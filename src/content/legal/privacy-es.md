@@ -58,6 +58,8 @@ Si eliges analizar una foto de comida, la imagen seleccionada se envía a **Anth
 
 Las fotos de comida y progreso se almacenan de forma privada en Supabase. No son públicas, no se muestran a otros usuarios y puedes borrarlas.
 
+Si eliges analizar fotos de progreso, las imágenes seleccionadas para comparar se envían a **Anthropic** para que la IA resuma diferencias visibles no diagnósticas y límites de consistencia de las fotos. Este análisis no es diagnóstico, estimación de grasa corporal ni evaluación médica.
+
 ## Artículos en nuestro diario
 
 Los artículos en el diario editorial de PACO Peptide se producen mediante un pipeline automatizado:

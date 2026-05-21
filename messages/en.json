@@ -399,6 +399,17 @@
     "comparison_hint": "same angle wins",
     "comparison_previous": "Previous",
     "comparison_latest": "Latest",
+    "analyze_comparison": "Analyze visible changes",
+    "analyzing": "Analyzing…",
+    "analyzed": "Analysis ready. Review the limits before trusting it.",
+    "analysis_title": "AI comparison · {confidence} confidence",
+    "analysis_visible": "Visible changes",
+    "analysis_limits": "Image limits",
+    "analysis_clinician": "Questions to ask",
+    "analysis_disclaimer": "This is not a diagnosis, body-fat estimate, or medical assessment. It only describes visible differences and photo consistency.",
+    "confidence_low": "low",
+    "confidence_medium": "medium",
+    "confidence_high": "high",
     "notes_placeholder": "Optional notes: lighting, time, posture, how you felt…",
     "save": "Save private photo",
     "saving": "Saving…",
@@ -413,7 +424,8 @@
     "error_auth": "Sign in again.",
     "error_upload": "Could not upload the photo.",
     "error_save": "Could not save the photo.",
-    "error_delete": "Could not delete the photo."
+    "error_delete": "Could not delete the photo.",
+    "error_analyze": "Could not analyze the comparison. You can still compare the photos visually."
   },
   "dose": {
     "title": "Log dose",

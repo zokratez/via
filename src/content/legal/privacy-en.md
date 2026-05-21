@@ -58,6 +58,8 @@ If you choose to analyze a food photo, the selected image is sent to **Anthropic
 
 Food photos and progress photos are stored privately in Supabase. They are not public, not shown to other users, and can be deleted by you.
 
+If you choose to analyze progress photos, the selected comparison images are sent to **Anthropic** so the AI can summarize visible, non-diagnostic differences and photo-consistency limits. This analysis is not a diagnosis, body-fat estimate, or medical assessment.
+
 ## Articles in our journal
 
 Articles in PACO Peptide's editorial journal are produced through an automated pipeline:

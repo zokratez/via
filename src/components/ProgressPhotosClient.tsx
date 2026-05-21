@@ -12,6 +12,13 @@ type ProgressPhoto = {
   notes: string | null;
   signedUrl: string | null;
 };
+type ProgressAnalysis = {
+  summary: string;
+  visible_changes: string[];
+  consistency_notes: string[];
+  questions_for_clinician: string[];
+  confidence: "low" | "medium" | "high";
+};
 
 const ANGLES = ["front", "side", "back", "face", "other"] as const;
 type Angle = (typeof ANGLES)[number];
@@ -50,8 +57,10 @@ export function ProgressPhotosClient({
   const [capturedAt, setCapturedAt] = useState(todayLocalDateTime());
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [analysis, setAnalysis] = useState<ProgressAnalysis | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isAnalyzing, startAnalyze] = useTransition();
   const latestPhoto = photos[0] ?? null;
   const oldestPhoto = photos[photos.length - 1] ?? null;
   const latestDaysAgo = latestPhoto
@@ -212,6 +221,34 @@ export function ProgressPhotosClient({
       await supabase.storage.from("progress-photos").remove([photo.storage_path]);
       setPhotos((current) => current.filter((item) => item.id !== photo.id));
       setMessage(t("deleted"));
+    });
+  }
+
+  async function onAnalyzeComparison() {
+    if (!comparisonPhotos) return;
+    setMessage(null);
+    setAnalysis(null);
+    startAnalyze(async () => {
+      const res = await fetch("/api/progress/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          previousId: comparisonPhotos.previous.id,
+          latestId: comparisonPhotos.latest.id,
+          locale,
+        }),
+      });
+      if (!res.ok) {
+        setMessage(t("error_analyze"));
+        return;
+      }
+      const payload = (await res.json()) as { analysis?: ProgressAnalysis };
+      if (!payload.analysis) {
+        setMessage(t("error_analyze"));
+        return;
+      }
+      setAnalysis(payload.analysis);
+      setMessage(t("analyzed"));
     });
   }
 
@@ -532,6 +569,125 @@ export function ProgressPhotosClient({
               </article>
             ))}
           </div>
+
+          <button
+            type="button"
+            onClick={onAnalyzeComparison}
+            disabled={isPending || isAnalyzing}
+            className="pp-action-card"
+            style={{
+              width: "100%",
+              marginTop: "1rem",
+              border: "0.5px solid var(--pp-accent)",
+              borderRadius: "999px",
+              background: isAnalyzing ? "rgba(201, 150, 107, 0.18)" : "var(--pp-accent)",
+              color: isAnalyzing ? "var(--pp-accent)" : "var(--pp-bg)",
+              fontFamily: SANS,
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              padding: "0.95rem",
+              cursor: "pointer",
+            }}
+          >
+            {isAnalyzing ? t("analyzing") : t("analyze_comparison")}
+          </button>
+
+          {analysis && (
+            <div
+              style={{
+                border: "0.5px solid rgba(136, 211, 159, 0.32)",
+                borderRadius: "12px",
+                padding: "1rem",
+                marginTop: "1rem",
+                background: "rgba(8, 6, 5, 0.34)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "#88d39f",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {t("analysis_title", {
+                  confidence: t(`confidence_${analysis.confidence}`),
+                })}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-text)",
+                  fontSize: "18px",
+                  lineHeight: 1.45,
+                  margin: "0.65rem 0 0",
+                }}
+              >
+                {analysis.summary}
+              </p>
+
+              {[
+                {
+                  title: t("analysis_visible"),
+                  items: analysis.visible_changes,
+                },
+                {
+                  title: t("analysis_limits"),
+                  items: analysis.consistency_notes,
+                },
+                {
+                  title: t("analysis_clinician"),
+                  items: analysis.questions_for_clinician,
+                },
+              ].map((section) =>
+                section.items.length > 0 ? (
+                  <div key={section.title} style={{ marginTop: "0.9rem" }}>
+                    <p
+                      style={{
+                        fontFamily: SANS,
+                        color: "var(--pp-text-tertiary)",
+                        fontSize: "10px",
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        margin: 0,
+                      }}
+                    >
+                      {section.title}
+                    </p>
+                    <ul
+                      style={{
+                        color: "var(--pp-text-secondary)",
+                        fontFamily: SERIF,
+                        fontSize: "14px",
+                        lineHeight: 1.55,
+                        margin: "0.45rem 0 0",
+                        paddingLeft: "1.1rem",
+                      }}
+                    >
+                      {section.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null,
+              )}
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "11px",
+                  lineHeight: 1.55,
+                  margin: "0.95rem 0 0",
+                }}
+              >
+                {t("analysis_disclaimer")}
+              </p>
+            </div>
+          )}
         </section>
       )}
 

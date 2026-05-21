@@ -399,6 +399,17 @@
     "comparison_hint": "mismo ángulo gana",
     "comparison_previous": "Anterior",
     "comparison_latest": "Última",
+    "analyze_comparison": "Analizar cambios visibles",
+    "analyzing": "Analizando…",
+    "analyzed": "Análisis listo. Revisa los límites antes de confiar.",
+    "analysis_title": "Comparación IA · confianza {confidence}",
+    "analysis_visible": "Cambios visibles",
+    "analysis_limits": "Límites de la imagen",
+    "analysis_clinician": "Preguntas para hacer",
+    "analysis_disclaimer": "Esto no es diagnóstico, estimación de grasa corporal ni evaluación médica. Solo describe diferencias visibles y consistencia de las fotos.",
+    "confidence_low": "baja",
+    "confidence_medium": "media",
+    "confidence_high": "alta",
     "notes_placeholder": "Notas opcionales: luz, hora, postura, cómo te sentías…",
     "save": "Guardar foto privada",
     "saving": "Guardando…",
@@ -413,7 +424,8 @@
     "error_auth": "Inicia sesión de nuevo.",
     "error_upload": "No se pudo subir la foto.",
     "error_save": "No se pudo guardar la foto.",
-    "error_delete": "No se pudo borrar la foto."
+    "error_delete": "No se pudo borrar la foto.",
+    "error_analyze": "No se pudo analizar la comparación. Aún puedes comparar las fotos visualmente."
   },
   "dose": {
     "title": "Registrar dosis",
