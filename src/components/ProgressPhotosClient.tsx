@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
@@ -29,6 +29,15 @@ function todayLocalDateTime(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function daysBetween(a: Date, b: Date): number {
+  const oneDay = 86_400_000;
+  const startA = new Date(a);
+  const startB = new Date(b);
+  startA.setHours(0, 0, 0, 0);
+  startB.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.round((startB.getTime() - startA.getTime()) / oneDay));
+}
+
 export function ProgressPhotosClient({
   initialPhotos,
 }: {
@@ -43,6 +52,51 @@ export function ProgressPhotosClient({
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const latestPhoto = photos[0] ?? null;
+  const oldestPhoto = photos[photos.length - 1] ?? null;
+  const latestDaysAgo = latestPhoto
+    ? daysBetween(new Date(latestPhoto.captured_at), new Date())
+    : null;
+  const trackingDays =
+    latestPhoto && oldestPhoto
+      ? daysBetween(new Date(oldestPhoto.captured_at), new Date(latestPhoto.captured_at)) + 1
+      : 0;
+  const angleCounts = useMemo(
+    () =>
+      ANGLES.map((item) => ({
+        angle: item,
+        label: t(`angle_${item}`),
+        count: photos.filter((photo) => photo.angle === item).length,
+      })),
+    [photos, t],
+  );
+  const primaryAngle = angleCounts.reduce(
+    (best, current) => (current.count > best.count ? current : best),
+    angleCounts[0],
+  );
+  const progressInsight =
+    photos.length === 0
+      ? {
+          title: t("insight_empty_title"),
+          body: t("insight_empty_body"),
+        }
+      : latestDaysAgo !== null && latestDaysAgo > 10
+        ? {
+            title: t("insight_stale_title"),
+            body: t("insight_stale_body", { days: latestDaysAgo }),
+          }
+        : primaryAngle.count >= 2
+          ? {
+              title: t("insight_compare_title"),
+              body: t("insight_compare_body", {
+                angle: primaryAngle.label,
+                count: primaryAngle.count,
+              }),
+            }
+          : {
+              title: t("insight_consistency_title"),
+              body: t("insight_consistency_body"),
+            };
 
   async function refreshPhotos(userId: string) {
     const supabase = createClient();
@@ -152,6 +206,187 @@ export function ProgressPhotosClient({
 
   return (
     <div>
+      <section
+        className="pp-fade-up"
+        style={{
+          border: "0.5px solid rgba(201, 150, 107, 0.36)",
+          borderRadius: "16px",
+          padding: "1rem",
+          marginBottom: "1rem",
+          background:
+            "radial-gradient(circle at 18% 0%, rgba(201, 150, 107, 0.18), transparent 34%), linear-gradient(135deg, rgba(30, 24, 21, 0.98), rgba(15, 12, 10, 0.92))",
+        }}
+      >
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            {
+              label: t("stat_photos"),
+              value: photos.length.toString(),
+              sub: t("stat_photos_sub"),
+            },
+            {
+              label: t("stat_latest"),
+              value:
+                latestDaysAgo === null
+                  ? t("stat_empty")
+                  : latestDaysAgo === 0
+                    ? t("stat_today")
+                    : t("stat_days_ago", { days: latestDaysAgo }),
+              sub: latestPhoto ? t(`angle_${latestPhoto.angle}`) : t("stat_latest_sub"),
+            },
+            {
+              label: t("stat_tracking"),
+              value:
+                trackingDays === 0
+                  ? t("stat_empty")
+                  : t("stat_days", { days: trackingDays }),
+              sub:
+                primaryAngle.count > 0
+                  ? t("stat_primary_angle", { angle: primaryAngle.label })
+                  : t("stat_tracking_sub"),
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="pp-stat-card"
+              style={{
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: "12px",
+                padding: "0.9rem",
+                background: "rgba(8, 6, 5, 0.28)",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {item.label}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-accent)",
+                  fontSize: "clamp(28px, 8vw, 42px)",
+                  fontStyle: "italic",
+                  lineHeight: 1,
+                  margin: "0.55rem 0 0",
+                }}
+              >
+                {item.value}
+              </p>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "11px",
+                  lineHeight: 1.5,
+                  margin: "0.45rem 0 0",
+                }}
+              >
+                {item.sub}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            marginTop: "1rem",
+            border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            padding: "1rem",
+            background: "rgba(8, 6, 5, 0.24)",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: SANS,
+              color: "var(--pp-accent)",
+              fontSize: "10px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              margin: 0,
+            }}
+          >
+            {t("today_focus")}
+          </p>
+          <p
+            style={{
+              fontFamily: SERIF,
+              color: "var(--pp-text)",
+              fontSize: "24px",
+              fontStyle: "italic",
+              lineHeight: 1.1,
+              margin: "0.55rem 0 0",
+            }}
+          >
+            {progressInsight.title}
+          </p>
+          <p
+            style={{
+              fontFamily: SERIF,
+              color: "var(--pp-text-secondary)",
+              fontSize: "15px",
+              lineHeight: 1.55,
+              margin: "0.55rem 0 0",
+            }}
+          >
+            {progressInsight.body}
+          </p>
+        </div>
+
+        <div
+          className="grid gap-2 sm:grid-cols-5"
+          style={{ marginTop: "1rem" }}
+        >
+          {angleCounts.map((item) => (
+            <div
+              key={item.angle}
+              style={{
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: "999px",
+                padding: "0.55rem 0.7rem",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.5rem",
+                alignItems: "center",
+                background:
+                  item.count > 0
+                    ? "rgba(201, 150, 107, 0.1)"
+                    : "rgba(255,255,255,0.025)",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {item.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: SANS,
+                  color: item.count > 0 ? "var(--pp-accent)" : "var(--pp-text-tertiary)",
+                  fontSize: "11px",
+                }}
+              >
+                {item.count}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <form
         onSubmit={onUpload}
         style={{
