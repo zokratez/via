@@ -2,52 +2,47 @@
 
 ## Purpose
 
-`Mi Meta` is PACO's persistent goal companion: a quiet shadow that follows the user through the product and surfaces the next useful action. It should feel like the iPhone Search pill, but for the user's own journey.
+`Mi Meta` is PACO's quiet goal companion. Internally it can be thought of as `El Fantasma`: the observer twin to Bukowski. Bukowski talks. Mi Meta watches the rhythm and opens only when the user asks.
 
-## Product Position
+## Current SaaS Scope
 
-- User-facing name: `Mi Meta` / `My Goal`.
-- Personality: calm, observant, practical, never alarmist.
-- Role: connect logs, food, sleep, symptoms, progress, coach, and Diario into daily/weekly/monthly goal guidance.
-- Safety boundary: no diagnosis, no treatment decisions, no body-fat certainty, no medical claims. It explains possible patterns and helps users prepare questions for a clinician.
+- Dashboard-only for now.
+- Fixed Liquid Glass pill near the lower-right edge, above the existing bottom controls.
+- Default state is calm: no permanent green dot, no all-caps label, no location-pin feeling.
+- The green check appears only when there is a new meaningful signal.
+- Tapping the pill clears that signal locally with `mimeta_last_seen_signal_id`.
+- The sheet opens as a solid iOS-style bottom sheet with internal scrolling.
 
-## SaaS V1
+## Signal Rules
 
-- Add a constant floating Liquid Glass pill across user-facing pages.
-- Open a small goal sheet with quick actions:
-  - Dashboard status
-  - Food/macros
-  - Check-in
-  - Bukowski
-- Use a green check signal for helpful, non-urgent nudges.
-- Keep the component global in the locale layout so future native app and HealthKit data can feed the same concept.
+Signals should be rare and useful. Generate a new signal only for:
 
-## SaaS V2
+- Weight trend direction change over a recent 7-day window.
+- Dose-log streak milestones: 3, 7, 14, or 30.
+- A 7-day weight checkpoint window.
+- First-ever dose, weight, or symptom entry.
 
-- Add `user_goals` table for weight target, protein target, step target, sleep target, hydration target, and weekly focus.
-- Add `goal_signals` table for daily soft alerts such as low protein, missed check-in, low sleep, high symptom day, or new Diario article relevance.
-- Add `/api/my-goal/status` to summarize current user status.
-- Add Bukowski context injection so the coach can reference recent signals.
-- Add goal-specific Diario recommendations.
+Do not create signals for routine absence of data, daily time checks, or guilt-style nudges.
 
-## Native iOS Later
+## Copy Rules
 
-- HealthKit read permissions for steps, active energy, body mass, sleep, workouts, and routes.
-- Widgets, Live Activity, App Intents, Siri, and Spotlight actions.
-- Apple Watch signals feed the same `Mi Meta` status model.
+- Observational present tense.
+- Slightly literary, never bossy.
+- No clinical claims.
+- No exclamation marks.
+- No bright warning colors.
+- Avoid second-person commands.
+- Prefer: "El peso bajó 0.4 kg en los últimos 7 días."
+- Avoid: "Tienes que registrar tu peso."
 
-## UX Rules
+## Design Brief
 
-- It should be present but not annoying.
-- Default pill state should be quiet, text-first, and elegant.
-- The green check should not be permanent. It appears only when there is a new goal signal or useful alert.
-- When shown, the alert indicator should be only a small green check mark, not a large badge or red-style notification.
-- The open sheet must scroll inside itself on mobile so the page behind it does not trap the user.
-- The visual direction should feel like iPhone Search/Spotlight: liquid glass, simple, restrained, and premium.
-- Never use fear-based alerts.
-- Always let the user decide what to do.
-- Every insight should have a next action: log, read, ask Bukowski, or bring to doctor.
+Design a calm Liquid Glass companion called `Mi Meta`. It should feel like the iPhone Search pill, but more private and quieter. Default state: 88px by 32px pill, subtle target icon, lowercase serif italic `Mi meta`, muted white text, brass icon, no green dot. Signal state: only an 8px muted sage circle with a tiny white check at the top-right. No pulse, no red, no amber, no notification energy.
 
-## Claude Design Brief
+The bottom sheet should feel native and restrained: solid dark surface, rounded top corners, small drag handle, one observational sentence, a brass progress bar with no numbers, up to three action rows, and a quiet footer: `Tu Fantasma no decide. Observa.`
 
-Design a calmer, more elegant `Mi Meta` companion for PACO Peptide. It should sit near the mobile bottom navigation like the iPhone Search pill, but it must be less loud than a notification. Default state: small glass pill with a subtle outline icon and the text `Mi Meta`. Alert state: show only a small green check mark when PACO has a new useful signal; otherwise no green check is visible. The sheet should feel like a premium iOS bottom sheet, scroll internally on small screens, and summarize the user's goal status plus next actions. Avoid medical diagnosis language. Tone: observant shadow, not nagging coach.
+## Native App Later
+
+- HealthKit can feed steps, active energy, body mass, sleep, workouts, and routes.
+- Widgets, Live Activity, App Intents, Siri, and Spotlight can reuse the same `Mi Meta` status model.
+- Apple Watch data should enrich observations, not turn the feature into a nag.

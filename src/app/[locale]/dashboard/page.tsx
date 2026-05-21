@@ -14,7 +14,9 @@ import {
   AlertBanner,
   type MedicationWithLastDose,
 } from "@/components/AlertBanner";
+import { MiMeta } from "@/components/MiMeta";
 import { WelcomeOverlay } from "@/components/WelcomeOverlay";
+import { getMiMetaSignalState } from "@/lib/mimeta/signals";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -191,6 +193,37 @@ export default async function DashboardPage({
   const tApp = await getTranslations("app");
   const tAuth = await getTranslations("auth");
   const tDose = await getTranslations("dose");
+  const tMiMeta = await getTranslations("mimeta");
+  const miMetaSignal = await getMiMetaSignalState({
+    supabase,
+    userId: user!.id,
+    locale: locale as "es" | "en",
+    now,
+  });
+  const miMetaActionLabel = (href: string) => {
+    if (href === "/log/weight") return tMiMeta("action_log_weight");
+    if (href === "/log/dose") return tMiMeta("action_log_dose");
+    if (href === "/log/sleep") return tMiMeta("action_log_sleep");
+    if (href === "/calculadora" || href === "/calculator") {
+      return tMiMeta("action_calculator");
+    }
+    if (href === "/diario" || href === "/journal") {
+      return tMiMeta("action_journal");
+    }
+    if (href === "/coach") return tMiMeta("action_coach");
+    return "";
+  };
+  const signalState = {
+    ...miMetaSignal,
+    statusSentence:
+      miMetaSignal.statusSentence.trim().length > 0
+        ? miMetaSignal.statusSentence
+        : tMiMeta("empty_state_sentence"),
+    nextActions: miMetaSignal.nextActions.map((action) => ({
+      ...action,
+      label: miMetaActionLabel(action.href) || action.label,
+    })),
+  };
 
   const key = greetingKey(now);
   const greeting =
@@ -1210,6 +1243,7 @@ export default async function DashboardPage({
             initialTab={initialTab}
           />
         </div>
+        <MiMeta signal={signalState} />
       </main>
 
       <WelcomeOverlay

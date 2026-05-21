@@ -347,241 +347,237 @@
   z-index: 1;
 }
 
-.pp-my-goal-anchor {
+.pp-mimeta-anchor {
   position: fixed;
   right: max(18px, env(safe-area-inset-right, 0px));
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
   z-index: 92;
   pointer-events: none;
+  transition: opacity 0.2s ease-out;
 }
 
-.pp-my-goal-pill {
-  pointer-events: auto;
-  min-width: 108px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 999px;
-  padding: 0 13px;
+.pp-mimeta-pill {
+  position: relative;
+  width: 88px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 0 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  color: rgba(244, 237, 224, 0.82);
-  font-family: var(--pp-font-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  cursor: pointer;
-  background: rgba(35, 30, 27, 0.46);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.18),
-    inset 0 -8px 14px rgba(0, 0, 0, 0.12),
-    0 10px 28px rgba(0, 0, 0, 0.28);
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-family: var(--pp-font-serif);
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1;
+  text-transform: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
     transform 0.18s ease-out,
     border-color 0.18s ease-out,
-    box-shadow 0.18s ease-out;
+    opacity 0.18s ease-out;
 }
 
-.pp-my-goal-pill:hover {
-  transform: translateY(-2px) scale(1.02);
-  border-color: rgba(244, 237, 224, 0.28);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.22),
-    inset 0 -8px 14px rgba(0, 0, 0, 0.12),
-    0 14px 34px rgba(0, 0, 0, 0.34);
+.pp-mimeta-pill:hover,
+.pp-mimeta-pill:focus-visible {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
-.pp-my-goal-status {
-  width: 19px;
-  height: 19px;
+.pp-mimeta-pill-icon {
+  display: inline-flex;
+  color: rgba(201, 150, 107, 0.6);
+}
+
+.pp-mimeta-signal-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.9), transparent 28%),
-    linear-gradient(135deg, #8df28a, #2b7c3a);
-  color: #102914;
-  font-size: 12px;
+  background: #5b8a52;
+  color: #fff;
+  font-family: var(--pp-font-sans);
+  font-size: 6px;
+  font-weight: 700;
   line-height: 1;
-  font-weight: 900;
-  box-shadow:
-    0 0 0 3px rgba(110, 255, 132, 0.1),
-    0 8px 18px rgba(66, 220, 90, 0.2);
 }
 
-.pp-my-goal-overlay {
+.pp-mimeta-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1001;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.62);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.4);
+  animation: pp-mimeta-backdrop-in 0.2s ease-out both;
+}
+
+.pp-mimeta-sheet {
+  width: 100%;
+  max-width: 540px;
+  max-height: 70vh;
+  border-radius: 24px 24px 0 0;
+  background: #1a1614;
+  box-shadow: 0 -28px 80px rgba(0, 0, 0, 0.48);
+  animation: pp-mimeta-sheet-in 0.35s cubic-bezier(0.32, 0.72, 0, 1) both;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.pp-mimeta-handle-area {
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  touch-action: none;
+}
+
+.pp-mimeta-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pp-mimeta-content {
+  max-height: calc(70vh - 28px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 24px max(24px, env(safe-area-inset-bottom, 0px));
+}
+
+.pp-mimeta-header h2 {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--pp-font-serif);
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.pp-mimeta-header p {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--pp-font-sans);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: lowercase;
+}
+
+.pp-mimeta-status-card {
+  margin-top: 24px;
+  border-radius: 16px;
+  padding: 20px;
+  background: #221c1a;
+}
+
+.pp-mimeta-status-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--pp-font-serif);
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.pp-mimeta-progress-track {
+  height: 4px;
+  margin-top: 16px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
 
-.pp-my-goal-sheet {
-  width: min(560px, 100%);
-  max-height: min(720px, calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 2rem));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 86% 10%, rgba(95, 176, 91, 0.16), transparent 34%),
-    radial-gradient(circle at 12% 0%, rgba(201, 150, 107, 0.18), transparent 34%),
-    rgba(25, 21, 18, 0.92);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
-  backdrop-filter: blur(24px) saturate(170%);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.14),
-    0 28px 80px rgba(0, 0, 0, 0.52);
+.pp-mimeta-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #c9966b;
+  transition: width 0.6s ease;
 }
 
-.pp-my-goal-sheet-scroll {
-  max-height: inherit;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 1.1rem;
+.pp-mimeta-actions {
+  margin-top: 24px;
 }
 
-.pp-my-goal-sheet-top {
+.pp-mimeta-action-row {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px 0;
   display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.pp-my-goal-kicker {
-  margin: 0 0 0.45rem;
-  color: rgba(150, 226, 152, 0.86);
-  font-family: var(--pp-font-sans);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-}
-
-.pp-my-goal-sheet h2 {
-  margin: 0;
-  color: var(--pp-text);
-  font-family: var(--pp-font-serif);
-  font-size: clamp(2rem, 8vw, 3.2rem);
-  font-style: italic;
-  font-weight: 400;
-  line-height: 0.95;
-}
-
-.pp-my-goal-sheet-top p:not(.pp-my-goal-kicker) {
-  margin: 0.75rem 0 0;
-  color: var(--pp-text-secondary);
-  font-family: var(--pp-font-serif);
-  font-size: 1rem;
-  line-height: 1.55;
-}
-
-.pp-my-goal-close {
-  flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--pp-text-secondary);
+  gap: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
+  font-family: var(--pp-font-serif);
+  font-size: 16px;
+  line-height: 1.2;
+  text-align: left;
 }
 
-.pp-my-goal-alert {
-  margin-top: 1rem;
-  padding: 0.9rem;
-  border: 1px solid rgba(119, 227, 131, 0.18);
-  border-radius: 20px;
-  display: flex;
-  gap: 0.8rem;
-  background: rgba(49, 92, 50, 0.16);
+.pp-mimeta-action-row:last-child {
+  border-bottom: 0;
 }
 
-.pp-my-goal-alert > span {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
+.pp-mimeta-action-row span:nth-child(2) {
+  flex: 1;
+}
+
+.pp-mimeta-action-icon {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(130, 239, 129, 0.9);
-  color: #142315;
-  font-family: var(--pp-font-sans);
-  font-weight: 800;
+  color: rgba(201, 150, 107, 0.5);
 }
 
-.pp-my-goal-alert strong {
-  color: rgba(239, 255, 235, 0.92);
-  font-family: var(--pp-font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.pp-mimeta-action-row svg:last-child {
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.pp-my-goal-alert p {
-  margin: 0.25rem 0 0;
-  color: var(--pp-text-secondary);
-  font-family: var(--pp-font-serif);
+.pp-mimeta-footer {
+  margin: 32px 0 0;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--pp-font-sans);
+  font-size: 11px;
   line-height: 1.5;
+  text-align: center;
 }
 
-.pp-my-goal-grid {
-  margin-top: 1rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.72rem;
+@keyframes pp-mimeta-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.pp-my-goal-card {
-  min-height: 96px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 20px;
-  padding: 0.9rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: inherit;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.035);
-  transition:
-    transform 0.18s ease-out,
-    border-color 0.18s ease-out,
-    background 0.18s ease-out;
-}
-
-.pp-my-goal-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(201, 150, 107, 0.36);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.pp-my-goal-card span {
-  color: var(--pp-text);
-  font-family: var(--pp-font-sans);
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.pp-my-goal-card small {
-  color: var(--pp-text-tertiary);
-  font-family: var(--pp-font-serif);
-  font-size: 0.92rem;
-  line-height: 1.4;
+@keyframes pp-mimeta-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .pp-mobile-nav {
@@ -694,45 +690,16 @@
   }
 }
 
-@media (max-width: 767px) {
-  .pp-my-goal-anchor {
-    right: max(18px, env(safe-area-inset-right, 0px));
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 88px);
-  }
-
-  .pp-my-goal-pill {
-    min-width: 104px;
-    height: 36px;
-    font-size: 10px;
-  }
-
-  .pp-my-goal-overlay {
-    padding: 0.7rem;
-    align-items: flex-end;
-  }
-
-  .pp-my-goal-sheet {
-    border-radius: 24px;
-    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.4rem);
-  }
-
-  .pp-my-goal-sheet-scroll {
-    padding: 1rem;
-  }
-
-  .pp-my-goal-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .pp-my-goal-pill,
-  .pp-my-goal-card {
+  .pp-mimeta-pill,
+  .pp-mimeta-sheet,
+  .pp-mimeta-backdrop,
+  .pp-mimeta-progress-fill {
     transition: none !important;
+    animation: none !important;
   }
 
-  .pp-my-goal-pill:hover,
-  .pp-my-goal-card:hover {
+  .pp-mimeta-pill:hover {
     transform: none !important;
   }
 }
