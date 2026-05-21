@@ -453,6 +453,8 @@ export default async function DashboardPage({
 
   const actions = [
     { href: "/check-in", label: t("action_checkin") },
+    { href: "/food", label: t("action_food") },
+    { href: "/progress", label: t("action_progress") },
     { href: "/log/dose", label: t("log_dose") },
     { href: "/log/weight", label: t("log_weight") },
     { href: "/log/symptom", label: t("log_symptom") },
@@ -966,9 +968,12 @@ export default async function DashboardPage({
           </div>
 
           <div
-            className="grid gap-3 sm:grid-cols-3"
+            className="grid gap-3 sm:grid-cols-4"
             style={{ marginTop: "1rem" }}
           >
+            <Link href="/food" style={actionStyle} className="pp-action-card">
+              {t("today_jump_food")}
+            </Link>
             <Link href="/calendar" style={actionStyle} className="pp-action-card">
               {t("today_jump_calendar")}
             </Link>
