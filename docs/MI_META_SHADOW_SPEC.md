@@ -39,7 +39,15 @@
 ## UX Rules
 
 - It should be present but not annoying.
-- Signals should be light: green check for useful, amber only when something deserves attention.
+- Default pill state should be quiet, text-first, and elegant.
+- The green check should not be permanent. It appears only when there is a new goal signal or useful alert.
+- When shown, the alert indicator should be only a small green check mark, not a large badge or red-style notification.
+- The open sheet must scroll inside itself on mobile so the page behind it does not trap the user.
+- The visual direction should feel like iPhone Search/Spotlight: liquid glass, simple, restrained, and premium.
 - Never use fear-based alerts.
 - Always let the user decide what to do.
 - Every insight should have a next action: log, read, ask Bukowski, or bring to doctor.
+
+## Claude Design Brief
+
+Design a calmer, more elegant `Mi Meta` companion for PACO Peptide. It should sit near the mobile bottom navigation like the iPhone Search pill, but it must be less loud than a notification. Default state: small glass pill with a subtle outline icon and the text `Mi Meta`. Alert state: show only a small green check mark when PACO has a new useful signal; otherwise no green check is visible. The sheet should feel like a premium iOS bottom sheet, scroll internally on small screens, and summarize the user's goal status plus next actions. Avoid medical diagnosis language. Tone: observant shadow, not nagging coach.

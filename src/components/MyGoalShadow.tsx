@@ -10,6 +10,7 @@ const HIDDEN_PATH_RE =
 
 const SANS = "var(--pp-font-sans)";
 const SERIF = "var(--pp-font-serif)";
+const HAS_NEW_GOAL_ALERT = false;
 
 function GoalIcon() {
   return (
@@ -112,9 +113,11 @@ export function MyGoalShadow() {
           aria-label={t("open_label")}
           className="pp-global-search-pill pp-my-goal-pill"
         >
-          <span className="pp-my-goal-status" aria-hidden="true">
-            <span className="pp-my-goal-check">✓</span>
-          </span>
+          {HAS_NEW_GOAL_ALERT && (
+            <span className="pp-my-goal-status" aria-hidden="true">
+              ✓
+            </span>
+          )}
           <GoalIcon />
           <span>{t("pill")}</span>
         </button>
@@ -132,56 +135,60 @@ export function MyGoalShadow() {
             onClick={(e) => e.stopPropagation()}
             className="pp-my-goal-sheet"
           >
-            <div className="pp-my-goal-sheet-top">
-              <div>
-                <p className="pp-my-goal-kicker">{t("kicker")}</p>
-                <h2>{t("title")}</h2>
-                <p>{t("body")}</p>
-              </div>
-              <button
-                type="button"
-                onClick={closeOverlay}
-                aria-label={t("close_label")}
-                className="pp-my-goal-close"
-              >
-                <CloseIcon />
-              </button>
-            </div>
-
-            <div className="pp-my-goal-alert">
-              <span aria-hidden="true">✓</span>
-              <div>
-                <strong>{t("alert_title")}</strong>
-                <p>{t("alert_body")}</p>
-              </div>
-            </div>
-
-            <div className="pp-my-goal-grid">
-              {actions.map((action) => (
-                <Link
-                  key={action.href}
-                  href={action.href}
+            <div className="pp-my-goal-sheet-scroll">
+              <div className="pp-my-goal-sheet-top">
+                <div>
+                  <p className="pp-my-goal-kicker">{t("kicker")}</p>
+                  <h2>{t("title")}</h2>
+                  <p>{t("body")}</p>
+                </div>
+                <button
+                  type="button"
                   onClick={closeOverlay}
-                  className="pp-my-goal-card"
+                  aria-label={t("close_label")}
+                  className="pp-my-goal-close"
                 >
-                  <span>{action.title}</span>
-                  <small>{action.body}</small>
-                </Link>
-              ))}
-            </div>
+                  <CloseIcon />
+                </button>
+              </div>
 
-            <p
-              style={{
-                margin: "1rem 0 0",
-                color: "var(--pp-text-tertiary)",
-                fontFamily: SERIF,
-                fontSize: "0.92rem",
-                fontStyle: "italic",
-                lineHeight: 1.55,
-              }}
-            >
-              {t("disclaimer")}
-            </p>
+              {HAS_NEW_GOAL_ALERT && (
+                <div className="pp-my-goal-alert">
+                  <span aria-hidden="true">✓</span>
+                  <div>
+                    <strong>{t("alert_title")}</strong>
+                    <p>{t("alert_body")}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="pp-my-goal-grid">
+                {actions.map((action) => (
+                  <Link
+                    key={action.href}
+                    href={action.href}
+                    onClick={closeOverlay}
+                    className="pp-my-goal-card"
+                  >
+                    <span>{action.title}</span>
+                    <small>{action.body}</small>
+                  </Link>
+                ))}
+              </div>
+
+              <p
+                style={{
+                  margin: "1rem 0 0",
+                  color: "var(--pp-text-tertiary)",
+                  fontFamily: SERIF,
+                  fontSize: "0.92rem",
+                  fontStyle: "italic",
+                  lineHeight: 1.55,
+                }}
+              >
+                {t("disclaimer")}
+              </p>
+            </div>
           </section>
         </div>
       )}
