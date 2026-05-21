@@ -56,7 +56,7 @@ What it should avoid:
 
 ## Future Feature: Food Photo Calories And Macros
 
-Status: Phase 1 private food photo/manual macro tracking in progress. AI estimates are not implemented yet.
+Status: Phase 1 private food photo/manual macro tracking complete. Phase 2 in progress: AI meal photo scan fills editable calories/macros before save.
 
 Safe product framing:
 AI estimates food calories and macros from photos with confidence ranges. The user can edit the estimate before saving.

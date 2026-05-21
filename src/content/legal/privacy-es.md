@@ -15,6 +15,7 @@ Cuando creas una cuenta y usas PACO Peptide, recopilamos:
 - **Correo electrónico** — para autenticación y comunicación de cuenta
 - **Datos de salud que ingresas** — peso, dosis registradas, sitios de inyección, síntomas que registras voluntariamente
 - **Conversaciones con el coach (Bukowski)** — los mensajes que envías y las respuestas que recibes
+- **Fotos privadas que subes** — fotos de progreso y fotos de comida, incluyendo notas opcionales y campos de nutrición
 
 ### Información que recopilamos automáticamente
 
@@ -51,6 +52,12 @@ Política de Anthropic: [anthropic.com/legal/privacy](https://www.anthropic.com/
 
 Guardamos tus conversaciones en nuestra base de datos para que tengas historial dentro de PACO Peptide. Si eliminas tu cuenta, eliminamos las conversaciones.
 
+## Cómo se procesa el análisis de fotos de comida
+
+Si eliges analizar una foto de comida, la imagen seleccionada se envía a **Anthropic** para que la IA estime calorías y macros visibles. La estimación no es consejo médico, puede estar equivocada y se muestra para que la revises antes de guardarla.
+
+Las fotos de comida y progreso se almacenan de forma privada en Supabase. No son públicas, no se muestran a otros usuarios y puedes borrarlas.
+
 ## Artículos en nuestro diario
 
 Los artículos en el diario editorial de PACO Peptide se producen mediante un pipeline automatizado:
@@ -64,6 +71,7 @@ No enviamos datos de usuarios a PubMed ni a Anthropic durante este proceso. La g
 ## Dónde se almacenan tus datos
 
 - **Cuenta y datos de salud:** Supabase (servidores en EE.UU., región AWS us-west-1)
+- **Fotos privadas:** Supabase Storage, mismo proyecto y región que tus datos de cuenta
 - **Pagos:** Stripe (cumple PCI-DSS)
 - **Conversaciones del coach:** Supabase, mismo lugar que tu cuenta
 - **Contadores de límite de uso:** Upstash (basado en Redis, se usa para aplicar los límites diarios del plan gratis — recibe únicamente un identificador interno opaco; nunca correo, datos de salud, ni contenido de mensajes)

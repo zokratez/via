@@ -275,14 +275,14 @@
     "future_photo_body": "Privada, borrable y lista para comparación visual de tendencias.",
     "future_food_eyebrow": "nuevo",
     "future_food_title": "Foto de comida",
-    "future_food_body": "Registra comida privada ahora; estimación de calorías y macros con IA viene después."
+    "future_food_body": "Registra comida privada con estimaciones editables de calorías y macros con IA."
   },
   "food": {
     "nav_checkin": "check-in",
     "back": "← Volver al check-in",
     "eyebrow": "Comida privada",
     "title": "Fotos de comida",
-    "body": "Guarda lo que comiste con foto, notas y macros opcionales. La estimación con IA vendrá después; por ahora tú tienes el control del dato.",
+    "body": "Guarda lo que comiste con foto, notas y estimaciones editables de macros con IA. Tú revisas antes de guardar.",
     "file": "Foto de comida",
     "meal_type": "Tipo de comida",
     "meal_meal": "Comida",
@@ -296,7 +296,15 @@
     "protein": "Proteína",
     "carbs": "Carbs",
     "fat": "Grasa",
-    "manual_hint": "Fase 1: registro privado y manual. Luego PACO podrá estimar con IA y pedirte confirmación.",
+    "manual_hint": "Toca analizar para que PACO estime macros. Revisa y corrige antes de guardar.",
+    "analyze": "Analizar comida",
+    "analyzing": "Analizando…",
+    "analyzed": "Estimación lista. Revísala antes de guardar.",
+    "estimate_title": "Estimación IA · confianza {confidence}",
+    "estimate_hint": "Revisa porciones, aceite, salsas y bebidas antes de guardar.",
+    "confidence_low": "baja",
+    "confidence_medium": "media",
+    "confidence_high": "alta",
     "save": "Guardar comida privada",
     "saving": "Guardando…",
     "saved": "Comida guardada.",
@@ -310,7 +318,8 @@
     "error_auth": "Inicia sesión de nuevo.",
     "error_upload": "No se pudo subir la foto.",
     "error_save": "No se pudo guardar la comida.",
-    "error_delete": "No se pudo borrar la comida."
+    "error_delete": "No se pudo borrar la comida.",
+    "error_analyze": "No se pudo analizar la comida. Puedes llenar los datos manualmente."
   },
   "progress": {
     "nav_checkin": "check-in",

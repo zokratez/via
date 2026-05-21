@@ -15,6 +15,7 @@ When you create an account and use PACO Peptide, we collect:
 - **Email address** — for authentication and account communication
 - **Health data you enter** — weight, recorded doses, injection sites, symptoms you log voluntarily
 - **Coach conversations (Bukowski)** — the messages you send and the responses you receive
+- **Private photos you upload** — progress photos and food photos, including optional notes and nutrition fields
 
 ### Information we collect automatically
 
@@ -51,6 +52,12 @@ Anthropic's policy: [anthropic.com/legal/privacy](https://www.anthropic.com/lega
 
 We store your conversations in our database so you have history within PACO Peptide. If you delete your account, we delete your conversations.
 
+## How food photo analysis is processed
+
+If you choose to analyze a food photo, the selected image is sent to **Anthropic** so the AI can estimate visible calories and macros. The estimate is not medical advice, may be wrong, and is shown for your review before you save it.
+
+Food photos and progress photos are stored privately in Supabase. They are not public, not shown to other users, and can be deleted by you.
+
 ## Articles in our journal
 
 Articles in PACO Peptide's editorial journal are produced through an automated pipeline:
@@ -64,6 +71,7 @@ No user data is sent to PubMed or Anthropic during this process. Article generat
 ## Where your data is stored
 
 - **Account and health data:** Supabase (US servers, AWS us-west-1 region)
+- **Private photos:** Supabase Storage, same project and region as your account data
 - **Payments:** Stripe (PCI-DSS compliant)
 - **Coach conversations:** Supabase, same location as your account
 - **Rate-limit counters:** Upstash (Redis-based, used to enforce free-tier daily limits — receives only an opaque internal user identifier; no email, no health data, no message content)

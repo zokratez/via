@@ -275,14 +275,14 @@
     "future_photo_body": "Private, deletable, and ready for visual trend comparison.",
     "future_food_eyebrow": "new",
     "future_food_title": "Food photo",
-    "future_food_body": "Log private food now; AI calorie and macro estimates come next."
+    "future_food_body": "Log private food with editable AI calorie and macro estimates."
   },
   "food": {
     "nav_checkin": "check-in",
     "back": "← Back to check-in",
     "eyebrow": "Private food",
     "title": "Food photos",
-    "body": "Save what you ate with a photo, notes, and optional macros. AI estimates come later; for now you control the data.",
+    "body": "Save what you ate with a photo, notes, and editable AI macro estimates. You review before anything is saved.",
     "file": "Food photo",
     "meal_type": "Meal type",
     "meal_meal": "Meal",
@@ -296,7 +296,15 @@
     "protein": "Protein",
     "carbs": "Carbs",
     "fat": "Fat",
-    "manual_hint": "Phase 1: private manual log. Later PACO can estimate with AI and ask you to confirm.",
+    "manual_hint": "Tap analyze so PACO can estimate macros. Review and correct before saving.",
+    "analyze": "Analyze meal",
+    "analyzing": "Analyzing…",
+    "analyzed": "Estimate ready. Review it before saving.",
+    "estimate_title": "AI estimate · {confidence} confidence",
+    "estimate_hint": "Review portions, oil, sauces, and drinks before saving.",
+    "confidence_low": "low",
+    "confidence_medium": "medium",
+    "confidence_high": "high",
     "save": "Save private food",
     "saving": "Saving…",
     "saved": "Food saved.",
@@ -310,7 +318,8 @@
     "error_auth": "Sign in again.",
     "error_upload": "Could not upload the photo.",
     "error_save": "Could not save the food.",
-    "error_delete": "Could not delete the food."
+    "error_delete": "Could not delete the food.",
+    "error_analyze": "Could not analyze the meal. You can fill the data manually."
   },
   "progress": {
     "nav_checkin": "check-in",

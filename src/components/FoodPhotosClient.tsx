@@ -25,6 +25,15 @@ type NutritionField = {
   label: string;
   step: string;
 };
+type FoodEstimate = {
+  description: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  confidence: "low" | "medium" | "high";
+  uncertainty: string;
+};
 
 function fileExtension(file: File): string {
   if (file.type === "image/png") return "png";
@@ -61,8 +70,10 @@ export function FoodPhotosClient({
   const [carbs, setCarbs] = useState("");
   const [fat, setFat] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [estimate, setEstimate] = useState<FoodEstimate | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isAnalyzing, startAnalyze] = useTransition();
 
   async function refreshPhotos(userId: string) {
     const supabase = createClient();
@@ -152,10 +163,64 @@ export function FoodPhotosClient({
       setProtein("");
       setCarbs("");
       setFat("");
+      setEstimate(null);
       setMealType("meal");
       setEatenAt(nowLocalDateTime());
       setMessage(t("saved"));
       await refreshPhotos(user.id);
+    });
+  }
+
+  async function onAnalyze() {
+    setMessage(null);
+    setEstimate(null);
+    if (!file) {
+      setMessage(t("error_file"));
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setMessage(t("error_image"));
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage(t("error_size"));
+      return;
+    }
+
+    startAnalyze(async () => {
+      const fd = new FormData();
+      fd.set("file", file);
+      fd.set("locale", locale);
+      const res = await fetch("/api/food/analyze", {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) {
+        setMessage(t("error_analyze"));
+        return;
+      }
+      const payload = (await res.json()) as { estimate?: FoodEstimate };
+      if (!payload.estimate) {
+        setMessage(t("error_analyze"));
+        return;
+      }
+      setEstimate(payload.estimate);
+      if (payload.estimate.description) {
+        setDescription(payload.estimate.description);
+      }
+      if (payload.estimate.calories !== null) {
+        setCalories(String(payload.estimate.calories));
+      }
+      if (payload.estimate.protein_g !== null) {
+        setProtein(String(payload.estimate.protein_g));
+      }
+      if (payload.estimate.carbs_g !== null) {
+        setCarbs(String(payload.estimate.carbs_g));
+      }
+      if (payload.estimate.fat_g !== null) {
+        setFat(String(payload.estimate.fat_g));
+      }
+      setMessage(t("analyzed"));
     });
   }
 
@@ -208,7 +273,10 @@ export function FoodPhotosClient({
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            setFile(e.target.files?.[0] ?? null);
+            setEstimate(null);
+          }}
           style={{
             width: "100%",
             color: "var(--pp-text-secondary)",
@@ -339,8 +407,71 @@ export function FoodPhotosClient({
         </p>
 
         <button
+          type="button"
+          onClick={onAnalyze}
+          disabled={isPending || isAnalyzing || !file}
+          className="pp-action-card"
+          style={{
+            width: "100%",
+            marginTop: "1rem",
+            border: "0.5px solid rgba(136, 211, 159, 0.66)",
+            borderRadius: "999px",
+            background: "rgba(136, 211, 159, 0.12)",
+            color: "#88d39f",
+            fontFamily: SANS,
+            fontSize: "12px",
+            fontWeight: 700,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            padding: "0.95rem",
+            cursor: file ? "pointer" : "not-allowed",
+            opacity: file ? 1 : 0.55,
+          }}
+        >
+          {isAnalyzing ? t("analyzing") : t("analyze")}
+        </button>
+
+        {estimate && (
+          <div
+            style={{
+              border: "0.5px solid rgba(136, 211, 159, 0.28)",
+              borderRadius: "10px",
+              padding: "0.9rem",
+              marginTop: "0.85rem",
+              background: "rgba(8, 6, 5, 0.28)",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "#88d39f",
+                fontSize: "11px",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {t("estimate_title", {
+                confidence: t(`confidence_${estimate.confidence}`),
+              })}
+            </p>
+            <p
+              style={{
+                fontFamily: SERIF,
+                color: "var(--pp-text-secondary)",
+                fontSize: "14px",
+                lineHeight: 1.55,
+                margin: "0.55rem 0 0",
+              }}
+            >
+              {estimate.uncertainty || t("estimate_hint")}
+            </p>
+          </div>
+        )}
+
+        <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || isAnalyzing}
           className="pp-action-card"
           style={{
             width: "100%",
