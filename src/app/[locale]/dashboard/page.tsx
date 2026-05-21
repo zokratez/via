@@ -110,6 +110,7 @@ export default async function DashboardPage({
     lastDosePerMedRes,
     anyWeightRes,
     anyCoachMsgRes,
+    food14Res,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -174,6 +175,10 @@ export default async function DashboardPage({
       .eq("role", "user")
       .limit(1)
       .maybeSingle(),
+    supabase
+      .from("food_photos")
+      .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
+      .gte("eaten_at", cutoff14),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -368,6 +373,31 @@ export default async function DashboardPage({
       sum + thread.messages.filter((message) => message.role === "user").length,
     0,
   );
+  type FoodRow = {
+    eaten_at: string;
+    calories_estimate: number | string | null;
+    protein_g: number | string | null;
+    carbs_g: number | string | null;
+    fat_g: number | string | null;
+  };
+  const foodRows14 = ((food14Res.data ?? []) as FoodRow[]).map((food) => ({
+    eaten_at: food.eaten_at,
+    calories: food.calories_estimate === null ? 0 : Number(food.calories_estimate),
+    protein: food.protein_g === null ? 0 : Number(food.protein_g),
+    carbs: food.carbs_g === null ? 0 : Number(food.carbs_g),
+    fat: food.fat_g === null ? 0 : Number(food.fat_g),
+  }));
+  const foodToday = foodRows14.filter((food) => food.eaten_at.startsWith(todayKey));
+  const foodTodayTotals = foodToday.reduce(
+    (totals, food) => {
+      totals.calories += Number.isFinite(food.calories) ? food.calories : 0;
+      totals.protein += Number.isFinite(food.protein) ? food.protein : 0;
+      totals.carbs += Number.isFinite(food.carbs) ? food.carbs : 0;
+      totals.fat += Number.isFinite(food.fat) ? food.fat : 0;
+      return totals;
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  );
   const latestWeightDate =
     weights90.length > 0 ? weights90[weights90.length - 1].measured_at : null;
   const lastSleepDate =
@@ -394,11 +424,17 @@ export default async function DashboardPage({
               label: t("today_next_checkin"),
               detail: t("today_next_checkin_detail"),
             }
-          : {
-              href: "/coach",
-              label: t("today_next_coach"),
-              detail: t("today_next_coach_detail"),
-            };
+          : foodToday.length === 0
+            ? {
+                href: "/food",
+                label: t("today_next_food"),
+                detail: t("today_next_food_detail"),
+              }
+            : {
+                href: "/coach",
+                label: t("today_next_coach"),
+                detail: t("today_next_coach_detail"),
+              };
 
   const days = new Set<string>();
   for (const r of (doses14Res.data ?? []) as { taken_at: string }[]) {
@@ -409,6 +445,9 @@ export default async function DashboardPage({
   }
   for (const r of (symptoms14Res.data ?? []) as { occurred_at: string }[]) {
     days.add(r.occurred_at.slice(0, 10));
+  }
+  for (const r of foodRows14) {
+    days.add(r.eaten_at.slice(0, 10));
   }
   const streakCount = days.size;
 
@@ -438,6 +477,7 @@ export default async function DashboardPage({
         (symptoms14Res.data ?? []) as { occurred_at: string }[]
       ).filter((r) => r.occurred_at.startsWith(key)).length,
       sleep: sleepEntries.some((s) => s.slept_at.startsWith(key)),
+      food: foodRows14.some((f) => f.eaten_at.startsWith(key)),
     };
   });
   const rhythmTotals = rhythmDays.reduce(
@@ -446,9 +486,10 @@ export default async function DashboardPage({
       totals.weight += day.weight ? 1 : 0;
       totals.symptoms += day.symptoms;
       totals.sleep += day.sleep ? 1 : 0;
+      totals.food += day.food ? 1 : 0;
       return totals;
     },
-    { dose: 0, weight: 0, symptoms: 0, sleep: 0 },
+    { dose: 0, weight: 0, symptoms: 0, sleep: 0, food: 0 },
   );
 
   const actions = [
@@ -562,6 +603,7 @@ export default async function DashboardPage({
     sleep: "#7db9ff",
     symptoms: "#ef7b8a",
     coach: "#88d39f",
+    food: "#d6a06f",
   } as const;
 
   const colorTileStyle = (
@@ -744,7 +786,7 @@ export default async function DashboardPage({
           </div>
 
           <div
-            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
             style={{ marginTop: "1rem" }}
           >
             <Link
@@ -773,6 +815,27 @@ export default async function DashboardPage({
                   : `${averageSleepHours.toFixed(1)} h`}
               </p>
               <p style={commandSubStyle}>{t("today_tile_sleep_sub")}</p>
+            </Link>
+
+            <Link
+              href="/food"
+              style={colorTileStyle(metricAccents.food)}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_food")}</p>
+              <p style={{ ...commandValueStyle, color: metricAccents.food }}>
+                {foodToday.length === 0
+                  ? t("stat_empty")
+                  : `${Math.round(foodTodayTotals.calories)} kcal`}
+              </p>
+              <p style={commandSubStyle}>
+                {foodToday.length === 0
+                  ? t("today_tile_food_empty")
+                  : t("today_tile_food_sub", {
+                      meals: foodToday.length,
+                      protein: Math.round(foodTodayTotals.protein),
+                    })}
+              </p>
             </Link>
 
             <Link
@@ -832,6 +895,7 @@ export default async function DashboardPage({
                   dose: rhythmTotals.dose,
                   weight: rhythmTotals.weight,
                   sleep: rhythmTotals.sleep,
+                  food: rhythmTotals.food,
                   symptoms: rhythmTotals.symptoms,
                 })}
               </p>
@@ -881,7 +945,7 @@ export default async function DashboardPage({
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gridTemplateColumns: "repeat(5, 1fr)",
                       gap: "0.32rem",
                     }}
                   >
@@ -894,6 +958,11 @@ export default async function DashboardPage({
                       title={t("today_tile_sleep")}
                       className="pp-rhythm-dot"
                       style={rhythmDotStyle(day.sleep, metricAccents.sleep)}
+                    />
+                    <span
+                      title={t("today_tile_food")}
+                      className="pp-rhythm-dot"
+                      style={rhythmDotStyle(day.food, metricAccents.food)}
                     />
                     <span
                       title={t("stat_weight")}
@@ -914,7 +983,7 @@ export default async function DashboardPage({
             </div>
 
             <div
-              className="grid gap-2 sm:grid-cols-4"
+              className="grid gap-2 sm:grid-cols-5"
               style={{ marginTop: "0.8rem" }}
             >
               {[
@@ -927,6 +996,11 @@ export default async function DashboardPage({
                   href: "/dashboard?tab=sleep#dashboard-tabs",
                   label: t("today_tile_sleep"),
                   color: metricAccents.sleep,
+                },
+                {
+                  href: "/food",
+                  label: t("today_tile_food"),
+                  color: metricAccents.food,
                 },
                 {
                   href: "/dashboard?tab=weight#dashboard-tabs",
