@@ -220,7 +220,37 @@ Do not estimate body fat, diagnose swelling, disease, pregnancy, age, attractive
       return jsonResponse(502, { error: "bad_ai_response" });
     }
 
-    return jsonResponse(200, { analysis });
+    const { data: saved, error: saveError } = await supabase
+      .from("progress_analyses")
+      .insert({
+        user_id: user.id,
+        previous_photo_id: previous.id,
+        latest_photo_id: latest.id,
+        angle: previous.angle,
+        summary: analysis.summary,
+        visible_changes: analysis.visible_changes,
+        consistency_notes: analysis.consistency_notes,
+        questions_for_clinician: analysis.questions_for_clinician,
+        confidence: analysis.confidence,
+      })
+      .select("id,created_at")
+      .single();
+
+    if (saveError) {
+      Sentry.captureException(saveError);
+      return jsonResponse(500, { error: "analysis_save_failed" });
+    }
+
+    return jsonResponse(200, {
+      analysis: {
+        ...analysis,
+        id: saved.id,
+        created_at: saved.created_at,
+        previous_photo_id: previous.id,
+        latest_photo_id: latest.id,
+        angle: previous.angle,
+      },
+    });
   } catch (err) {
     console.error("[progress/analyze]", err);
     Sentry.captureException(err);

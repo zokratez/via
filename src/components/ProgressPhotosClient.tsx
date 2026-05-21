@@ -13,6 +13,11 @@ type ProgressPhoto = {
   signedUrl: string | null;
 };
 type ProgressAnalysis = {
+  id?: string;
+  created_at?: string;
+  previous_photo_id?: string;
+  latest_photo_id?: string;
+  angle?: string;
   summary: string;
   visible_changes: string[];
   consistency_notes: string[];
@@ -47,8 +52,10 @@ function daysBetween(a: Date, b: Date): number {
 
 export function ProgressPhotosClient({
   initialPhotos,
+  initialAnalyses,
 }: {
   initialPhotos: ProgressPhoto[];
+  initialAnalyses: ProgressAnalysis[];
 }) {
   const t = useTranslations("progress");
   const locale = useLocale();
@@ -58,6 +65,7 @@ export function ProgressPhotosClient({
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<ProgressAnalysis | null>(null);
+  const [analyses, setAnalyses] = useState(initialAnalyses);
   const [message, setMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isAnalyzing, startAnalyze] = useTransition();
@@ -248,8 +256,19 @@ export function ProgressPhotosClient({
         return;
       }
       setAnalysis(payload.analysis);
+      setAnalyses((current) => [payload.analysis!, ...current].slice(0, 5));
       setMessage(t("analyzed"));
     });
+  }
+
+  function analysisDate(value?: string): string | null {
+    if (!value) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
   }
 
   const SANS = "var(--pp-font-sans)";
@@ -688,6 +707,84 @@ export function ProgressPhotosClient({
               </p>
             </div>
           )}
+        </section>
+      )}
+
+      {analyses.length > 0 && (
+        <section
+          className="pp-fade-up"
+          style={{
+            border: "0.5px solid rgba(136, 211, 159, 0.26)",
+            borderRadius: "14px",
+            padding: "1rem",
+            marginBottom: "1rem",
+            background:
+              "linear-gradient(135deg, rgba(136, 211, 159, 0.08), rgba(8, 6, 5, 0.32))",
+          }}
+        >
+          <p
+            style={{
+              fontFamily: SANS,
+              color: "#88d39f",
+              fontSize: "10px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              margin: 0,
+            }}
+          >
+            {t("saved_reports_eyebrow")}
+          </p>
+          <h2
+            style={{
+              fontFamily: SERIF,
+              color: "var(--pp-text)",
+              fontSize: "28px",
+              fontStyle: "italic",
+              fontWeight: 400,
+              lineHeight: 1,
+              margin: "0.5rem 0 0",
+            }}
+          >
+            {t("saved_reports_title")}
+          </h2>
+          <div style={{ display: "grid", gap: "0.75rem", marginTop: "1rem" }}>
+            {analyses.map((item, index) => (
+              <article
+                key={item.id ?? `${item.created_at}-${index}`}
+                style={{
+                  border: "0.5px solid rgba(255,255,255,0.08)",
+                  borderRadius: "12px",
+                  padding: "0.9rem",
+                  background: "rgba(8, 6, 5, 0.3)",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
+                    fontSize: "10px",
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    margin: 0,
+                  }}
+                >
+                  {analysisDate(item.created_at) ?? t("saved_reports_latest")} ·{" "}
+                  {t(`confidence_${item.confidence}`)}
+                </p>
+                <p
+                  style={{
+                    fontFamily: SERIF,
+                    color: "var(--pp-text-secondary)",
+                    fontSize: "15px",
+                    lineHeight: 1.5,
+                    margin: "0.45rem 0 0",
+                  }}
+                >
+                  {item.summary}
+                </p>
+              </article>
+            ))}
+          </div>
         </section>
       )}
 

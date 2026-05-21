@@ -16,6 +16,18 @@ type ProgressPhotoRow = {
   angle: string;
   notes: string | null;
 };
+type ProgressAnalysisRow = {
+  id: string;
+  created_at: string;
+  previous_photo_id: string;
+  latest_photo_id: string;
+  angle: string;
+  summary: string;
+  visible_changes: string[];
+  consistency_notes: string[];
+  questions_for_clinician: string[];
+  confidence: "low" | "medium" | "high";
+};
 
 export default async function ProgressPage({
   params,
@@ -63,6 +75,15 @@ export default async function ProgressPage({
       return { ...photo, signedUrl: signed?.signedUrl ?? null };
     }),
   );
+
+  const { data: analysisData } = await supabase
+    .from("progress_analyses")
+    .select(
+      "id,created_at,previous_photo_id,latest_photo_id,angle,summary,visible_changes,consistency_notes,questions_for_clinician,confidence",
+    )
+    .eq("user_id", user!.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
 
   const navLinkStyle: React.CSSProperties = {
     fontFamily: SANS,
@@ -178,7 +199,10 @@ export default async function ProgressPage({
           </p>
         </section>
 
-        <ProgressPhotosClient initialPhotos={photos} />
+        <ProgressPhotosClient
+          initialPhotos={photos}
+          initialAnalyses={(analysisData ?? []) as ProgressAnalysisRow[]}
+        />
       </main>
     </div>
   );
