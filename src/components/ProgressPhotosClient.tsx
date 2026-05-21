@@ -74,6 +74,20 @@ export function ProgressPhotosClient({
     (best, current) => (current.count > best.count ? current : best),
     angleCounts[0],
   );
+  const comparisonPhotos = useMemo(() => {
+    if (primaryAngle.count < 2) return null;
+    const matches = photos
+      .filter((photo) => photo.angle === primaryAngle.angle)
+      .sort(
+        (a, b) =>
+          new Date(b.captured_at).getTime() - new Date(a.captured_at).getTime(),
+      );
+    return {
+      angle: primaryAngle.label,
+      latest: matches[0],
+      previous: matches[1],
+    };
+  }, [photos, primaryAngle]);
   const progressInsight =
     photos.length === 0
       ? {
@@ -386,6 +400,140 @@ export function ProgressPhotosClient({
           ))}
         </div>
       </section>
+
+      {comparisonPhotos && (
+        <section
+          className="pp-fade-up"
+          style={{
+            border: "0.5px solid rgba(201, 150, 107, 0.3)",
+            borderRadius: "14px",
+            padding: "1rem",
+            marginBottom: "1rem",
+            background:
+              "linear-gradient(135deg, rgba(201, 150, 107, 0.08), rgba(8, 6, 5, 0.3))",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              alignItems: "baseline",
+              flexWrap: "wrap",
+              marginBottom: "0.9rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {t("comparison_eyebrow")}
+              </p>
+              <h2
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-text)",
+                  fontSize: "28px",
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  margin: "0.5rem 0 0",
+                }}
+              >
+                {t("comparison_title", { angle: comparisonPhotos.angle })}
+              </h2>
+            </div>
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "var(--pp-accent)",
+                fontSize: "11px",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {t("comparison_hint")}
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              {
+                label: t("comparison_previous"),
+                photo: comparisonPhotos.previous,
+              },
+              {
+                label: t("comparison_latest"),
+                photo: comparisonPhotos.latest,
+              },
+            ].map((item) => (
+              <article
+                key={item.label}
+                className="pp-stat-card"
+                style={{
+                  border: "0.5px solid var(--pp-border)",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  background: "var(--pp-surface)",
+                }}
+              >
+                {item.photo.signedUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.photo.signedUrl}
+                    alt={t("photo_alt", {
+                      angle: t(`angle_${item.photo.angle}`),
+                    })}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      aspectRatio: "3 / 4",
+                      objectFit: "cover",
+                      background: "rgba(0,0,0,0.2)",
+                    }}
+                  />
+                ) : (
+                  <div style={{ aspectRatio: "3 / 4" }} />
+                )}
+                <div style={{ padding: "0.85rem" }}>
+                  <p
+                    style={{
+                      fontFamily: SANS,
+                      color: "var(--pp-accent)",
+                      fontSize: "11px",
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      margin: 0,
+                    }}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: SERIF,
+                      color: "var(--pp-text-secondary)",
+                      fontSize: "14px",
+                      margin: "0.45rem 0 0",
+                    }}
+                  >
+                    {new Intl.DateTimeFormat(locale, {
+                      dateStyle: "medium",
+                    }).format(new Date(item.photo.captured_at))}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <form
         onSubmit={onUpload}
