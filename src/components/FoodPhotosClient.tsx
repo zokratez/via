@@ -97,6 +97,10 @@ function sameLocalDay(a: Date, b: Date): boolean {
   );
 }
 
+function localDayKey(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
 function formatNumber(value: number, fractionDigits = 0): string {
   return new Intl.NumberFormat(undefined, {
     maximumFractionDigits: fractionDigits,
@@ -159,7 +163,7 @@ export function FoodPhotosClient({
       }>
     >((groups, photo) => {
       const date = new Date(photo.eaten_at);
-      const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      const key = localDayKey(date);
       const existing = groups.find((group) => group.key === key);
       if (existing) {
         existing.items.push(photo);
@@ -175,6 +179,37 @@ export function FoodPhotosClient({
       return groups;
     }, []);
   }, [photos, locale]);
+  const weeklyNutrition = useMemo(() => {
+    const weekdayFormatter = new Intl.DateTimeFormat(locale, { weekday: "short" });
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (6 - index));
+      date.setHours(0, 0, 0, 0);
+      const items = photos.filter((photo) =>
+        localDayKey(new Date(photo.eaten_at)) === localDayKey(date),
+      );
+      return {
+        key: localDayKey(date),
+        label:
+          index === 6
+            ? t("rhythm_today")
+            : weekdayFormatter.format(date).replace(".", ""),
+        totals: sumNutrition(items),
+        meals: items.length,
+      };
+    });
+  }, [photos, today, locale, t]);
+  const weeklyMaxCalories = Math.max(
+    1,
+    ...weeklyNutrition.map((day) => day.totals.calories),
+  );
+  const weeklyMaxProtein = Math.max(
+    1,
+    ...weeklyNutrition.map((day) => day.totals.protein),
+  );
+  const hasWeeklyNutrition = weeklyNutrition.some(
+    (day) => day.totals.mealsWithNutrition > 0,
+  );
 
   const macroTotal = todayTotals.protein + todayTotals.carbs + todayTotals.fat;
   const macroSegments =
@@ -613,6 +648,166 @@ export function FoodPhotosClient({
                 {formatNumber(segment.value, 1)}g
               </p>
             ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: "1rem",
+            border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            padding: "0.9rem",
+            background:
+              "linear-gradient(145deg, rgba(214, 160, 111, 0.08), rgba(8, 6, 5, 0.22))",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              alignItems: "baseline",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {t("weekly_title")}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "14px",
+                  lineHeight: 1.5,
+                  margin: "0.35rem 0 0",
+                }}
+              >
+                {t("weekly_hint")}
+              </p>
+            </div>
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "#88d39f",
+                fontSize: "11px",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              <span style={{ color: "#d6a06f" }}>●</span> {t("calories")} ·{" "}
+              <span style={{ color: "#88d39f" }}>●</span> {t("protein")}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+              gap: "0.5rem",
+              alignItems: "end",
+              minHeight: "168px",
+              marginTop: "1rem",
+            }}
+            aria-label={t("weekly_title")}
+          >
+            {weeklyNutrition.map((day) => {
+              const calorieHeight = hasWeeklyNutrition
+                ? Math.max(8, (day.totals.calories / weeklyMaxCalories) * 112)
+                : 8;
+              const proteinHeight = hasWeeklyNutrition
+                ? Math.max(6, (day.totals.protein / weeklyMaxProtein) * 86)
+                : 6;
+              return (
+                <div
+                  key={day.key}
+                  title={`${day.label}: ${formatNumber(day.totals.calories)} kcal · ${formatNumber(day.totals.protein, 1)}g ${t("protein")}`}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                    minWidth: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "122px",
+                      display: "flex",
+                      alignItems: "flex-end",
+                      justifyContent: "center",
+                      gap: "0.18rem",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "42%",
+                        height: `${calorieHeight}px`,
+                        borderRadius: "999px 999px 4px 4px",
+                        background:
+                          day.totals.calories > 0
+                            ? "linear-gradient(180deg, #f3bf85, #a96f3e)"
+                            : "rgba(214, 160, 111, 0.16)",
+                        boxShadow:
+                          day.totals.calories > 0
+                            ? "0 0 22px rgba(214,160,111,0.22)"
+                            : "none",
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: "28%",
+                        height: `${proteinHeight}px`,
+                        borderRadius: "999px 999px 4px 4px",
+                        background:
+                          day.totals.protein > 0
+                            ? "linear-gradient(180deg, #b5f0c3, #4c9b63)"
+                            : "rgba(136, 211, 159, 0.14)",
+                        boxShadow:
+                          day.totals.protein > 0
+                            ? "0 0 20px rgba(136,211,159,0.2)"
+                            : "none",
+                      }}
+                    />
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: SANS,
+                      color: "var(--pp-text-secondary)",
+                      fontSize: "10px",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      textAlign: "center",
+                      margin: "0.45rem 0 0",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {day.label}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: SANS,
+                      color: "var(--pp-text-tertiary)",
+                      fontSize: "9px",
+                      textAlign: "center",
+                      margin: "0.2rem 0 0",
+                    }}
+                  >
+                    {day.meals > 0 ? `${day.meals} ${t("meals_short")}` : "—"}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
