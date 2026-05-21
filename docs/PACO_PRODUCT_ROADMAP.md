@@ -54,9 +54,9 @@ What it should avoid:
 - Making treatment decisions.
 - Public posting without explicit user action.
 
-## Future Feature: Food Photo Calories And Macros
+## Food Calories And Macros
 
-Status: Phase 1 private food photo/manual macro tracking complete. Phase 2 in progress: AI meal photo scan fills editable calories/macros before save.
+Status: private food logging, manual macro entry, AI meal photo scan, and AI text-description estimates are implemented. Future barcode/native-depth work can feed the same `food_photos` log.
 
 Safe product framing:
 AI estimates food calories and macros from photos with confidence ranges. The user can edit the estimate before saving.
@@ -66,6 +66,17 @@ Suggested behavior:
 - Ask for portion confirmation when uncertain.
 - Save calories, protein, carbs, fat, and notes.
 - Let Bukowski correlate food patterns with symptoms and weight trends.
+
+Completed behavior:
+- Photo optional: users can save a meal with only notes/macros.
+- AI photo estimate fills editable calories, protein, carbs, and fat.
+- AI text estimate works when the user describes the meal without a photo.
+- Daily totals, 7-day rhythm, and dashboard food signal all use the same saved entries.
+
+Next nutrition upgrades:
+- Barcode scan for packaged foods.
+- Saved frequent meals / copy yesterday's meal.
+- Better portion prompts when confidence is low.
 
 ## Future Feature: Native Depth-Assisted Portions
 

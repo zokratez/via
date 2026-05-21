@@ -39,7 +39,7 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 ## Current Feature Map
 
 - Dashboard: command center with dose, sleep, food, progress, symptoms, coach, weekly rhythm signals.
-- Food: private photo upload/delete, AI meal estimate, editable calories/protein/carbs/fat, daily totals, weekly rhythm, daily insight.
+- Food: private photo upload/delete, optional-photo manual meals, AI photo/text meal estimates, editable calories/protein/carbs/fat, daily totals, weekly rhythm, daily insight.
 - Progress: private progress photos, angle stats, side-by-side comparison, on-demand AI visible-change analysis.
 - Coach: Bukowski conversation flow, history, PDF export.
 - Calculator: peptide syringe/math tool.
@@ -56,6 +56,6 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 ## Next Safe Build Ideas
 
 - Persist AI progress analysis results so users can revisit them.
-- Add barcode/manual/search food entry alongside photo scan.
+- Add barcode scan and frequent-meal reuse alongside the completed photo/text/manual food entry.
 - Add a single daily check-in flow that gathers food, progress, sleep, symptoms, weight, and Bukowski question in one pass.
 - Add richer chart drilldowns from dashboard tiles into the underlying logs.
