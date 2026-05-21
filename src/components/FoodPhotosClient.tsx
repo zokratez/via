@@ -502,6 +502,43 @@ export function FoodPhotosClient({
     });
   }
 
+  async function onRepeat(photo: FoodPhoto) {
+    setMessage(null);
+    startTransition(async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setMessage(t("error_auth"));
+        return;
+      }
+
+      const inserted = await supabase.from("food_photos").insert({
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        eaten_at: new Date().toISOString(),
+        storage_path: null,
+        meal_type: MEAL_TYPES.includes(photo.meal_type as MealType)
+          ? photo.meal_type
+          : "meal",
+        description: photo.description,
+        calories_estimate: photo.calories_estimate,
+        protein_g: photo.protein_g,
+        carbs_g: photo.carbs_g,
+        fat_g: photo.fat_g,
+      });
+
+      if (inserted.error) {
+        setMessage(t("error_save"));
+        return;
+      }
+
+      setMessage(t("repeated"));
+      await refreshPhotos(user.id);
+    });
+  }
+
   const SANS = "var(--pp-font-sans)";
   const SERIF = "var(--pp-font-serif)";
 
@@ -1608,6 +1645,24 @@ export function FoodPhotosClient({
                                 }}
                               >
                                 {t("edit")}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onRepeat(photo)}
+                                disabled={isPending}
+                                style={{
+                                  background: "transparent",
+                                  border: "none",
+                                  color: "#88d39f",
+                                  fontFamily: SANS,
+                                  fontSize: "11px",
+                                  letterSpacing: "0.16em",
+                                  textTransform: "uppercase",
+                                  cursor: "pointer",
+                                  padding: 0,
+                                }}
+                              >
+                                {t("repeat")}
                               </button>
                               <button
                                 type="button"
