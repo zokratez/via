@@ -210,6 +210,39 @@ export function FoodPhotosClient({
   const hasWeeklyNutrition = weeklyNutrition.some(
     (day) => day.totals.mealsWithNutrition > 0,
   );
+  const todayInsight =
+    todayPhotos.length === 0
+      ? {
+          title: t("insight_empty_title"),
+          body: t("insight_empty_body"),
+          color: "#d6a06f",
+        }
+      : todayTotals.protein < 30
+        ? {
+            title: t("insight_protein_title"),
+            body: t("insight_protein_body", {
+              protein: formatNumber(todayTotals.protein, 1),
+            }),
+            color: "#88d39f",
+          }
+        : todayPhotos.length < 2
+          ? {
+              title: t("insight_next_meal_title"),
+              body: t("insight_next_meal_body", {
+                meals: todayPhotos.length,
+                protein: formatNumber(todayTotals.protein, 1),
+              }),
+              color: "#d6a06f",
+            }
+          : {
+              title: t("insight_tracked_title"),
+              body: t("insight_tracked_body", {
+                meals: todayPhotos.length,
+                calories: formatNumber(todayTotals.calories),
+                protein: formatNumber(todayTotals.protein, 1),
+              }),
+              color: "#88d39f",
+            };
 
   const macroTotal = todayTotals.protein + todayTotals.carbs + todayTotals.fat;
   const macroSegments =
@@ -649,6 +682,54 @@ export function FoodPhotosClient({
               </p>
             ))}
           </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: "1rem",
+            border: `0.5px solid ${todayInsight.color}55`,
+            borderRadius: "12px",
+            padding: "1rem",
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.035), rgba(8,6,5,0.28))",
+            boxShadow: `0 18px 40px color-mix(in srgb, ${todayInsight.color} 9%, transparent)`,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: SANS,
+              color: todayInsight.color,
+              fontSize: "10px",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              margin: 0,
+            }}
+          >
+            {t("today_focus")}
+          </p>
+          <p
+            style={{
+              fontFamily: SERIF,
+              color: "var(--pp-text)",
+              fontSize: "24px",
+              fontStyle: "italic",
+              lineHeight: 1.1,
+              margin: "0.55rem 0 0",
+            }}
+          >
+            {todayInsight.title}
+          </p>
+          <p
+            style={{
+              fontFamily: SERIF,
+              color: "var(--pp-text-secondary)",
+              fontSize: "15px",
+              lineHeight: 1.55,
+              margin: "0.55rem 0 0",
+            }}
+          >
+            {todayInsight.body}
+          </p>
         </div>
 
         <div
