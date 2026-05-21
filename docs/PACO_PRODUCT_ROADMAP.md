@@ -71,11 +71,11 @@ Completed behavior:
 - Photo optional: users can save a meal with only notes/macros.
 - AI photo estimate fills editable calories, protein, carbs, and fat.
 - AI text estimate works when the user describes the meal without a photo.
+- Saved meals can be repeated into today as private manual entries.
 - Daily totals, 7-day rhythm, and dashboard food signal all use the same saved entries.
 
 Next nutrition upgrades:
 - Barcode scan for packaged foods.
-- Saved frequent meals / copy yesterday's meal.
 - Better portion prompts when confidence is low.
 
 ## Future Feature: Native Depth-Assisted Portions
