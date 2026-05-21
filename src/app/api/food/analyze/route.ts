@@ -105,51 +105,54 @@ export async function POST(req: Request) {
   }
 
   const file = formData.get("file");
+  const descriptionInput = formData.get("description");
   const locale = formData.get("locale");
   if (locale !== "es" && locale !== "en") {
     return jsonResponse(400, { error: "invalid_locale" });
   }
-  if (!(file instanceof File)) {
-    return jsonResponse(400, { error: "missing_file" });
+  const description =
+    typeof descriptionInput === "string" ? descriptionInput.trim().slice(0, 800) : "";
+  const hasFile = file instanceof File;
+  if (!hasFile && description.length === 0) {
+    return jsonResponse(400, { error: "missing_food_context" });
   }
-  if (!ALLOWED_TYPES.has(file.type)) {
+  if (hasFile && !ALLOWED_TYPES.has(file.type)) {
     return jsonResponse(400, { error: "invalid_type" });
   }
-  if (file.size > MAX_IMAGE_BYTES) {
+  if (hasFile && file.size > MAX_IMAGE_BYTES) {
     return jsonResponse(413, { error: "file_too_large" });
   }
 
   try {
-    const bytes = Buffer.from(await file.arrayBuffer());
     const client = new Anthropic({ apiKey });
     const language =
       locale === "es"
         ? "Spanish, concise and direct"
         : "English, concise and direct";
+    const content: Anthropic.MessageParam["content"] = [];
 
-    const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 700,
-      temperature: 0,
-      system:
-        "You estimate nutrition from food photos. You are not exact. Return only valid JSON with no markdown. Never claim certainty. If the food is unclear, use nulls and explain uncertainty.",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: file.type as "image/jpeg" | "image/png" | "image/webp",
-                data: bytes.toString("base64"),
-              },
-            },
-            {
-              type: "text",
-              text: `Estimate the meal nutrition from this photo for a user logging food. Return only this JSON shape:
+    if (hasFile) {
+      const bytes = Buffer.from(await file.arrayBuffer());
+      content.push({
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: file.type as "image/jpeg" | "image/png" | "image/webp",
+          data: bytes.toString("base64"),
+        },
+      });
+    }
+
+    content.push({
+      type: "text",
+      text: `Estimate the meal nutrition for a user logging food.
+
+Input source: ${hasFile ? "photo" : "user description"}
+User description, if provided: ${description || "(none)"}
+
+Return only this JSON shape:
 {
-  "description": "short visible meal description in ${language}",
+  "description": "short meal description in ${language}",
   "calories": number_or_null,
   "protein_g": number_or_null,
   "carbs_g": number_or_null,
@@ -157,9 +160,19 @@ export async function POST(req: Request) {
   "confidence": "low" | "medium" | "high",
   "uncertainty": "what is uncertain, portion assumptions, or what the user should confirm in ${language}"
 }
-Use realistic portion ranges internally but return a single best estimate. Prefer low confidence when portion size, hidden oil, sauces, or ingredients are unclear.`,
-            },
-          ],
+Use realistic portion ranges internally but return a single best estimate. Prefer low confidence when portion size, hidden oil, sauces, or ingredients are unclear. If there is no photo, lean on the user's description and clearly state portion assumptions.`,
+    });
+
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 700,
+      temperature: 0,
+      system:
+        "You estimate meal nutrition from food photos or user descriptions. You are not exact. Return only valid JSON with no markdown. Never claim certainty. If the food is unclear, use nulls and explain uncertainty.",
+      messages: [
+        {
+          role: "user",
+          content,
         },
       ],
     });

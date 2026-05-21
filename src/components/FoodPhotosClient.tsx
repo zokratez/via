@@ -381,22 +381,23 @@ export function FoodPhotosClient({
   async function onAnalyze() {
     setMessage(null);
     setEstimate(null);
-    if (!file) {
-      setMessage(t("error_file"));
+    if (!file && description.trim().length === 0) {
+      setMessage(t("error_analyze_context"));
       return;
     }
-    if (!file.type.startsWith("image/")) {
+    if (file && !file.type.startsWith("image/")) {
       setMessage(t("error_image"));
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
+    if (file && file.size > 10 * 1024 * 1024) {
       setMessage(t("error_size"));
       return;
     }
 
     startAnalyze(async () => {
       const fd = new FormData();
-      fd.set("file", file);
+      if (file) fd.set("file", file);
+      fd.set("description", description);
       fd.set("locale", locale);
       const res = await fetch("/api/food/analyze", {
         method: "POST",
@@ -1089,7 +1090,7 @@ export function FoodPhotosClient({
         <button
           type="button"
           onClick={onAnalyze}
-          disabled={isPending || isAnalyzing || !file}
+          disabled={isPending || isAnalyzing || (!file && description.trim().length === 0)}
           className="pp-action-card"
           style={{
             width: "100%",
@@ -1104,8 +1105,8 @@ export function FoodPhotosClient({
             letterSpacing: "0.18em",
             textTransform: "uppercase",
             padding: "0.95rem",
-            cursor: file ? "pointer" : "not-allowed",
-            opacity: file ? 1 : 0.55,
+            cursor: file || description.trim().length > 0 ? "pointer" : "not-allowed",
+            opacity: file || description.trim().length > 0 ? 1 : 0.55,
           }}
         >
           {isAnalyzing ? t("analyzing") : t("analyze")}

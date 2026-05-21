@@ -333,7 +333,7 @@
     "manual_hint": "Tap analyze so PACO can estimate macros. Review and correct before saving.",
     "manual_entry_hint": "No photo needed. Type the food and macros you know, then save it into today's totals.",
     "manual_badge": "Manual entry",
-    "analyze": "Analyze meal",
+    "analyze": "Estimate macros",
     "analyzing": "Analyzing…",
     "analyzed": "Estimate ready. Review it before saving.",
     "estimate_title": "AI estimate · {confidence} confidence",
@@ -361,7 +361,8 @@
     "error_save": "Could not save the food.",
     "error_update": "Could not update the food.",
     "error_delete": "Could not delete the food.",
-    "error_analyze": "Could not analyze the meal. You can fill the data manually."
+    "error_analyze": "Could not analyze the meal. You can fill the data manually.",
+    "error_analyze_context": "Add a photo or describe the meal before asking PACO to estimate macros."
   },
   "progress": {
     "nav_checkin": "check-in",

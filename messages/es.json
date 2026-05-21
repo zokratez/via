@@ -333,7 +333,7 @@
     "manual_hint": "Toca analizar para que PACO estime macros. Revisa y corrige antes de guardar.",
     "manual_entry_hint": "No necesitas foto. Escribe la comida y los macros que sabes, luego guárdala en los totales de hoy.",
     "manual_badge": "Entrada manual",
-    "analyze": "Analizar comida",
+    "analyze": "Estimar macros",
     "analyzing": "Analizando…",
     "analyzed": "Estimación lista. Revísala antes de guardar.",
     "estimate_title": "Estimación IA · confianza {confidence}",
@@ -361,7 +361,8 @@
     "error_save": "No se pudo guardar la comida.",
     "error_update": "No se pudo actualizar la comida.",
     "error_delete": "No se pudo borrar la comida.",
-    "error_analyze": "No se pudo analizar la comida. Puedes llenar los datos manualmente."
+    "error_analyze": "No se pudo analizar la comida. Puedes llenar los datos manualmente.",
+    "error_analyze_context": "Agrega una foto o describe la comida antes de pedirle a PACO que estime macros."
   },
   "progress": {
     "nav_checkin": "check-in",
