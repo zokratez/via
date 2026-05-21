@@ -151,6 +151,7 @@
   text-decoration: none;
   color: inherit;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
     transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.22s ease-out,
@@ -206,6 +207,7 @@
   isolation: isolate;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
     transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
     border-color 0.18s ease-out,
@@ -250,6 +252,7 @@
   position: relative;
   isolation: isolate;
   text-decoration: none;
+  touch-action: manipulation;
   transition:
     transform 0.18s ease-out,
     border-color 0.18s ease-out,
@@ -395,6 +398,7 @@
   text-transform: uppercase;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
     transform 0.18s ease-out,
     color 0.18s ease-out,
@@ -440,10 +444,59 @@
 @media (max-width: 767px) {
   .pp-mobile-nav {
     display: grid;
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
+    backdrop-filter: blur(14px) saturate(145%);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.18),
+      inset 0 -8px 14px rgba(0, 0, 0, 0.12),
+      0 12px 34px rgba(0, 0, 0, 0.3);
   }
 
   body {
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 82px);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .pp-stat-card,
+  .pp-action-card,
+  .pp-rhythm-day,
+  .pp-mobile-nav-item {
+    transition:
+      transform 0.08s ease-out,
+      opacity 0.08s ease-out,
+      background-color 0.08s ease-out;
+  }
+
+  .pp-stat-card:hover,
+  .pp-action-card:hover,
+  .pp-rhythm-day:hover,
+  .pp-mobile-nav-item:hover,
+  .pp-mobile-nav-item:focus-visible {
+    box-shadow: inherit;
+    filter: none;
+    transform: none;
+  }
+
+  .pp-stat-card:hover::before,
+  .pp-action-card:hover::after,
+  .pp-rhythm-day:hover .pp-rhythm-dot,
+  .pp-mobile-nav-item:hover::before {
+    opacity: 0;
+    transform: none;
+  }
+
+  .pp-stat-card:active,
+  .pp-action-card:active,
+  .pp-rhythm-day:active,
+  .pp-mobile-nav-item:active {
+    opacity: 0.86;
+    transform: scale(0.985);
+  }
+
+  .pp-mobile-nav-item.is-active:active {
+    opacity: 0.92;
+    transform: scale(0.98);
   }
 }
 
