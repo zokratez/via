@@ -111,6 +111,7 @@ export default async function DashboardPage({
     anyWeightRes,
     anyCoachMsgRes,
     food14Res,
+    progress14Res,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -179,6 +180,11 @@ export default async function DashboardPage({
       .from("food_photos")
       .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
       .gte("eaten_at", cutoff14),
+    supabase
+      .from("progress_photos")
+      .select("captured_at, angle")
+      .gte("captured_at", cutoff14)
+      .order("captured_at", { ascending: false }),
   ]);
 
   const t = await getTranslations("dashboard");
@@ -398,6 +404,18 @@ export default async function DashboardPage({
     },
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
+  type ProgressRow = {
+    captured_at: string;
+    angle: string | null;
+  };
+  const progressRows14 = (progress14Res.data ?? []) as ProgressRow[];
+  const latestProgressPhoto = progressRows14[0] ?? null;
+  const progressDaysAgo = latestProgressPhoto
+    ? Math.floor(
+        (now.getTime() - new Date(latestProgressPhoto.captured_at).getTime()) /
+          86_400_000,
+      )
+    : null;
   const latestWeightDate =
     weights90.length > 0 ? weights90[weights90.length - 1].measured_at : null;
   const lastSleepDate =
@@ -449,6 +467,9 @@ export default async function DashboardPage({
   for (const r of foodRows14) {
     days.add(r.eaten_at.slice(0, 10));
   }
+  for (const r of progressRows14) {
+    days.add(r.captured_at.slice(0, 10));
+  }
   const streakCount = days.size;
 
   const makeDayKey = (daysAgo: number) => {
@@ -478,6 +499,7 @@ export default async function DashboardPage({
       ).filter((r) => r.occurred_at.startsWith(key)).length,
       sleep: sleepEntries.some((s) => s.slept_at.startsWith(key)),
       food: foodRows14.some((f) => f.eaten_at.startsWith(key)),
+      progress: progressRows14.some((p) => p.captured_at.startsWith(key)),
     };
   });
   const rhythmTotals = rhythmDays.reduce(
@@ -487,9 +509,10 @@ export default async function DashboardPage({
       totals.symptoms += day.symptoms;
       totals.sleep += day.sleep ? 1 : 0;
       totals.food += day.food ? 1 : 0;
+      totals.progress += day.progress ? 1 : 0;
       return totals;
     },
-    { dose: 0, weight: 0, symptoms: 0, sleep: 0, food: 0 },
+    { dose: 0, weight: 0, symptoms: 0, sleep: 0, food: 0, progress: 0 },
   );
 
   const actions = [
@@ -604,6 +627,7 @@ export default async function DashboardPage({
     symptoms: "#ef7b8a",
     coach: "#88d39f",
     food: "#d6a06f",
+    progress: "#c9966b",
   } as const;
 
   const colorTileStyle = (
@@ -786,7 +810,7 @@ export default async function DashboardPage({
           </div>
 
           <div
-            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6"
             style={{ marginTop: "1rem" }}
           >
             <Link
@@ -835,6 +859,30 @@ export default async function DashboardPage({
                       meals: foodToday.length,
                       protein: Math.round(foodTodayTotals.protein),
                     })}
+              </p>
+            </Link>
+
+            <Link
+              href="/progress"
+              style={colorTileStyle(metricAccents.progress)}
+              className="pp-stat-card"
+            >
+              <p style={eyebrowStyle}>{t("today_tile_progress")}</p>
+              <p
+                style={{ ...commandValueStyle, color: metricAccents.progress }}
+              >
+                {progressDaysAgo === null
+                  ? t("stat_empty")
+                  : progressDaysAgo === 0
+                    ? t("today_tile_progress_today")
+                    : t("today_tile_progress_days", { days: progressDaysAgo })}
+              </p>
+              <p style={commandSubStyle}>
+                {latestProgressPhoto?.angle
+                  ? t("today_tile_progress_sub", {
+                      angle: latestProgressPhoto.angle,
+                    })
+                  : t("today_tile_progress_empty")}
               </p>
             </Link>
 
@@ -896,6 +944,7 @@ export default async function DashboardPage({
                   weight: rhythmTotals.weight,
                   sleep: rhythmTotals.sleep,
                   food: rhythmTotals.food,
+                  progress: rhythmTotals.progress,
                   symptoms: rhythmTotals.symptoms,
                 })}
               </p>
@@ -945,7 +994,7 @@ export default async function DashboardPage({
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(5, 1fr)",
+                      gridTemplateColumns: "repeat(6, 1fr)",
                       gap: "0.32rem",
                     }}
                   >
@@ -963,6 +1012,11 @@ export default async function DashboardPage({
                       title={t("today_tile_food")}
                       className="pp-rhythm-dot"
                       style={rhythmDotStyle(day.food, metricAccents.food)}
+                    />
+                    <span
+                      title={t("today_tile_progress")}
+                      className="pp-rhythm-dot"
+                      style={rhythmDotStyle(day.progress, metricAccents.progress)}
                     />
                     <span
                       title={t("stat_weight")}
@@ -983,7 +1037,7 @@ export default async function DashboardPage({
             </div>
 
             <div
-              className="grid gap-2 sm:grid-cols-5"
+              className="grid gap-2 sm:grid-cols-6"
               style={{ marginTop: "0.8rem" }}
             >
               {[
@@ -1001,6 +1055,11 @@ export default async function DashboardPage({
                   href: "/food",
                   label: t("today_tile_food"),
                   color: metricAccents.food,
+                },
+                {
+                  href: "/progress",
+                  label: t("today_tile_progress"),
+                  color: metricAccents.progress,
                 },
                 {
                   href: "/dashboard?tab=weight#dashboard-tabs",
