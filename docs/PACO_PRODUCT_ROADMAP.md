@@ -33,9 +33,9 @@ Privacy rules:
 - User can delete entries and photos.
 - Any use-case sharing must be explicit opt-in.
 
-## Future Feature: Private Progress Photos
+## Private Progress Photos
 
-Status: Phase 1 private upload/delete flow implemented. AI comparison and doctor-ready reports are not implemented yet.
+Status: private upload/delete flow, same-angle comparison, on-demand AI visible-change analysis, and saved AI comparison reports are implemented. Doctor-ready PDF/export reports are not implemented yet.
 
 Safe product framing:
 AI visual progress analysis compares private user photos over time and summarizes visible changes, trends, and questions the user may want to discuss with a clinician. It is not medical diagnosis and does not replace a licensed professional.
@@ -43,6 +43,7 @@ AI visual progress analysis compares private user photos over time and summarize
 What it can do:
 - Compare same-user progress photos over time.
 - Summarize visible trend changes.
+- Save AI comparison reports for later review.
 - Correlate photos with weight, dose, symptoms, sleep, and notes.
 - Produce a doctor-ready report.
 - Let users delete photos.
