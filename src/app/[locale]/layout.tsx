@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { FooterGate } from "@/components/FooterGate";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { MyGoalShadow } from "@/components/MyGoalShadow";
 import { routing } from "@/i18n/routing";
 import { SITE_URL } from "@/lib/seo";
 
@@ -57,6 +58,7 @@ export default async function LocaleLayout({
           <Footer locale={locale as "es" | "en"} />
         </FooterGate>
       </div>
+      <MyGoalShadow />
       <GlobalSearch />
       <MobileBottomNav />
     </NextIntlClientProvider>

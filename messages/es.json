@@ -12,6 +12,26 @@
     "calculator": "Calc",
     "search": "Buscar"
   },
+  "my_goal": {
+    "open_label": "Abrir Mi Meta",
+    "close_label": "Cerrar Mi Meta",
+    "dialog_label": "Mi Meta",
+    "pill": "Mi meta",
+    "kicker": "Tu sombra diaria",
+    "title": "Mi meta",
+    "body": "Un lugar para revisar lo que hiciste, lo que falta y el próximo movimiento sin perderte en el panel.",
+    "alert_title": "Nueva señal ligera",
+    "alert_body": "PACO está listo para conectar tus pasos, comida, sueño, energía y preguntas con acciones simples durante el día.",
+    "action_dashboard": "Ver estado",
+    "action_dashboard_body": "Tu resumen de dosis, peso, sueño, comida, progreso y síntomas.",
+    "action_food": "Comida",
+    "action_food_body": "Escanea, repite o corrige macros antes de guardar.",
+    "action_checkin": "Check-in",
+    "action_checkin_body": "Registra cómo vas hoy en un solo pase.",
+    "action_coach": "Bukowski",
+    "action_coach_body": "Convierte la señal en una pregunta para tu médico.",
+    "disclaimer": "Mi Meta no diagnostica ni decide tratamiento. Detecta patrones, explica posibilidades y te ayuda a preparar mejores preguntas."
+  },
   "home": {
     "nav_brand": "paco peptide",
     "nav_diario": "diario",

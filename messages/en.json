@@ -12,6 +12,26 @@
     "calculator": "Calc",
     "search": "Search"
   },
+  "my_goal": {
+    "open_label": "Open My Goal",
+    "close_label": "Close My Goal",
+    "dialog_label": "My Goal",
+    "pill": "My goal",
+    "kicker": "Your daily shadow",
+    "title": "My goal",
+    "body": "One place to see what happened, what is missing, and the next move without getting lost in the dashboard.",
+    "alert_title": "New light signal",
+    "alert_body": "PACO is ready to connect your steps, food, sleep, energy, and questions into simple actions during the day.",
+    "action_dashboard": "See status",
+    "action_dashboard_body": "Your dose, weight, sleep, food, progress, and symptom summary.",
+    "action_food": "Food",
+    "action_food_body": "Scan, repeat, or correct macros before saving.",
+    "action_checkin": "Check-in",
+    "action_checkin_body": "Log how today is going in one pass.",
+    "action_coach": "Bukowski",
+    "action_coach_body": "Turn the signal into a better question for your doctor.",
+    "disclaimer": "My Goal does not diagnose or decide treatment. It detects patterns, explains possibilities, and helps you prepare better questions."
+  },
   "home": {
     "nav_brand": "paco peptide",
     "nav_diario": "journal",
