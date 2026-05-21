@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 type FoodPhoto = {
   id: string;
   eaten_at: string;
-  storage_path: string;
+  storage_path: string | null;
   meal_type: string;
   description: string | null;
   calories_estimate: number | null;
@@ -283,6 +283,7 @@ export function FoodPhotosClient({
     const rows = (data ?? []) as Omit<FoodPhoto, "signedUrl">[];
     const withUrls = await Promise.all(
       rows.map(async (photo) => {
+        if (!photo.storage_path) return { ...photo, signedUrl: null };
         const { data: signed } = await supabase.storage
           .from("food-photos")
           .createSignedUrl(photo.storage_path, 60 * 10);
@@ -295,15 +296,21 @@ export function FoodPhotosClient({
   async function onUpload(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage(null);
-    if (!file) {
-      setMessage(t("error_file"));
+    const hasManualData =
+      description.trim().length > 0 ||
+      calories.trim().length > 0 ||
+      protein.trim().length > 0 ||
+      carbs.trim().length > 0 ||
+      fat.trim().length > 0;
+    if (!file && !hasManualData) {
+      setMessage(t("error_food_data"));
       return;
     }
-    if (!file.type.startsWith("image/")) {
+    if (file && !file.type.startsWith("image/")) {
       setMessage(t("error_image"));
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
+    if (file && file.size > 10 * 1024 * 1024) {
       setMessage(t("error_size"));
       return;
     }
@@ -319,17 +326,21 @@ export function FoodPhotosClient({
       }
 
       const id = crypto.randomUUID();
-      const storagePath = `${user.id}/${id}.${fileExtension(file)}`;
-      const upload = await supabase.storage
-        .from("food-photos")
-        .upload(storagePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+      let storagePath: string | null = null;
 
-      if (upload.error) {
-        setMessage(t("error_upload"));
-        return;
+      if (file) {
+        storagePath = `${user.id}/${id}.${fileExtension(file)}`;
+        const upload = await supabase.storage
+          .from("food-photos")
+          .upload(storagePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (upload.error) {
+          setMessage(t("error_upload"));
+          return;
+        }
       }
 
       const inserted = await supabase.from("food_photos").insert({
@@ -346,7 +357,9 @@ export function FoodPhotosClient({
       });
 
       if (inserted.error) {
-        await supabase.storage.from("food-photos").remove([storagePath]);
+        if (storagePath) {
+          await supabase.storage.from("food-photos").remove([storagePath]);
+        }
         setMessage(t("error_save"));
         return;
       }
@@ -430,7 +443,9 @@ export function FoodPhotosClient({
         setMessage(t("error_delete"));
         return;
       }
-      await supabase.storage.from("food-photos").remove([photo.storage_path]);
+      if (photo.storage_path) {
+        await supabase.storage.from("food-photos").remove([photo.storage_path]);
+      }
       setPhotos((current) => current.filter((item) => item.id !== photo.id));
       setMessage(t("deleted"));
     });
@@ -1068,7 +1083,7 @@ export function FoodPhotosClient({
             margin: "0.8rem 0 0",
           }}
         >
-          {t("manual_hint")}
+          {file ? t("manual_hint") : t("manual_entry_hint")}
         </p>
 
         <button
@@ -1318,7 +1333,29 @@ export function FoodPhotosClient({
                           }}
                         />
                       ) : (
-                        <div style={{ aspectRatio: "4 / 3" }} />
+                        <div
+                          style={{
+                            aspectRatio: "4 / 3",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background:
+                              "radial-gradient(circle at 50% 20%, rgba(136, 211, 159, 0.16), transparent 38%), rgba(8,6,5,0.36)",
+                          }}
+                        >
+                          <p
+                            style={{
+                              fontFamily: SANS,
+                              color: "#88d39f",
+                              fontSize: "11px",
+                              letterSpacing: "0.18em",
+                              textTransform: "uppercase",
+                              margin: 0,
+                            }}
+                          >
+                            {t("manual_badge")}
+                          </p>
+                        </div>
                       )}
                       <div style={{ padding: "0.85rem" }}>
                         {isEditing ? (

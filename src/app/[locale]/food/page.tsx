@@ -12,7 +12,7 @@ const SANS = "var(--pp-font-sans)";
 type FoodPhotoRow = {
   id: string;
   eaten_at: string;
-  storage_path: string;
+  storage_path: string | null;
   meal_type: string;
   description: string | null;
   calories_estimate: number | null;
@@ -63,6 +63,7 @@ export default async function FoodPage({
 
   const photos = await Promise.all(
     ((data ?? []) as FoodPhotoRow[]).map(async (photo) => {
+      if (!photo.storage_path) return { ...photo, signedUrl: null };
       const { data: signed } = await supabase.storage
         .from("food-photos")
         .createSignedUrl(photo.storage_path, 60 * 10);
