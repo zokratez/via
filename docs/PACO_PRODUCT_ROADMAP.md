@@ -35,6 +35,8 @@ Privacy rules:
 
 ## Future Feature: Private Progress Photos
 
+Status: Phase 1 private upload/delete flow implemented. AI comparison and doctor-ready reports are not implemented yet.
+
 Safe product framing:
 AI visual progress analysis compares private user photos over time and summarizes visible changes, trends, and questions the user may want to discuss with a clinician. It is not medical diagnosis and does not replace a licensed professional.
 

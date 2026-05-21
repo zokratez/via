@@ -105,14 +105,18 @@ export default async function DailyCheckInPage({
 
   const comingSoon = [
     {
+      href: "/progress",
       eyebrow: t("future_photo_eyebrow"),
       title: t("future_photo_title"),
       body: t("future_photo_body"),
+      active: true,
     },
     {
+      href: null,
       eyebrow: t("future_food_eyebrow"),
       title: t("future_food_title"),
       body: t("future_food_body"),
+      active: false,
     },
   ] as const;
 
@@ -283,41 +287,81 @@ export default async function DailyCheckInPage({
           aria-label={t("future_label")}
         >
           {comingSoon.map((item) => (
-            <div
-              key={item.title}
-              style={{
-                ...cardStyle,
-                minHeight: "128px",
-                borderStyle: "dashed",
-                opacity: 0.78,
-              }}
-            >
-              <p style={eyebrowStyle}>{item.eyebrow}</p>
-              <h2
+            item.href ? (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="pp-stat-card"
                 style={{
-                  fontFamily: SERIF,
-                  fontStyle: "italic",
-                  color: "var(--pp-text)",
-                  fontSize: "25px",
-                  fontWeight: 400,
-                  lineHeight: 1.05,
-                  margin: "0.8rem 0 0",
+                  ...cardStyle,
+                  minHeight: "128px",
+                  textDecoration: "none",
+                  borderColor: "rgba(201, 150, 107, 0.42)",
                 }}
               >
-                {item.title}
-              </h2>
-              <p
+                <p style={eyebrowStyle}>{item.eyebrow}</p>
+                <h2
+                  style={{
+                    fontFamily: SERIF,
+                    fontStyle: "italic",
+                    color: "var(--pp-accent)",
+                    fontSize: "25px",
+                    fontWeight: 400,
+                    lineHeight: 1.05,
+                    margin: "0.8rem 0 0",
+                  }}
+                >
+                  {item.title}
+                </h2>
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
+                    fontSize: "12px",
+                    lineHeight: 1.6,
+                    margin: "0.7rem 0 0",
+                  }}
+                >
+                  {item.body}
+                </p>
+              </Link>
+            ) : (
+              <div
+                key={item.title}
                 style={{
-                  fontFamily: SANS,
-                  color: "var(--pp-text-tertiary)",
-                  fontSize: "12px",
-                  lineHeight: 1.6,
-                  margin: "0.7rem 0 0",
+                  ...cardStyle,
+                  minHeight: "128px",
+                  borderStyle: "dashed",
+                  opacity: 0.78,
                 }}
               >
-                {item.body}
-              </p>
-            </div>
+                <p style={eyebrowStyle}>{item.eyebrow}</p>
+                <h2
+                  style={{
+                    fontFamily: SERIF,
+                    fontStyle: "italic",
+                    color: "var(--pp-text)",
+                    fontSize: "25px",
+                    fontWeight: 400,
+                    lineHeight: 1.05,
+                    margin: "0.8rem 0 0",
+                  }}
+                >
+                  {item.title}
+                </h2>
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
+                    fontSize: "12px",
+                    lineHeight: 1.6,
+                    margin: "0.7rem 0 0",
+                  }}
+                >
+                  {item.body}
+                </p>
+              </div>
+            )
           ))}
         </section>
       </main>
