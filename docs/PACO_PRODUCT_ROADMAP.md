@@ -56,6 +56,8 @@ What it should avoid:
 
 ## Future Feature: Food Photo Calories And Macros
 
+Status: Phase 1 private food photo/manual macro tracking in progress. AI estimates are not implemented yet.
+
 Safe product framing:
 AI estimates food calories and macros from photos with confidence ranges. The user can edit the estimate before saving.
 
@@ -64,6 +66,24 @@ Suggested behavior:
 - Ask for portion confirmation when uncertain.
 - Save calories, protein, carbs, fat, and notes.
 - Let Bukowski correlate food patterns with symptoms and weight trends.
+
+## Future Feature: Native Depth-Assisted Portions
+
+Status: parked for native-app research. Do not build into the web/PWA first pass.
+
+Idea:
+Use supported phone depth/LiDAR signals in a future native iOS/Android app to improve portion and volume estimates for meal photos.
+
+Why later:
+- Normal mobile web/PWA access to depth/LiDAR is limited and inconsistent.
+- Native implementation may be needed.
+- Depth data may improve volume estimates, but the product still needs AI analysis plus user confirmation.
+
+Acceptance criteria for future research:
+- Confirm whether current iOS/Android APIs can access useful depth data from food photos.
+- Test whether depth-assisted estimates are meaningfully better than AI image estimate plus portion confirmation.
+- Keep all depth/photo data private, deletable, and user-scoped.
+- Never present estimates as exact nutrition facts.
 
 ## Product Principle
 
