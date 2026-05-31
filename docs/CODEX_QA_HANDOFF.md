@@ -41,4 +41,4 @@ PACO Peptide is a Spanish-first bilingual peptide journalism and AI coach platfo
 - `ADMIN_FALLBACK_EMAILS` is optional and should only be used as temporary break-glass access.
 - Public search returns article results for logged-out visitors; private results require auth.
 - Calculator canonical paths are `/es/calculadora` and `/en/calculator`.
-- Terms pricing should match `$79/year` and `$9.99/month`.
+- Terms pricing should match `$79/year` and `$7.99/month`.

@@ -3,7 +3,7 @@
  *
  * Returns true when profiles.subscription_tier grants paid-tier access:
  *   - 'pro'             — normal active subscriber
- *   - 'trialing'        — inside the Stripe 7-day reverse-trial window
+ *   - 'trialing'        — inside the Stripe 2-day reverse-trial window
  *   - 'past_due_grace'  — short grace window after a failed payment
  *
  * Returns false for 'free', null, undefined, or any unknown value.

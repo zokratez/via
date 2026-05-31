@@ -14,7 +14,7 @@ The first Spanish-first companion app for the millions of people on GLP-1 medica
 1. **Spanish is an unserved market.** Ozempic/Wegovy uptake in US Hispanic populations and Mexico is massive. Spanish-language companion tooling is near-zero.
 2. **No regulatory cliff.** We don't prescribe, sell, or recommend drugs. We're a wellness tracker + wellness coach. Stays on the right side of FDA's general wellness policy.
 3. **AI coach is the wedge.** Static log apps are boring. A Spanish-speaking AI that answers "me salté una dosis, ¿qué hago?" at 2am is the hook.
-4. **Mobile-friendly pricing.** $9.99/mo undercuts Noom dramatically, sits at an impulse buy for the target demo.
+4. **Mobile-friendly pricing.** $7.99/mo undercuts Noom dramatically, sits at an impulse buy for the target demo.
 
 ## Core user journey
 
@@ -35,7 +35,7 @@ The first Spanish-first companion app for the millions of people on GLP-1 medica
 - Side effect log (5 categories, 1-5 severity)
 - AI coach (Claude Sonnet 4.6, guardrailed, Spanish-first)
 - Free tier: 3 coach queries/day
-- Pro tier: $9.99/mo or $79/yr, unlimited coach + PDF export
+- Pro tier: $7.99/mo or $79/yr, unlimited coach + PDF export
 - Privacy policy + ToS + disclaimer footer
 
 ## Explicitly out of scope for MVP

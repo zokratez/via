@@ -54,7 +54,7 @@ You are responsible for all activity in your account.
 
 ### Plans and prices
 
-PACO Peptide Pro is available for **$79 USD per year** or **$9.99 USD per month**, depending on the plan you select at checkout. Prices may change; we will notify you by email at least 30 days in advance.
+PACO Peptide Pro is available for **$79 USD per year** or **$7.99 USD per month**, depending on the plan you select at checkout. Prices may change; we will notify you by email at least 30 days in advance.
 
 ### Automatic renewal
 

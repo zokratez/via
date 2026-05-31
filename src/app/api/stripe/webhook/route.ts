@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
         let priceId: string | null = null;
         // Tier derived from the subscription's status (trialing for the
-        // 7-day reverse trial; active for immediate-pay or post-trial).
+        // 2-day reverse trial; active for immediate-pay or post-trial).
         // Fallback to "pro" only if for some reason the session has no
         // subscription attached (defensive — every Checkout we create is
         // mode:subscription so this branch should not be reachable).

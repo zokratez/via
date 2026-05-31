@@ -26,8 +26,8 @@
 | Plan | Price | Price ID |
 |---|---|---|
 | Annual | $79/yr | price_1TW0RjC0ioyOCtQFITaFq8wX |
-| Monthly | $9.99/mo | price_1TUfVsC0ioyOCtQFNLKxcx2g |
-| Free trial | 7 days on both | — |
+| Monthly | $7.99/mo | `STRIPE_PRICE_ID_VIA_PRO` must point at the live $7.99 Stripe Price |
+| Free trial | 2 days on both | — |
 | Webhook | we_1TUgE1C0ioyOCtQFa0z7yX7O at www.pacopeptide.com/api/stripe/webhook | Day 8 |
 
 **LESSON:** Stripe webhooks don't follow 3xx redirects. Apex pacopeptide.com 307s to www. Webhook endpoint MUST target canonical host (www). This caused 100% failure rate on first attempt.

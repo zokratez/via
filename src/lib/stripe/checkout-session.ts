@@ -9,10 +9,10 @@
  *
  * Both flows produce identical Checkout sessions:
  *   - mode: subscription
- *   - 7-day trial (subscription_data.trial_period_days)
+ *   - 2-day trial (subscription_data.trial_period_days)
  *   - allow_promotion_codes
  *   - payment_method_collection: "always" — required for trial; Stripe
- *     collects the card upfront but does not charge until day 7.
+ *     collects the card upfront but does not charge until day 2.
  *   - success_url: /[locale]/coach?upgraded=true (one-shot bypass on the
  *     page guard handles the webhook delivery gap — see SCOPE_PROPOSAL
  *     section 5).
@@ -25,6 +25,8 @@ import { getStripe } from "./server";
 
 export type CheckoutPlan = "annual" | "monthly";
 export type CheckoutLocale = "es" | "en";
+
+const CHECKOUT_TRIAL_DAYS = 2;
 
 export function isCheckoutPlan(v: unknown): v is CheckoutPlan {
   return v === "annual" || v === "monthly";
@@ -106,7 +108,7 @@ export async function createCheckoutSession(
       locale: locale === "es" ? "es" : "en",
       metadata: { supabase_user_id: userId, plan },
       subscription_data: {
-        trial_period_days: 7,
+        trial_period_days: CHECKOUT_TRIAL_DAYS,
         metadata: { supabase_user_id: userId, plan },
       },
       allow_promotion_codes: true,
