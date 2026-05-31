@@ -6,6 +6,12 @@ Living roadmap for launch polish and the next paid-product upgrades. Keep this f
 
 PACO is launch-ready for the original web SaaS checklist: public routes, protected routes, dashboard, coach, calculator, admin drafts/reviews, Stripe handoff, cron protection, and RLS isolation have been verified. The next work is product sharpness: make daily use easier, more visual, and more habit-forming.
 
+## Pricing Channel Rules
+
+- Current web SaaS: $7.99/month or $79/year with a 2-day Stripe trial.
+- Future native iOS app: $9.99/month through Apple IAP / RevenueCat.
+- Keep web pricing and App Store pricing documented separately so checkout, legal copy, and App Store listings do not drift.
+
 ## Immediate UX Polish
 
 - Dashboard command center: complete.

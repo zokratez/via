@@ -90,3 +90,7 @@ Goal: paying customers by Day 10. Launch-ready MVP by Day 7.
 Web MVP first. Once web is earning, `npx create-expo-app`, reuse the Supabase client, reuse `messages/*.json` via `i18n-js`, reuse Stripe server actions (via RevenueCat for mobile IAP).
 
 You already have the Expo + NativeWind 4.2.3 + RevenueCat pattern working from Huh? — that carries over.
+
+Pricing distinction:
+- Web Stripe: $7.99/mo or $79/yr with a 2-day trial.
+- Native Apple app: $9.99/mo through Apple IAP / RevenueCat.

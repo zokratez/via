@@ -30,6 +30,12 @@
 | Free trial | 2 days on both | — |
 | Webhook | we_1TUgE1C0ioyOCtQFa0z7yX7O at www.pacopeptide.com/api/stripe/webhook | Day 8 |
 
+### Future Native App Pricing
+
+The web SaaS and native app pricing are intentionally different:
+- Web Stripe checkout: $7.99/mo or $79/yr, 2-day trial.
+- Future Apple App Store IAP / RevenueCat: $9.99/mo. This accounts for App Store economics and should not overwrite the web Stripe price.
+
 **LESSON:** Stripe webhooks don't follow 3xx redirects. Apex pacopeptide.com 307s to www. Webhook endpoint MUST target canonical host (www). This caused 100% failure rate on first attempt.
 
 ### Content Pipeline (Fully Automated)

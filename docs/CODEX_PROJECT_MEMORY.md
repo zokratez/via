@@ -19,6 +19,12 @@ UPSTASH_REDIS_REST_URL=https://example.com UPSTASH_REDIS_REST_TOKEN=dummy npm ru
 
 PACO Peptide should feel like a private, Spanish-first command center for peptide journalism, Bukowski coaching, GLP-1 tracking, nutrition, and visual progress. The product earns trust by not selling peptides or vendors.
 
+## Pricing Memory
+
+- Web Stripe checkout: $7.99/month or $79/year with a 2-day trial.
+- Future Apple native app: $9.99/month through Apple IAP / RevenueCat.
+- Do not change one channel's price when updating the other; web and native pricing are intentionally different.
+
 ## UX Rules
 
 - Mobile-first. Most real QA happens on iPhone.
