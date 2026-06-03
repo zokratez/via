@@ -85,6 +85,31 @@ Completed behavior:
 Next nutrition upgrades:
 - Better portion prompts when confidence is low.
 
+## Next Implementation: Cal AI-Style Nutrition Command Center
+
+Goal:
+Make `/food` feel like the daily nutrition cockpit, not just a meal log. The web version should deliver the core habit loop before native camera/HealthKit work starts.
+
+Build now on web:
+- Macro goal setup for calories, protein, carbs, and fat.
+- Daily remaining targets: what is logged, what remains, and what is over/under.
+- Large visual macro dashboard with rings/cards/bars that match PACO's dark espresso + brass language.
+- Meal detail drilldowns from the dashboard and food page into saved entries.
+- Clear labels for every macro field so mobile users never see unlabeled numbers.
+- Better uncertainty prompts after AI food analysis, especially portion size, oil/sauce, sides, and hidden ingredients.
+- Bukowski context injection from today's food totals so the coach can explain patterns without pretending to diagnose.
+
+Defer to native:
+- Live camera barcode scanning.
+- Apple Health / Apple Watch activity integration.
+- Depth/LiDAR-assisted portion estimates.
+
+Safety:
+- Always frame calories/macros as estimates unless manually entered from a label.
+- Users review and edit before saving.
+- No exact medical or body-composition claims from food data.
+- Keep food photos and nutrition data private, deletable, and user-scoped.
+
 ## Future Feature: Native Depth-Assisted Portions
 
 Status: parked for native-app research. Do not build into the web/PWA first pass.

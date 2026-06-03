@@ -65,3 +65,4 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 - Add camera-based barcode scanning later if native/PWA support is worth it. Manual barcode lookup is complete.
 - Add a single daily check-in flow that gathers food, progress, sleep, symptoms, weight, and Bukowski question in one pass.
 - Add richer chart drilldowns from dashboard tiles into the underlying logs.
+- Build the Cal AI-style nutrition command center on web next: macro goals, remaining targets, visual rings/cards, meal drilldowns, portion uncertainty prompts, and Bukowski food context. Defer live barcode camera, HealthKit, and depth/LiDAR to native.
