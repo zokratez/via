@@ -475,7 +475,12 @@
   "dose": {
     "title": "Log dose",
     "medication": "Medication",
+    "peptide_name": "Peptide or medication",
+    "peptide_name_placeholder": "GHK-Cu, BPC-157, retatrutide, semaglutide…",
+    "peptide_picker_hint": "Type any name or tap a suggestion. New names are saved only for you.",
     "dose_mg": "Dose (mg)",
+    "dose_amount": "Dose amount",
+    "dose_unit": "Unit",
     "when": "When?",
     "now": "Now",
     "injection_site": "Injection site",

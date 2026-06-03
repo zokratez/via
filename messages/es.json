@@ -475,7 +475,12 @@
   "dose": {
     "title": "Registrar dosis",
     "medication": "Medicamento",
+    "peptide_name": "Péptido o medicamento",
+    "peptide_name_placeholder": "GHK-Cu, BPC-157, retatrutida, semaglutida…",
+    "peptide_picker_hint": "Escribe cualquier nombre o toca una sugerencia. Los nombres nuevos quedan guardados solo para ti.",
     "dose_mg": "Dosis (mg)",
+    "dose_amount": "Cantidad de dosis",
+    "dose_unit": "Unidad",
     "when": "¿Cuándo?",
     "now": "Ahora",
     "injection_site": "Sitio de inyección",
