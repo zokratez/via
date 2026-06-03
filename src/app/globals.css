@@ -100,6 +100,47 @@
     "Hoefler Text", Georgia, serif;
   --pp-font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     "Segoe UI", sans-serif;
+
+  /* PACO metric color system — one hue per signal, used app-wide */
+  --pp-metric-protein: #d99a5b;
+  --pp-metric-protein-tile: #2d2018;
+  --pp-metric-protein-border: #4a3322;
+  --pp-metric-protein-text: #c9a988;
+
+  --pp-metric-water: #5dcaa5;
+  --pp-metric-water-tile: #1a2826;
+  --pp-metric-water-border: #2a4540;
+  --pp-metric-water-text: #9fe1cb;
+
+  --pp-metric-steps: #97c459;
+  --pp-metric-steps-tile: #1f2818;
+  --pp-metric-steps-border: #344228;
+  --pp-metric-steps-text: #c0dd97;
+
+  --pp-metric-calories: #ef9f27;
+  --pp-metric-calories-tile: #2d2618;
+  --pp-metric-calories-border: #4a3f22;
+  --pp-metric-calories-text: #fac775;
+
+  --pp-metric-sleep: #7f77dd;
+  --pp-metric-sleep-tile: #1d2230;
+  --pp-metric-sleep-border: #2f3650;
+  --pp-metric-sleep-text: #afa9ec;
+
+  --pp-metric-weight: #ed93b1;
+  --pp-metric-weight-tile: #2c1a1f;
+  --pp-metric-weight-border: #4a2a32;
+  --pp-metric-weight-text: #f4c0d1;
+
+  --pp-metric-dose: #c9966b;
+  --pp-metric-dose-tile: #2a1f18;
+  --pp-metric-dose-border: #4a3322;
+  --pp-metric-dose-text: #d4ae87;
+
+  --pp-metric-symptom: #d85a30;
+  --pp-metric-symptom-tile: #2a1815;
+  --pp-metric-symptom-border: #4a2620;
+  --pp-metric-symptom-text: #f0997b;
 }
 
 .pp-scroll {
