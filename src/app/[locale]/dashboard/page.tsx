@@ -15,6 +15,7 @@ import {
   type MedicationWithLastDose,
 } from "@/components/AlertBanner";
 import { MiMeta } from "@/components/MiMeta";
+import { MetricTile } from "@/components/MetricTile";
 import { WelcomeOverlay } from "@/components/WelcomeOverlay";
 import { getMiMetaSignalState } from "@/lib/mimeta/signals";
 import { isActiveSubscriber } from "@/lib/subscription";
@@ -557,6 +558,75 @@ export default async function DashboardPage({
     { href: "/log/symptom", label: t("log_symptom") },
     { href: "/log/sleep", label: t("log_sleep") },
     { href: "/coach", label: t("action_coach") },
+  ] as const;
+  const foodMetricSubLabel =
+    foodToday.length === 0
+      ? t("metric_food_empty")
+      : t("metric_food_today", { count: foodToday.length });
+  const metricTiles = [
+    {
+      metric: "protein",
+      icon: "meat",
+      value:
+        foodTodayTotals.protein > 0
+          ? `${Math.round(foodTodayTotals.protein)} g`
+          : t("stat_empty"),
+      label: t("metric_protein"),
+      sublabel: foodMetricSubLabel,
+      badge: foodToday.length > 0 ? t("metric_badge_today") : undefined,
+      href: "/food",
+    },
+    {
+      metric: "water",
+      icon: "droplet",
+      value: t("stat_empty"),
+      label: t("metric_water"),
+      sublabel: t("metric_healthkit_later"),
+      badge: undefined,
+      href: undefined,
+    },
+    {
+      metric: "steps",
+      icon: "walk",
+      value: t("stat_empty"),
+      label: t("metric_steps"),
+      sublabel: t("metric_healthkit_later"),
+      badge: undefined,
+      href: undefined,
+    },
+    {
+      metric: "calories",
+      icon: "flame",
+      value:
+        foodTodayTotals.calories > 0
+          ? `${Math.round(foodTodayTotals.calories)} kcal`
+          : t("stat_empty"),
+      label: t("metric_calories"),
+      sublabel: foodMetricSubLabel,
+      badge: foodToday.length > 0 ? t("metric_badge_today") : undefined,
+      href: "/food",
+    },
+    {
+      metric: "sleep",
+      icon: "moon-stars",
+      value:
+        averageSleepHours === null
+          ? t("stat_empty")
+          : `${averageSleepHours.toFixed(1)} h`,
+      label: t("metric_sleep"),
+      sublabel: t("today_tile_sleep_sub"),
+      badge: undefined,
+      href: "/dashboard?tab=sleep#dashboard-tabs",
+    },
+    {
+      metric: "weight",
+      icon: "scale",
+      value: weightLatestStr,
+      label: t("metric_weight"),
+      sublabel: weightDeltaStr ?? t("metric_latest_record"),
+      badge: undefined,
+      href: "/dashboard?tab=weight#dashboard-tabs",
+    },
   ] as const;
 
   const SERIF = "var(--pp-font-serif)";
@@ -1160,42 +1230,19 @@ export default async function DashboardPage({
           </div>
         </section>
 
-        <div
-          className="grid gap-4 sm:grid-cols-3"
-          style={{ marginTop: "2.5rem" }}
-        >
-          <Link
-            href="/dashboard?tab=doses#dashboard-tabs"
-            style={{ ...cardStyle, animationDelay: "0s" }}
-            className="pp-stat-card pp-fade-up"
-          >
-            <p style={eyebrowStyle}>{t("stat_last_dose")}</p>
-            <p style={statValueStyle}>{lastDoseStr}</p>
-            {lastDoseSubStr && <p style={statSubStyle}>{lastDoseSubStr}</p>}
-          </Link>
-
-          <Link
-            href="/dashboard?tab=weight#dashboard-tabs"
-            style={{ ...cardStyle, animationDelay: "0.1s" }}
-            className="pp-stat-card pp-fade-up"
-          >
-            <p style={eyebrowStyle}>{t("stat_weight")}</p>
-            <p style={statValueStyle}>{weightLatestStr}</p>
-            {weightDeltaStr && <p style={statSubStyle}>{weightDeltaStr}</p>}
-          </Link>
-
-          <Link
-            href="/dashboard?tab=doses#dashboard-tabs"
-            style={{ ...cardStyle, animationDelay: "0.2s" }}
-            className="pp-stat-card pp-fade-up"
-          >
-            <p style={eyebrowStyle}>{t("stat_streak")}</p>
-            <p style={statValueStyle}>
-              {streakCount === 0
-                ? t("stat_empty")
-                : t("streak_days", { count: streakCount })}
-            </p>
-          </Link>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4" style={{ marginTop: "2.5rem" }}>
+          {metricTiles.map((tile) => (
+            <MetricTile
+              key={tile.metric}
+              metric={tile.metric}
+              icon={tile.icon}
+              value={tile.value}
+              label={tile.label}
+              sublabel={tile.sublabel}
+              badge={tile.badge}
+              href={tile.href}
+            />
+          ))}
         </div>
 
         <div

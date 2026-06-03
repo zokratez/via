@@ -243,6 +243,190 @@
   transform: translateY(0) scale(0.985);
 }
 
+.pp-metric-tile {
+  background: var(--pp-metric-tile);
+  border: 0.5px solid var(--pp-metric-border);
+  border-radius: 18px;
+  color: inherit;
+  display: block;
+  min-height: 126px;
+  overflow: hidden;
+  padding: 14px;
+  position: relative;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 200ms ease-out;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025),
+    0 0 0 0.5px rgba(255, 255, 255, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.pp-metric-tile[data-metric="protein"] {
+  --pp-metric-color: var(--pp-metric-protein);
+  --pp-metric-tile: var(--pp-metric-protein-tile);
+  --pp-metric-border: var(--pp-metric-protein-border);
+  --pp-metric-copy: var(--pp-metric-protein-text);
+}
+
+.pp-metric-tile[data-metric="water"] {
+  --pp-metric-color: var(--pp-metric-water);
+  --pp-metric-tile: var(--pp-metric-water-tile);
+  --pp-metric-border: var(--pp-metric-water-border);
+  --pp-metric-copy: var(--pp-metric-water-text);
+}
+
+.pp-metric-tile[data-metric="steps"] {
+  --pp-metric-color: var(--pp-metric-steps);
+  --pp-metric-tile: var(--pp-metric-steps-tile);
+  --pp-metric-border: var(--pp-metric-steps-border);
+  --pp-metric-copy: var(--pp-metric-steps-text);
+}
+
+.pp-metric-tile[data-metric="calories"] {
+  --pp-metric-color: var(--pp-metric-calories);
+  --pp-metric-tile: var(--pp-metric-calories-tile);
+  --pp-metric-border: var(--pp-metric-calories-border);
+  --pp-metric-copy: var(--pp-metric-calories-text);
+}
+
+.pp-metric-tile[data-metric="sleep"] {
+  --pp-metric-color: var(--pp-metric-sleep);
+  --pp-metric-tile: var(--pp-metric-sleep-tile);
+  --pp-metric-border: var(--pp-metric-sleep-border);
+  --pp-metric-copy: var(--pp-metric-sleep-text);
+}
+
+.pp-metric-tile[data-metric="weight"] {
+  --pp-metric-color: var(--pp-metric-weight);
+  --pp-metric-tile: var(--pp-metric-weight-tile);
+  --pp-metric-border: var(--pp-metric-weight-border);
+  --pp-metric-copy: var(--pp-metric-weight-text);
+}
+
+.pp-metric-tile[data-metric="dose"] {
+  --pp-metric-color: var(--pp-metric-dose);
+  --pp-metric-tile: var(--pp-metric-dose-tile);
+  --pp-metric-border: var(--pp-metric-dose-border);
+  --pp-metric-copy: var(--pp-metric-dose-text);
+}
+
+.pp-metric-tile[data-metric="symptom"] {
+  --pp-metric-color: var(--pp-metric-symptom);
+  --pp-metric-tile: var(--pp-metric-symptom-tile);
+  --pp-metric-border: var(--pp-metric-symptom-border);
+  --pp-metric-copy: var(--pp-metric-symptom-text);
+}
+
+.pp-metric-tile:hover,
+.pp-metric-tile:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.035),
+    0 0 0 0.5px rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.pp-metric-tile:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--pp-metric-color) 70%, white);
+  outline-offset: 3px;
+}
+
+.pp-metric-tile:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+.pp-metric-tile-topline {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-height: 20px;
+}
+
+.pp-metric-tile-icon {
+  color: color-mix(in srgb, var(--pp-metric-color) 88%, transparent);
+  display: inline-flex;
+  height: 18px;
+  width: 18px;
+}
+
+.pp-metric-tile-icon svg {
+  display: block;
+  height: 18px;
+  width: 18px;
+}
+
+.pp-metric-tile-icon path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5px;
+}
+
+.pp-metric-tile-badge {
+  color: var(--pp-metric-color);
+  font-family: var(--pp-font-sans);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.pp-metric-tile-value {
+  color: var(--pp-text);
+  font-family: var(--pp-font-serif);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1;
+  margin: 1.05rem 0 0;
+}
+
+.pp-metric-tile-unit {
+  color: var(--pp-metric-copy);
+  font-family: var(--pp-font-serif);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.pp-metric-tile-label {
+  color: var(--pp-metric-copy);
+  font-family: var(--pp-font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.25;
+  margin: 0.75rem 0 0;
+  text-transform: uppercase;
+}
+
+.pp-metric-tile-sublabel {
+  color: color-mix(in srgb, var(--pp-metric-copy) 70%, black);
+  font-family: var(--pp-font-sans);
+  font-size: 10px;
+  line-height: 1.35;
+  margin: 0.35rem 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-metric-tile {
+    transition: none;
+  }
+
+  .pp-metric-tile:hover,
+  .pp-metric-tile:focus-visible,
+  .pp-metric-tile:active {
+    transform: none;
+  }
+}
+
 .pp-action-card {
   position: relative;
   isolation: isolate;
