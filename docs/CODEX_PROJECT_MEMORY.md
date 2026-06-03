@@ -1,6 +1,6 @@
 # Codex Project Memory
 
-Use this alongside `docs/CODEX_QA_HANDOFF.md` and `docs/PACO_PRODUCT_ROADMAP.md` when restarting PACO Peptide work.
+Use `docs/PACO_VISION.md` first, then this file alongside `docs/CODEX_QA_HANDOFF.md` and `docs/PACO_PRODUCT_ROADMAP.md` when restarting PACO Peptide work.
 
 ## Operating Mode
 
