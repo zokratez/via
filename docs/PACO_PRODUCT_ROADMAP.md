@@ -41,17 +41,17 @@ Privacy rules:
 
 ## Private Progress Photos
 
-Status: private upload/delete flow, same-angle comparison, on-demand AI visible-change analysis, and saved AI comparison reports are implemented. Doctor-ready PDF/export reports are not implemented yet.
+Status: private upload/delete flow, same-angle comparison, on-demand AI visible-change analysis, and saved AI comparison reports are implemented. Clinician-shareable PDF/export reports are not implemented yet.
 
 Safe product framing:
-AI visual progress analysis compares private user photos over time and summarizes visible changes, trends, and questions the user may want to discuss with a clinician. It is not medical diagnosis and does not replace a licensed professional.
+PACO observes patterns, estimates, explains possibilities, and helps users prepare better questions for their doctor. AI visual progress analysis compares private user photos over time and summarizes visible changes, trends, and questions the user may want to discuss with a clinician.
 
 What it can do:
 - Compare same-user progress photos over time.
 - Summarize visible trend changes.
 - Save AI comparison reports for later review.
 - Correlate photos with weight, dose, symptoms, sleep, and notes.
-- Produce a doctor-ready report.
+- Produce an observer-style report a user can bring to a clinician.
 - Let users delete photos.
 
 What it should avoid:
@@ -97,7 +97,7 @@ Build now on web:
 - Meal detail drilldowns from the dashboard and food page into saved entries.
 - Clear labels for every macro field so mobile users never see unlabeled numbers.
 - Better uncertainty prompts after AI food analysis, especially portion size, oil/sauce, sides, and hidden ingredients.
-- Bukowski context injection from today's food totals so the coach can explain patterns without pretending to diagnose.
+- Bukowski context injection from today's food totals so the coach can explain observed patterns with the same observer framing.
 
 Defer to native:
 - Live camera barcode scanning.
@@ -130,4 +130,4 @@ Acceptance criteria for future research:
 
 ## Product Principle
 
-PACO should feel like a private command center: beautiful enough to use daily, precise enough to trust, and careful enough not to pretend it is a doctor.
+PACO observes patterns, estimates, explains possibilities, and helps users prepare better questions for their doctor.

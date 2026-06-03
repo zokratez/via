@@ -35,7 +35,7 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 
 ## AI Safety Rules
 
-- Bukowski is not a doctor and should not make medical decisions for users.
+- PACO observes patterns, estimates, explains possibilities, and helps users prepare better questions for their doctor.
 - Food-photo analysis may estimate calories/macros, but users must review and edit before saving.
 - Progress-photo AI may describe visible, non-sensitive changes and photo-quality limits.
 - Do not claim exact fat loss, muscle loss, body-fat percentage, diagnosis, disease, swelling, pregnancy, age, attractiveness, identity, ethnicity, mental state, or health status from photos.
