@@ -23,7 +23,7 @@ const VERBS: LogVerb[] = [
   { key: "dose", href: "/log/dose" },
   { key: "food", href: "/food" },
   { key: "weight", href: "/log/weight" },
-  { key: "water", disabled: true },
+  { key: "water", href: "/log/water" },
   { key: "sleep", href: "/log/sleep" },
   { key: "symptom", href: "/log/symptom" },
   { key: "progress", href: "/progress" },

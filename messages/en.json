@@ -566,6 +566,18 @@
     "optional": "(optional)",
     "validation_failed": "Check the fields"
   },
+  "water": {
+    "title": "Log water",
+    "amount_ml": "Water (mL)",
+    "drank_at": "When?",
+    "note": "Note",
+    "now": "Now",
+    "save": "Save",
+    "saving": "Saving…",
+    "back": "Back",
+    "optional": "(optional)",
+    "validation_failed": "Check the fields"
+  },
   "symptom": {
     "title": "Log symptom",
     "category": "Category",
@@ -762,6 +774,7 @@
     "month_dec": "December",
     "log_dose_title": "{name} — {dose} mg",
     "log_weight_title": "Weight: {kg} kg",
+    "log_water_title": "Water: {ml} mL",
     "log_symptom_title": "Symptom: {category} (severity {severity}/5)",
     "log_sleep_title": "Sleep: {hours} h (quality {quality}/5)"
   },
