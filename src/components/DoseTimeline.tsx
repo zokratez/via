@@ -394,6 +394,8 @@ export function DoseTimeline({
             first && first.dose !== 0
               ? ((latest.dose - first.dose) / first.dose) * 100
               : 0;
+          const totalChangeLabel =
+            item.points.length === 1 ? "—" : formatPercent(totalChange);
 
           return (
             <div
@@ -439,7 +441,7 @@ export function DoseTimeline({
                     fontWeight: 600,
                   }}
                 >
-                  {formatPercent(totalChange)}
+                  {totalChangeLabel}
                 </strong>
               </span>
             </div>
