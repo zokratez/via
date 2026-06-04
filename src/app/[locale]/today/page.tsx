@@ -43,6 +43,7 @@ export default async function TodayPage({
     doses7Res,
     foodTodayRes,
     food7Res,
+    waterTodayRes,
     sleep7Res,
     weights90Res,
   ] = await Promise.all([
@@ -58,6 +59,10 @@ export default async function TodayPage({
       .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
       .gte("eaten_at", todayKey),
     supabase.from("food_photos").select("eaten_at").gte("eaten_at", cutoff7),
+    supabase
+      .from("water_entries")
+      .select("drank_at, amount_ml")
+      .gte("drank_at", todayKey),
     supabase
       .from("sleep_entries")
       .select("slept_at, hours")
@@ -96,6 +101,18 @@ export default async function TodayPage({
     foodToday.length === 0
       ? t("metric_food_empty")
       : t("metric_food_today", { count: foodToday.length });
+
+  type WaterRow = {
+    drank_at: string;
+    amount_ml: number | string;
+  };
+  const waterToday = ((waterTodayRes.data ?? []) as WaterRow[]).filter(
+    (water) => water.drank_at.startsWith(todayKey),
+  );
+  const waterTodayTotalMl = waterToday.reduce((sum, water) => {
+    const amount = Number(water.amount_ml);
+    return sum + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
 
   const sleepRows = (sleep7Res.data ?? []) as Array<{
     slept_at: string;
@@ -191,13 +208,16 @@ export default async function TodayPage({
     {
       metric: "water",
       icon: "droplet",
-      value: t("metric_coming_soon"),
+      value:
+        waterTodayTotalMl > 0
+          ? `${Math.round(waterTodayTotalMl)} mL`
+          : t("stat_empty"),
       label: t("metric_water"),
-      sublabel: t("metric_iphone_app"),
-      badge: undefined,
-      href: undefined,
-      comingSoon: true,
-      emptyState: "source-gated",
+      sublabel:
+        waterTodayTotalMl > 0 ? t("metric_badge_today") : t("metric_tap_to_log"),
+      badge: waterTodayTotalMl > 0 ? t("metric_badge_today") : undefined,
+      href: "/log/water",
+      ...loggableEmpty(waterTodayTotalMl <= 0),
     },
     {
       metric: "steps",
@@ -233,7 +253,7 @@ export default async function TodayPage({
       label: t("metric_sleep"),
       sublabel: t("today_tile_sleep_sub"),
       badge: undefined,
-      href: "/dashboard?tab=sleep#dashboard-tabs",
+      href: "/log/sleep",
       ...loggableEmpty(averageSleepHours === null),
     },
     {
@@ -243,7 +263,7 @@ export default async function TodayPage({
       label: t("metric_weight"),
       sublabel: weightDeltaStr ?? t("metric_latest_record"),
       badge: undefined,
-      href: "/dashboard?tab=weight#dashboard-tabs",
+      href: "/log/weight",
       ...loggableEmpty(weights90.length === 0),
     },
   ] as const;

@@ -98,6 +98,7 @@ export default async function DashboardPage({
   const hasStripeSubscription = isActiveSubscriber(profile?.subscription_tier);
 
   const now = new Date();
+  const todayKey = now.toISOString().slice(0, 10);
   const cutoff14 = new Date(now.getTime() - 14 * 86_400_000).toISOString();
   const cutoff90 = new Date(now.getTime() - 90 * 86_400_000).toISOString();
 
@@ -116,6 +117,7 @@ export default async function DashboardPage({
     anyWeightRes,
     anyCoachMsgRes,
     food14Res,
+    waterTodayRes,
     progress14Res,
   ] = await Promise.all([
     supabase
@@ -185,6 +187,10 @@ export default async function DashboardPage({
       .from("food_photos")
       .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
       .gte("eaten_at", cutoff14),
+    supabase
+      .from("water_entries")
+      .select("drank_at, amount_ml")
+      .gte("drank_at", todayKey),
     supabase
       .from("progress_photos")
       .select("captured_at, angle")
@@ -399,7 +405,6 @@ export default async function DashboardPage({
   const hasWeight = (anyWeightRes.data as { id: string } | null) !== null;
   const hasCoach = (anyCoachMsgRes.data as { id: string } | null) !== null;
 
-  const todayKey = now.toISOString().slice(0, 10);
   const cutoff7Time = now.getTime() - 7 * 86_400_000;
   const recentSleep = sleepEntries.filter(
     (s) => new Date(s.slept_at).getTime() >= cutoff7Time,
@@ -439,6 +444,17 @@ export default async function DashboardPage({
     },
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
+  type WaterRow = {
+    drank_at: string;
+    amount_ml: number | string;
+  };
+  const waterToday = ((waterTodayRes.data ?? []) as WaterRow[]).filter(
+    (water) => water.drank_at.startsWith(todayKey),
+  );
+  const waterTodayTotalMl = waterToday.reduce((sum, water) => {
+    const amount = Number(water.amount_ml);
+    return sum + (Number.isFinite(amount) ? amount : 0);
+  }, 0);
   type ProgressRow = {
     captured_at: string;
     angle: string | null;
@@ -585,11 +601,21 @@ export default async function DashboardPage({
     {
       metric: "water",
       icon: "droplet",
-      value: t("stat_empty"),
+      value:
+        waterTodayTotalMl > 0
+          ? `${Math.round(waterTodayTotalMl)} mL`
+          : t("stat_empty"),
       label: t("metric_water"),
-      sublabel: t("metric_healthkit_later"),
-      badge: undefined,
-      href: undefined,
+      sublabel:
+        waterTodayTotalMl > 0 ? t("metric_badge_today") : t("metric_tap_to_log"),
+      badge: waterTodayTotalMl > 0 ? t("metric_badge_today") : undefined,
+      href: "/log/water",
+      ...(waterTodayTotalMl <= 0
+        ? {
+            emptyState: "loggable" as const,
+            emptySublabel: t("metric_tap_to_log"),
+          }
+        : {}),
     },
     {
       metric: "steps",
