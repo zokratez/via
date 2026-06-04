@@ -22,6 +22,7 @@ import { WelcomeOverlay } from "@/components/WelcomeOverlay";
 import { getMiMetaSignalState } from "@/lib/mimeta/signals";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
+import { isTodayEnabled } from "@/lib/today/flag";
 
 function greetingKey(now = new Date()): "morning" | "afternoon" | "evening" {
   const h = now.getHours();
@@ -91,6 +92,10 @@ export default async function DashboardPage({
     tier: profile?.subscription_tier,
     locale: locale as "es" | "en",
   });
+
+  if (!sp.tab && !sp.ok && (await isTodayEnabled(user!.id))) {
+    redirect({ href: "/today", locale });
+  }
 
   const name =
     profile?.display_name?.trim() ||
