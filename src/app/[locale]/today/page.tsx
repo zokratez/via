@@ -1,5 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
+import { BukowskiObservation } from "@/components/BukowskiObservation";
+import { DoseStrip, type DoseStripDose } from "@/components/DoseStrip";
 import { MetricTile } from "@/components/MetricTile";
 import { createClient } from "@/lib/supabase/server";
 import { isTodayEnabled } from "@/lib/today/flag";
@@ -35,11 +37,26 @@ export default async function TodayPage({
     .slice(0, 10);
   const cutoff90 = new Date(now.getTime() - 90 * 86_400_000).toISOString();
 
-  const [foodTodayRes, sleep7Res, weights90Res] = await Promise.all([
+  const [
+    lastDoseRes,
+    doses7Res,
+    foodTodayRes,
+    food7Res,
+    sleep7Res,
+    weights90Res,
+  ] = await Promise.all([
+    supabase
+      .from("doses")
+      .select("taken_at, injection_site, peptide_name")
+      .order("taken_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.from("doses").select("taken_at").gte("taken_at", cutoff7),
     supabase
       .from("food_photos")
       .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
       .gte("eaten_at", todayKey),
+    supabase.from("food_photos").select("eaten_at").gte("eaten_at", cutoff7),
     supabase
       .from("sleep_entries")
       .select("slept_at, hours")
@@ -51,6 +68,7 @@ export default async function TodayPage({
       .gte("measured_at", cutoff90)
       .order("measured_at", { ascending: true }),
   ]);
+  const lastDose = lastDoseRes.data as DoseStripDose;
 
   type FoodRow = {
     eaten_at: string;
@@ -87,6 +105,39 @@ export default async function TodayPage({
       ? sleepRows.reduce((sum, sleep) => sum + Number(sleep.hours), 0) /
         sleepRows.length
       : null;
+
+  const foodRows7 = (food7Res.data ?? []) as Array<{ eaten_at: string }>;
+  const makeDayKey = (daysAgo: number) => {
+    const date = new Date(now);
+    date.setDate(date.getDate() - daysAgo);
+    return date.toISOString().slice(0, 10);
+  };
+  const rhythmDays = Array.from({ length: 7 }, (_, index) => {
+    const daysAgo = 6 - index;
+    const key = makeDayKey(daysAgo);
+    return {
+      key,
+      dose: ((doses7Res.data ?? []) as { taken_at: string }[]).some((r) =>
+        r.taken_at.startsWith(key),
+      ),
+      sleep: sleepRows.some((s) => s.slept_at.startsWith(key)),
+      food: foodRows7.some((f) => f.eaten_at.startsWith(key)),
+    };
+  });
+  const rhythmTotals = rhythmDays.reduce(
+    (totals, day) => {
+      totals.dose += day.dose ? 1 : 0;
+      totals.sleep += day.sleep ? 1 : 0;
+      totals.food += day.food ? 1 : 0;
+      return totals;
+    },
+    { dose: 0, sleep: 0, food: 0 },
+  );
+  const bukowskiObservation = t("bukowski_observation_body", {
+    dose: rhythmTotals.dose,
+    sleep: rhythmTotals.sleep,
+    food: rhythmTotals.food,
+  });
 
   const weights90 = (
     (weights90Res.data ?? []) as Array<{
@@ -219,6 +270,14 @@ export default async function TodayPage({
         >
           Today
         </h1>
+
+        <div
+          className="pp-today-glass-stack"
+          style={{ marginBottom: "1.25rem" }}
+        >
+          <BukowskiObservation observation={bukowskiObservation} t={t} />
+          <DoseStrip lastDose={lastDose} t={t} tDose={t} />
+        </div>
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {metricTiles.map((tile) => (
