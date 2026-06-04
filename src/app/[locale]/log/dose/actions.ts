@@ -50,6 +50,13 @@ const doseSchema = z.object({
   locale: z.enum(LOCALES),
 });
 
+function formText(formData: FormData, key: string) {
+  const value = formData.get(key);
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 function findKnownPeptide(name: string) {
   const normalized = name.trim().toLowerCase();
   return KNOWN_PEPTIDES.find((peptide) => {
@@ -64,17 +71,17 @@ function toStoredMg(amount: number, unit: (typeof DOSE_UNITS)[number]) {
 
 export async function logDoseAction(formData: FormData) {
   const raw = {
-    medication_id: formData.get("medication_id"),
-    peptide_name: formData.get("peptide_name"),
+    medication_id: formText(formData, "medication_id"),
+    peptide_name: formText(formData, "peptide_name"),
     dose_amount: formData.get("dose_amount"),
     dose_unit: formData.get("dose_unit"),
     frequency:
-      formData.get("frequency") ?? formData.get("default_freq") ?? undefined,
-    frequency_detail: formData.get("frequency_detail") ?? undefined,
-    route: formData.get("route") ?? undefined,
+      formText(formData, "frequency") ?? formText(formData, "default_freq"),
+    frequency_detail: formText(formData, "frequency_detail"),
+    route: formText(formData, "route"),
     taken_at: formData.get("taken_at"),
-    injection_site: formData.get("injection_site") ?? undefined,
-    notes: formData.get("notes") ?? undefined,
+    injection_site: formText(formData, "injection_site"),
+    notes: formText(formData, "notes"),
     locale: formData.get("locale"),
   };
   const parsed = doseSchema.safeParse(raw);

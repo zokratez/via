@@ -199,7 +199,7 @@ export default function LogDosePage() {
   function onSubmitDose(v: DoseFormValues) {
     setErrorMsg(null);
     if (!v.peptide_name.trim()) {
-      setErrorMsg(t("validation_failed"));
+      setErrorMsg(t("missing_peptide_name"));
       return;
     }
     const fd = new FormData();

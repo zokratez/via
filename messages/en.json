@@ -511,6 +511,7 @@
     "saving": "Saving…",
     "back": "Back",
     "validation_failed": "Check the fields",
+    "missing_peptide_name": "Peptide name is missing.",
     "add_first_medication": "Add your first medication",
     "add_first_medication_sub": "You don't have any medications saved yet. Start here.",
     "medication_name": "Name",

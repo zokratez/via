@@ -511,6 +511,7 @@
     "saving": "Guardando…",
     "back": "Volver",
     "validation_failed": "Revisa los campos",
+    "missing_peptide_name": "Falta el nombre del péptido.",
     "add_first_medication": "Agrega tu primer medicamento",
     "add_first_medication_sub": "Aún no tienes medicamentos guardados. Empieza por aquí.",
     "medication_name": "Nombre",
