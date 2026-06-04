@@ -2,8 +2,10 @@
  * Today feature gate.
  *
  * The durable allowlist lives in public.today_users and is read only
- * through the service-role key from server-side Today gates. No browser
- * client should be able to enumerate or resolve this flag.
+ * through the service-role key from server-side Today gates. A global
+ * app_flags kill-switch can open Today to all authenticated users without
+ * removing the allowlist fallback. No browser client should be able to
+ * enumerate or resolve these flags.
  */
 
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
@@ -27,6 +29,18 @@ export async function isTodayEnabled(
   const admin = createSupabaseAdmin(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  const { data: globalFlag, error: globalFlagError } = await admin
+    .from("app_flags")
+    .select("enabled")
+    .eq("key", "today_global_enabled")
+    .maybeSingle();
+
+  if (globalFlagError) {
+    console.error("[today/flag:global]", globalFlagError);
+  } else if (globalFlag?.enabled === true) {
+    return true;
+  }
 
   const { data, error } = await admin
     .from("today_users")
