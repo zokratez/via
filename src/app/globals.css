@@ -142,6 +142,13 @@
   --pp-metric-symptom-tile: #381f1a;
   --pp-metric-symptom-border: #5a3328;
   --pp-metric-symptom-text: #f0997b;
+
+  --pp-dose-series-1: #c9966b;
+  --pp-dose-series-2: #7c9968;
+  --pp-dose-series-3: #7f77dd;
+  --pp-dose-series-4: #d85a30;
+  --pp-dose-series-5: #5dcaa5;
+  --pp-dose-series-6: #ed93b1;
 }
 
 .pp-scroll {
