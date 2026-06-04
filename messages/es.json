@@ -10,7 +10,10 @@
     "checkin": "Check-in",
     "coach": "Coach",
     "calculator": "Calc",
-    "search": "Buscar"
+    "search": "Buscar",
+    "today": "Today",
+    "log": "Log",
+    "bukowski": "Bukowski"
   },
   "mimeta": {
     "pill_label": "Mi meta",

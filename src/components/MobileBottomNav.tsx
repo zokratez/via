@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const HIDDEN_PATH_RE =
-  /^\/(es|en)\/(auth|admin|privacy|terms|reviews\/submit)(\/.*)?$/;
+  /^\/(es|en)\/(auth|admin|privacy|terms|reviews\/submit|today)(\/.*)?$/;
 
 function Icon({
   kind,

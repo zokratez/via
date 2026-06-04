@@ -3,6 +3,7 @@ import { redirect } from "@/i18n/navigation";
 import { BukowskiObservation } from "@/components/BukowskiObservation";
 import { DoseStrip, type DoseStripDose } from "@/components/DoseStrip";
 import { MetricTile } from "@/components/MetricTile";
+import { TodayBottomNav } from "@/components/TodayBottomNav";
 import { createClient } from "@/lib/supabase/server";
 import { isTodayEnabled } from "@/lib/today/flag";
 
@@ -299,6 +300,7 @@ export default async function TodayPage({
           ))}
         </div>
       </section>
+      <TodayBottomNav />
     </main>
   );
 }
