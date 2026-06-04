@@ -258,6 +258,12 @@ export default async function DashboardPage({
       lastDoseSubStr = tDose(SITE_KEYS[lastDose.injection_site]);
     }
   }
+  const lastDoseName = lastDose?.peptide_name ?? t("dose_strip_unknown");
+  const doseStripDetail = lastDose
+    ? lastDoseSubStr
+      ? `${lastDoseName} · ${lastDoseSubStr}`
+      : lastDoseName
+    : t("dose_strip_empty_detail");
 
   type WeightRow = {
     measured_at: string;
@@ -549,6 +555,11 @@ export default async function DashboardPage({
     },
     { dose: 0, weight: 0, symptoms: 0, sleep: 0, food: 0, progress: 0 },
   );
+  const bukowskiObservation = t("bukowski_observation_body", {
+    dose: rhythmTotals.dose,
+    sleep: rhythmTotals.sleep,
+    food: rhythmTotals.food,
+  });
 
   const actions = [
     { href: "/check-in", label: t("action_checkin") },
@@ -910,6 +921,46 @@ export default async function DashboardPage({
                 </p>
                 <p style={commandSubStyle}>{nextAction.detail}</p>
               </div>
+            </Link>
+          </div>
+
+          <div className="pp-today-glass-stack">
+            <Link
+              href="/dashboard?tab=doses#dashboard-tabs"
+              className="pp-dose-strip pp-glass-edge-content"
+              aria-label={t("dose_strip_title")}
+            >
+              <span className="pp-dose-strip-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 8h7a4 4 0 1 1 0 8H8a5 5 0 0 1-1-8ZM15 8l3-3M18 5l1 3" />
+                </svg>
+              </span>
+              <span className="pp-dose-strip-copy">
+                <span className="pp-dose-strip-eyebrow">
+                  {t("dose_strip_eyebrow")}
+                </span>
+                <span className="pp-dose-strip-value">{lastDoseStr}</span>
+                <span className="pp-dose-strip-detail">{doseStripDetail}</span>
+              </span>
+              <span className="pp-dose-strip-action">
+                {t("dose_strip_action")}
+              </span>
+            </Link>
+
+            <Link
+              href="/coach"
+              className="pp-bukowski-observation pp-glass-edge-content"
+              aria-label={t("bukowski_observation_title")}
+            >
+              <span className="pp-bukowski-mark" aria-hidden="true">
+                ¶
+              </span>
+              <span>
+                <span className="pp-bukowski-eyebrow">
+                  {t("bukowski_observation_eyebrow")}
+                </span>
+                <span className="pp-bukowski-text">{bukowskiObservation}</span>
+              </span>
             </Link>
           </div>
 
