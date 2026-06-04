@@ -79,7 +79,7 @@ export function MetricTile({
 }: MetricTileProps) {
   const { main, suffix } = splitValue(value);
   const content = (
-    <>
+    <span className="pp-metric-tile-content">
       <div className="pp-metric-tile-topline">
         <i className={`ti ti-${icon} pp-metric-tile-icon`} aria-hidden="true">
           <MetricIcon icon={icon} />
@@ -92,7 +92,7 @@ export function MetricTile({
       </p>
       <p className="pp-metric-tile-label">{label}</p>
       {sublabel && <p className="pp-metric-tile-sublabel">{sublabel}</p>}
-    </>
+    </span>
   );
 
   if (href) {

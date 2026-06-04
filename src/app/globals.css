@@ -105,42 +105,42 @@
   /* PACO metric color system — one hue per signal, used app-wide */
   --pp-metric-protein: #d99a5b;
   --pp-metric-protein-tile: #3a2519;
-  --pp-metric-protein-border: #65523d;
+  --pp-metric-protein-border: #5a4128;
   --pp-metric-protein-text: #c9a988;
 
   --pp-metric-water: #5dcaa5;
   --pp-metric-water-tile: #1a3530;
-  --pp-metric-water-border: #49625d;
+  --pp-metric-water-border: #2f5048;
   --pp-metric-water-text: #9fe1cb;
 
   --pp-metric-steps: #97c459;
   --pp-metric-steps-tile: #1f3320;
-  --pp-metric-steps-border: #525f47;
+  --pp-metric-steps-border: #3e5230;
   --pp-metric-steps-text: #c0dd97;
 
   --pp-metric-calories: #ef9f27;
   --pp-metric-calories-tile: #3d2e15;
-  --pp-metric-calories-border: #655c3d;
+  --pp-metric-calories-border: #5a4f28;
   --pp-metric-calories-text: #fac775;
 
   --pp-metric-sleep: #7f77dd;
   --pp-metric-sleep-tile: #1f2840;
-  --pp-metric-sleep-border: #4e546b;
+  --pp-metric-sleep-border: #3a4260;
   --pp-metric-sleep-text: #afa9ec;
 
   --pp-metric-weight: #ed93b1;
   --pp-metric-weight-tile: #3a1f28;
-  --pp-metric-weight-border: #654951;
+  --pp-metric-weight-border: #5a3340;
   --pp-metric-weight-text: #f4c0d1;
 
   --pp-metric-dose: #c9966b;
   --pp-metric-dose-tile: #38271a;
-  --pp-metric-dose-border: #65523d;
+  --pp-metric-dose-border: #5a4128;
   --pp-metric-dose-text: #d4ae87;
 
   --pp-metric-symptom: #d85a30;
   --pp-metric-symptom-tile: #381f1a;
-  --pp-metric-symptom-border: #65463e;
+  --pp-metric-symptom-border: #5a3328;
   --pp-metric-symptom-text: #f0997b;
 }
 
@@ -273,14 +273,22 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 30%;
-  border-radius: 18px 18px 0 0;
+  height: 45%;
+  border-radius: 18px 18px 40px 40px;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.04) 55%,
     rgba(255, 255, 255, 0) 100%
   );
   pointer-events: none;
+  z-index: 0;
+}
+
+.pp-metric-tile-content {
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .pp-metric-tile[data-metric="protein"] {
