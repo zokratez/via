@@ -42,6 +42,13 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 - For body composition, frame output as a visual trend only and recommend DEXA, BodPod, InBody, calipers, or a clinician for true measurement.
 - Update privacy copy whenever photos or user data are sent to an AI provider.
 
+## Migration Discipline
+
+- Migrations that add NOT NULL columns must ship with synchronized app code that populates the column on every insert, OR a column default, OR a backfill UPDATE before the constraint applies.
+- When code stops requiring a foreign-key relationship, drop NOT NULL on that FK column in the SAME migration, not a later hotfix.
+- Migration files committed to the repo are NOT auto-applied to production. Either apply via Supabase MCP or hand Sam the SQL to paste into the dashboard SQL Editor.
+- "Build passed" != "feature works." Verify the affected user flow in production before declaring shipped.
+
 ## Current Feature Map
 
 - Dashboard: command center with dose, sleep, food, progress, symptoms, coach, weekly rhythm signals.
