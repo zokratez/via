@@ -15,6 +15,20 @@
     "log": "Log",
     "bukowski": "Bukowski"
   },
+  "log_sheet": {
+    "eyebrow": "Log",
+    "title": "What happened?",
+    "close": "Close log sheet",
+    "soon": "Coming soon",
+    "dose": "Dose",
+    "food": "Food",
+    "weight": "Weight",
+    "water": "Water",
+    "sleep": "Sleep",
+    "symptom": "Symptom",
+    "progress": "Progress",
+    "note": "Note"
+  },
   "mimeta": {
     "pill_label": "My goal",
     "aria_new_observation": "new observation",

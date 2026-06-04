@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { LogSheet } from "@/components/LogSheet";
 
 function Icon({
   kind,
@@ -53,30 +55,36 @@ function Icon({
 
 export function TodayBottomNav() {
   const t = useTranslations("mobile_nav");
+  const [logOpen, setLogOpen] = useState(false);
 
   return (
-    <nav className="pp-mobile-nav" aria-label={t("label")}>
-      <Link
-        href="/today"
-        className="pp-mobile-nav-item is-active"
-        aria-current="page"
-      >
-        <Icon kind="today" active />
-        <span>{t("today")}</span>
-      </Link>
-      <button
-        type="button"
-        className="pp-mobile-nav-item"
-        aria-disabled="true"
-        onClick={(event) => event.preventDefault()}
-      >
-        <Icon kind="log" active={false} />
-        <span>{t("log")}</span>
-      </button>
-      <Link href="/coach" className="pp-mobile-nav-item">
-        <Icon kind="bukowski" active={false} />
-        <span>{t("bukowski")}</span>
-      </Link>
-    </nav>
+    <>
+      <nav className="pp-mobile-nav" aria-label={t("label")}>
+        <Link
+          href="/today"
+          className="pp-mobile-nav-item is-active"
+          aria-current="page"
+        >
+          <Icon kind="today" active />
+          <span>{t("today")}</span>
+        </Link>
+        <button
+          type="button"
+          className={
+            logOpen ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"
+          }
+          aria-expanded={logOpen}
+          onClick={() => setLogOpen(true)}
+        >
+          <Icon kind="log" active={logOpen} />
+          <span>{t("log")}</span>
+        </button>
+        <Link href="/coach" className="pp-mobile-nav-item">
+          <Icon kind="bukowski" active={false} />
+          <span>{t("bukowski")}</span>
+        </Link>
+      </nav>
+      <LogSheet open={logOpen} onClose={() => setLogOpen(false)} />
+    </>
   );
 }
