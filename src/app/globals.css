@@ -356,11 +356,11 @@
 
 .pp-metric-tile[data-coming-soon="true"] {
   cursor: default;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .pp-metric-tile[data-coming-soon="true"] .pp-metric-tile-value {
-  color: var(--pp-metric-copy);
+  color: color-mix(in srgb, var(--pp-metric-copy) 82%, transparent);
   font-family: var(--pp-font-sans);
   font-size: 12px;
   font-style: normal;
@@ -368,6 +368,10 @@
   letter-spacing: 0.16em;
   line-height: 1.2;
   text-transform: uppercase;
+}
+
+.pp-metric-tile[data-coming-soon="true"] .pp-metric-tile-sublabel {
+  color: color-mix(in srgb, var(--pp-metric-copy) 82%, transparent);
 }
 
 .pp-metric-tile:hover,
