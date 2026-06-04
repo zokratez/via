@@ -9,6 +9,7 @@ import { type DosePoint } from "@/components/DoseTimeline";
 import { type SymptomEntry } from "@/components/SymptomChart";
 import { type SleepEntry } from "@/components/SleepChart";
 import { type CoachThread } from "@/components/CoachHistory";
+import { BukowskiObservation } from "@/components/BukowskiObservation";
 import { DashboardTabs, type TabKey } from "@/components/DashboardTabs";
 import { DoseStrip, type DoseStripDose } from "@/components/DoseStrip";
 import {
@@ -921,21 +922,7 @@ export default async function DashboardPage({
           <div className="pp-today-glass-stack">
             <DoseStrip lastDose={lastDose} t={t} tDose={tDose} />
 
-            <Link
-              href="/coach"
-              className="pp-bukowski-observation pp-glass-edge-content"
-              aria-label={t("bukowski_observation_title")}
-            >
-              <span className="pp-bukowski-mark" aria-hidden="true">
-                ¶
-              </span>
-              <span>
-                <span className="pp-bukowski-eyebrow">
-                  {t("bukowski_observation_eyebrow")}
-                </span>
-                <span className="pp-bukowski-text">{bukowskiObservation}</span>
-              </span>
-            </Link>
+            <BukowskiObservation observation={bukowskiObservation} t={t} />
           </div>
 
           <div
