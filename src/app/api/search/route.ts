@@ -103,7 +103,7 @@ export async function POST(req: Request) {
         .limit(10),
       supabase
         .from("doses")
-        .select("id, taken_at, dose_mg, medications(name, generic_name)")
+        .select("id, taken_at, dose_mg, peptide_name, medications(name, generic_name)")
         .eq("user_id", user.id)
         .order("taken_at", { ascending: false })
         .limit(50),
@@ -155,6 +155,7 @@ export async function POST(req: Request) {
     id: string;
     taken_at: string;
     dose_mg: number | string;
+    peptide_name: string | null;
     medications:
       | { name: string | null; generic_name: string | null }
       | { name: string | null; generic_name: string | null }[]
@@ -164,7 +165,7 @@ export async function POST(req: Request) {
     const med = Array.isArray(d.medications)
       ? d.medications[0] ?? null
       : d.medications;
-    const medName = med?.name ?? "";
+    const medName = d.peptide_name ?? med?.name ?? "";
     const medGeneric = med?.generic_name ?? "";
     if (
       !medName.toLowerCase().includes(lowerQuery) &&

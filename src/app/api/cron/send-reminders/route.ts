@@ -183,6 +183,7 @@ type DoseRow = {
   user_id: string;
   taken_at: string;
   medication_id: string | null;
+  peptide_name: string | null;
   medications:
     | { name: string | null; generic_name: string | null }
     | { name: string | null; generic_name: string | null }[]
@@ -224,7 +225,7 @@ async function runReminders(): Promise<SendResult> {
   const { data: doseRows, error: dosesErr } = await supabase
     .from("doses")
     .select(
-      "user_id, taken_at, medication_id, medications(name, generic_name)",
+      "user_id, taken_at, medication_id, peptide_name, medications(name, generic_name)",
     )
     .in("user_id", userIds)
     .order("taken_at", { ascending: false });
@@ -317,7 +318,10 @@ async function runReminders(): Promise<SendResult> {
     const recipient = (userResp.user as AuthUserRow).email!;
     const locale: Locale = profile.locale === "en" ? "en" : "es";
     const medicationName =
-      med?.name ?? med?.generic_name ?? (locale === "es" ? "tu medicamento" : "your medication");
+      dose.peptide_name ??
+      med?.name ??
+      med?.generic_name ??
+      (locale === "es" ? "tu medicamento" : "your medication");
     const doseUrl = `${baseUrl}/${locale}/log/dose`;
     const subject = buildSubject(kind, locale);
     const html = buildHtml({

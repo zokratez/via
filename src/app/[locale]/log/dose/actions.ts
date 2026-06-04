@@ -101,31 +101,6 @@ export async function logDoseAction(formData: FormData) {
       .maybeSingle();
     medication = data as { id: string; name: string } | null;
   }
-  if (!medication) {
-    const { data } = await supabase
-      .from("medications")
-      .select("id, name")
-      .eq("user_id", user.id)
-      .eq("is_active", true)
-      .ilike("name", peptideName)
-      .maybeSingle();
-    medication = data as { id: string; name: string } | null;
-  }
-  if (!medication) {
-    const { data, error } = await supabase
-      .from("medications")
-      .insert({
-        user_id: user.id,
-        name: peptideName,
-        generic_name: knownPeptide?.name.toLowerCase() ?? peptideName.toLowerCase(),
-        concentration_mg_per_ml: null,
-      })
-      .select("id, name")
-      .single();
-    if (error || !data) return { error: "db_failed" as const };
-    medication = data as { id: string; name: string };
-  }
-  if (!medication) return { error: "validation_failed" as const };
 
   if (!knownPeptide) {
     const { data: existingCustom } = await supabase
@@ -147,7 +122,8 @@ export async function logDoseAction(formData: FormData) {
 
   const { error } = await supabase.from("doses").insert({
     user_id: user.id,
-    medication_id: medication.id,
+    medication_id: medication?.id ?? null,
+    peptide_name: peptideName,
     taken_at: takenAt.toISOString(),
     dose_mg: storedDoseMg,
     injection_site: parsed.data.injection_site ?? null,
@@ -157,7 +133,6 @@ export async function logDoseAction(formData: FormData) {
   if (error) return { error: "db_failed" as const };
 
   try {
-    const medName = (medication.name as string | undefined) ?? "";
     const t = await getTranslations({
       locale: parsed.data.locale,
       namespace: "calendar",
@@ -166,12 +141,12 @@ export async function logDoseAction(formData: FormData) {
       userId: user.id,
       locale: parsed.data.locale,
       title: t("log_dose_title", {
-        name: medName,
+        name: peptideName,
         dose: storedDoseMg,
       }),
       eventDate: toDateOnly(takenAt),
       eventType: "injection",
-      relatedMedicationId: medication.id,
+      relatedMedicationId: medication?.id ?? null,
     });
   } catch {
     // Calendar mirror is best-effort; never block dose log.

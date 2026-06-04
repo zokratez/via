@@ -118,7 +118,7 @@ export default async function DashboardPage({
   ] = await Promise.all([
     supabase
       .from("doses")
-      .select("taken_at, injection_site")
+      .select("taken_at, injection_site, peptide_name")
       .order("taken_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -139,7 +139,7 @@ export default async function DashboardPage({
     supabase
       .from("doses")
       .select(
-        "taken_at, dose_mg, injection_site, medications(name, generic_name)",
+        "taken_at, dose_mg, injection_site, peptide_name, medications(name, generic_name)",
       )
       .gte("taken_at", cutoff90)
       .order("taken_at", { ascending: true }),
@@ -235,7 +235,7 @@ export default async function DashboardPage({
         : t("greeting_evening", { name });
 
   const lastDose = lastDoseRes.data as
-    | { taken_at: string; injection_site: string | null }
+    | { taken_at: string; injection_site: string | null; peptide_name: string | null }
     | null;
   let lastDoseStr: string;
   let lastDoseSubStr: string | null = null;
@@ -300,6 +300,7 @@ export default async function DashboardPage({
     taken_at: string;
     dose_mg: number | string;
     injection_site: string | null;
+    peptide_name: string | null;
     medications:
       | { name: string | null; generic_name: string | null }
       | { name: string | null; generic_name: string | null }[]
@@ -369,7 +370,7 @@ export default async function DashboardPage({
         taken_at: d.taken_at,
         dose_mg: Number(d.dose_mg),
         injection_site: d.injection_site,
-        medication_name: med?.name ?? null,
+        medication_name: d.peptide_name ?? med?.name ?? null,
         generic_name: med?.generic_name ?? null,
       };
     },
