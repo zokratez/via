@@ -356,7 +356,7 @@
 
 .pp-metric-tile[data-coming-soon="true"] {
   cursor: default;
-  opacity: 0.62;
+  opacity: 0.78;
 }
 
 .pp-metric-tile[data-coming-soon="true"] .pp-metric-tile-value {
@@ -466,7 +466,7 @@
 }
 
 .pp-metric-tile-sublabel {
-  color: color-mix(in srgb, var(--pp-metric-copy) 70%, black);
+  color: color-mix(in srgb, var(--pp-metric-copy) 85%, black);
   font-family: var(--pp-font-sans);
   font-size: 10px;
   line-height: 1.35;
