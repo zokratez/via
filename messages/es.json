@@ -256,6 +256,7 @@
     "metric_iphone_app": "con la app de iPhone",
     "metric_calories_consumed_today": "consumidas hoy",
     "metric_latest_record": "último registro",
+    "metric_tap_to_log": "Toca para registrar",
     "time_just_now": "ahora mismo",
     "time_minutes_short": "hace {count} min",
     "time_hours_short": "hace {count} h",

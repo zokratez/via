@@ -17,6 +17,8 @@ export type MetricTileProps = {
   badge?: string;
   href?: string;
   comingSoon?: boolean;
+  emptyState?: "loggable" | "source-gated";
+  emptySublabel?: string;
 };
 
 function splitValue(value: string) {
@@ -78,8 +80,27 @@ export function MetricTile({
   badge,
   href,
   comingSoon = false,
+  emptyState,
+  emptySublabel,
 }: MetricTileProps) {
-  const { main, suffix } = splitValue(value);
+  const isLoggableEmpty = emptyState === "loggable";
+  const isSourceGated = comingSoon || emptyState === "source-gated";
+  const displayValue = isLoggableEmpty ? "—" : value;
+  const displaySublabel =
+    isLoggableEmpty && emptySublabel ? emptySublabel : sublabel;
+  const { main, suffix } = splitValue(displayValue);
+  const valueStyle =
+    isLoggableEmpty
+      ? {
+          color: "color-mix(in srgb, var(--pp-metric-copy) 70%, transparent)",
+          fontFamily: "var(--pp-font-sans)",
+          fontSize: "20px",
+          fontStyle: "normal",
+          fontWeight: 600,
+          letterSpacing: "0.04em",
+          opacity: 0.72,
+        }
+      : undefined;
   const content = (
     <span className="pp-metric-tile-content">
       <div className="pp-metric-tile-topline">
@@ -88,16 +109,18 @@ export function MetricTile({
         </i>
         {badge && <span className="pp-metric-tile-badge">{badge}</span>}
       </div>
-      <p className="pp-metric-tile-value">
+      <p className="pp-metric-tile-value" style={valueStyle}>
         <span>{main}</span>
         {suffix && <span className="pp-metric-tile-unit"> {suffix}</span>}
       </p>
       <p className="pp-metric-tile-label">{label}</p>
-      {sublabel && <p className="pp-metric-tile-sublabel">{sublabel}</p>}
+      {displaySublabel && (
+        <p className="pp-metric-tile-sublabel">{displaySublabel}</p>
+      )}
     </span>
   );
 
-  if (href && !comingSoon) {
+  if (href && !isSourceGated) {
     return (
       <Link href={href} className="pp-metric-tile" data-metric={metric}>
         {content}
@@ -109,7 +132,7 @@ export function MetricTile({
     <div
       className="pp-metric-tile"
       data-metric={metric}
-      data-coming-soon={comingSoon ? "true" : undefined}
+      data-coming-soon={isSourceGated ? "true" : undefined}
     >
       {content}
     </div>
