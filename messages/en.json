@@ -274,6 +274,7 @@
     "metric_calories_consumed_today": "consumed today",
     "metric_latest_record": "latest record",
     "metric_tap_to_log": "Tap to log",
+    "metric_tap_cue": "log",
     "time_just_now": "just now",
     "time_minutes_short": "{count} min ago",
     "time_hours_short": "{count} h ago",

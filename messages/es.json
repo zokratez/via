@@ -274,6 +274,7 @@
     "metric_calories_consumed_today": "consumidas hoy",
     "metric_latest_record": "último registro",
     "metric_tap_to_log": "Toca para registrar",
+    "metric_tap_cue": "registrar",
     "time_just_now": "ahora mismo",
     "time_minutes_short": "hace {count} min",
     "time_hours_short": "hace {count} h",

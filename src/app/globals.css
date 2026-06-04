@@ -477,6 +477,20 @@
   margin: 0.35rem 0 0;
 }
 
+.pp-metric-tile-cue {
+  bottom: 12px;
+  color: color-mix(in srgb, var(--pp-metric-copy) 72%, transparent);
+  font-family: var(--pp-font-sans);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  position: absolute;
+  right: 12px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
 .pp-today-glass-stack {
   display: grid;
   gap: 0.75rem;

@@ -1281,6 +1281,13 @@ export default async function DashboardPage({
               badge={tile.badge}
               href={tile.href}
               comingSoon={"comingSoon" in tile ? tile.comingSoon : undefined}
+              emptyState={"emptyState" in tile ? tile.emptyState : undefined}
+              emptySublabel={
+                "emptySublabel" in tile ? tile.emptySublabel : undefined
+              }
+              tapCue={
+                tile.value === t("stat_empty") ? undefined : t("metric_tap_cue")
+              }
             />
           ))}
         </div>

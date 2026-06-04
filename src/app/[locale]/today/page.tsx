@@ -316,6 +316,9 @@ export default async function TodayPage({
               emptySublabel={
                 "emptySublabel" in tile ? tile.emptySublabel : undefined
               }
+              tapCue={
+                tile.value === t("stat_empty") ? undefined : t("metric_tap_cue")
+              }
             />
           ))}
         </div>

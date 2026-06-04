@@ -19,6 +19,7 @@ export type MetricTileProps = {
   comingSoon?: boolean;
   emptyState?: "loggable" | "source-gated";
   emptySublabel?: string;
+  tapCue?: string;
 };
 
 function splitValue(value: string) {
@@ -82,9 +83,11 @@ export function MetricTile({
   comingSoon = false,
   emptyState,
   emptySublabel,
+  tapCue,
 }: MetricTileProps) {
   const isLoggableEmpty = emptyState === "loggable";
   const isSourceGated = comingSoon || emptyState === "source-gated";
+  const showTapCue = Boolean(href) && !isSourceGated && !isLoggableEmpty;
   const displayValue = isLoggableEmpty ? "—" : value;
   const displaySublabel =
     isLoggableEmpty && emptySublabel ? emptySublabel : sublabel;
@@ -116,6 +119,9 @@ export function MetricTile({
       <p className="pp-metric-tile-label">{label}</p>
       {displaySublabel && (
         <p className="pp-metric-tile-sublabel">{displaySublabel}</p>
+      )}
+      {showTapCue && tapCue && (
+        <span className="pp-metric-tile-cue">+ {tapCue}</span>
       )}
     </span>
   );
