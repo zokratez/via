@@ -32,6 +32,29 @@ const SITES = [
 type Site = (typeof SITES)[number];
 const DOSE_UNITS = ["mg", "mcg"] as const;
 type DoseUnit = (typeof DOSE_UNITS)[number];
+const FREQUENCIES = [
+  "daily",
+  "twice-daily",
+  "every-other-day",
+  "twice-weekly",
+  "weekly",
+  "cyclic",
+  "custom",
+] as const;
+type Frequency = (typeof FREQUENCIES)[number];
+const ROUTES = [
+  "subcutaneous",
+  "intramuscular",
+  "topical",
+  "nasal",
+  "oral",
+  "other",
+] as const;
+type AdministrationRoute = (typeof ROUTES)[number];
+const INJECTION_ROUTES = new Set<AdministrationRoute>([
+  "subcutaneous",
+  "intramuscular",
+]);
 
 type Medication = {
   id: string;
@@ -43,7 +66,7 @@ type Medication = {
 type UserPeptide = {
   id: string;
   name: string;
-  default_freq: string;
+  default_freq: Frequency;
   default_unit: DoseUnit;
 };
 
@@ -51,7 +74,8 @@ type Suggestion = {
   key: string;
   name: string;
   aliases: readonly string[];
-  defaultFreq: string;
+  category?: string;
+  defaultFreq: Frequency;
   units: readonly DoseUnit[];
   medicationId?: string;
   concentration?: number | null;
@@ -61,7 +85,9 @@ type Suggestion = {
 type DoseFormValues = {
   medication_id: string;
   peptide_name: string;
-  default_freq: string;
+  frequency: Frequency;
+  frequency_detail: string;
+  route: AdministrationRoute;
   dose_amount: string;
   dose_unit: DoseUnit;
   taken_at: string;
@@ -74,6 +100,27 @@ function nowLocalDateTime(): string {
   d.setSeconds(0, 0);
   const pad = (n: number) => n.toString().padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function toFrequency(value: string | null | undefined): Frequency {
+  return FREQUENCIES.find((frequency) => frequency === value) ?? "custom";
+}
+
+function routeForPeptide(
+  name: string,
+  category?: string,
+): AdministrationRoute {
+  const normalized = name.trim().toLowerCase();
+  if (category === "skin-healing" || category === "skin") return "topical";
+  if (
+    category === "nootropic" ||
+    normalized.includes("semax") ||
+    normalized.includes("selank") ||
+    normalized.includes("sermorelin")
+  ) {
+    return "nasal";
+  }
+  return "subcutaneous";
 }
 
 export default function LogDosePage() {
@@ -90,7 +137,9 @@ export default function LogDosePage() {
     defaultValues: {
       medication_id: "",
       peptide_name: "",
-      default_freq: "custom",
+      frequency: "custom",
+      frequency_detail: "",
+      route: "subcutaneous",
       dose_amount: "",
       dose_unit: "mg",
       taken_at: nowLocalDateTime(),
@@ -130,7 +179,7 @@ export default function LogDosePage() {
         (customPeptidesRes.data ?? []).map((p) => ({
           id: p.id as string,
           name: p.name as string,
-          default_freq: (p.default_freq as string | null) ?? "custom",
+          default_freq: toFrequency(p.default_freq as string | null),
           default_unit:
             p.default_unit === "mcg" || p.default_unit === "mg"
               ? p.default_unit
@@ -156,7 +205,9 @@ export default function LogDosePage() {
     const fd = new FormData();
     if (v.medication_id) fd.set("medication_id", v.medication_id);
     fd.set("peptide_name", v.peptide_name);
-    fd.set("default_freq", v.default_freq);
+    fd.set("frequency", v.frequency);
+    if (v.frequency_detail) fd.set("frequency_detail", v.frequency_detail);
+    fd.set("route", v.route);
     fd.set("dose_amount", v.dose_amount);
     fd.set("dose_unit", v.dose_unit);
     fd.set("taken_at", v.taken_at);
@@ -175,6 +226,11 @@ export default function LogDosePage() {
 
   const selectedSite = doseForm.watch("injection_site");
   const peptideName = doseForm.watch("peptide_name");
+  const selectedFrequency = doseForm.watch("frequency");
+  const selectedRoute = doseForm.watch("route");
+  const showFrequencyDetail =
+    selectedFrequency === "cyclic" || selectedFrequency === "custom";
+  const showInjectionSite = INJECTION_ROUTES.has(selectedRoute);
   const peptideQuery = peptideName.trim().toLowerCase();
   const isLoadingMeds = meds === null;
   const suggestions = useMemo<Suggestion[]>(() => {
@@ -182,6 +238,7 @@ export default function LogDosePage() {
       key: `known:${peptide.name}`,
       name: peptide.name,
       aliases: peptide.aliases,
+      category: peptide.category,
       defaultFreq: peptide.defaultFreq,
       units: peptide.units,
       source: "known",
@@ -225,10 +282,22 @@ export default function LogDosePage() {
   );
   const unitOptions = selectedSuggestion?.units ?? DOSE_UNITS;
 
+  useEffect(() => {
+    if (!showInjectionSite && selectedSite) {
+      doseForm.setValue("injection_site", "");
+    }
+  }, [doseForm, selectedSite, showInjectionSite]);
+
   function selectSuggestion(suggestion: Suggestion) {
     doseForm.setValue("peptide_name", suggestion.name);
     doseForm.setValue("medication_id", suggestion.medicationId ?? "");
-    doseForm.setValue("default_freq", suggestion.defaultFreq);
+    doseForm.setValue("frequency", suggestion.defaultFreq);
+    doseForm.setValue(
+      "route",
+      routeForPeptide(suggestion.name, suggestion.category),
+    );
+    doseForm.setValue("frequency_detail", "");
+    doseForm.setValue("injection_site", "");
     doseForm.setValue("dose_unit", suggestion.units[0] ?? "mg");
   }
 
@@ -265,7 +334,6 @@ export default function LogDosePage() {
               aria-invalid={!!doseForm.formState.errors.peptide_name}
             />
             <input type="hidden" {...doseForm.register("medication_id")} />
-            <input type="hidden" {...doseForm.register("default_freq")} />
             <p style={labelHintStyle}>{t("peptide_picker_hint")}</p>
             <div
               style={{
@@ -325,6 +393,100 @@ export default function LogDosePage() {
           </div>
 
           <div style={formGroupStyle}>
+            <label style={labelStyle}>{t("frequency")}</label>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "0.5rem",
+              }}
+            >
+              {FREQUENCIES.map((frequency) => {
+                const isActive = selectedFrequency === frequency;
+                return (
+                  <button
+                    key={frequency}
+                    type="button"
+                    onClick={() => {
+                      doseForm.setValue("frequency", frequency);
+                      if (frequency !== "cyclic" && frequency !== "custom") {
+                        doseForm.setValue("frequency_detail", "");
+                      }
+                    }}
+                    aria-pressed={isActive}
+                    style={chipStyle(isActive)}
+                  >
+                    {t(`frequency_${frequency.replaceAll("-", "_")}`)}
+                  </button>
+                );
+              })}
+            </div>
+            {showFrequencyDetail && (
+              <input
+                id="frequency-detail"
+                placeholder={t("frequency_detail_placeholder")}
+                style={{ ...inputStyle, marginTop: "0.75rem" }}
+                className="focus:border-[var(--pp-accent)] transition-colors"
+                {...doseForm.register("frequency_detail")}
+              />
+            )}
+          </div>
+
+          <div style={formGroupStyle}>
+            <label style={labelStyle}>{t("route")}</label>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "0.5rem",
+              }}
+            >
+              {ROUTES.map((route) => {
+                const isActive = selectedRoute === route;
+                return (
+                  <button
+                    key={route}
+                    type="button"
+                    onClick={() => doseForm.setValue("route", route)}
+                    aria-pressed={isActive}
+                    style={chipStyle(isActive)}
+                  >
+                    {t(`route_${route.replaceAll("-", "_")}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {showInjectionSite && (
+            <div style={formGroupStyle}>
+              <label style={labelStyle}>{t("injection_site")}</label>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gap: "0.5rem",
+                }}
+              >
+                {SITES.map((s) => {
+                  const isActive = selectedSite === s;
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => doseForm.setValue("injection_site", s)}
+                      aria-pressed={isActive}
+                      style={chipStyle(isActive)}
+                    >
+                      {t(`site_${s}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div style={formGroupStyle}>
             <label htmlFor="taken-at" style={labelStyle}>
               {t("when")}
             </label>
@@ -344,32 +506,6 @@ export default function LogDosePage() {
               >
                 {t("now")}
               </button>
-            </div>
-          </div>
-
-          <div style={formGroupStyle}>
-            <label style={labelStyle}>{t("injection_site")}</label>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "0.5rem",
-              }}
-            >
-              {SITES.map((s) => {
-                const isActive = selectedSite === s;
-                return (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => doseForm.setValue("injection_site", s)}
-                    aria-pressed={isActive}
-                    style={chipStyle(isActive)}
-                  >
-                    {t(`site_${s}`)}
-                  </button>
-                );
-              })}
             </div>
           </div>
 

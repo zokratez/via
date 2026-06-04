@@ -27,13 +27,23 @@ const DEFAULT_FREQS = [
   "cyclic",
   "custom",
 ] as const;
+const ROUTES = [
+  "subcutaneous",
+  "intramuscular",
+  "topical",
+  "nasal",
+  "oral",
+  "other",
+] as const;
 
 const doseSchema = z.object({
   medication_id: z.string().uuid().optional(),
   peptide_name: z.string().trim().min(1).max(100),
   dose_amount: z.coerce.number().positive().max(100000),
   dose_unit: z.enum(DOSE_UNITS),
-  default_freq: z.enum(DEFAULT_FREQS).optional(),
+  frequency: z.enum(DEFAULT_FREQS).optional(),
+  frequency_detail: z.string().trim().max(200).optional(),
+  route: z.enum(ROUTES).optional(),
   taken_at: z.string().min(1),
   injection_site: z.enum(SITES).optional(),
   notes: z.string().trim().max(2000).optional(),
@@ -58,7 +68,10 @@ export async function logDoseAction(formData: FormData) {
     peptide_name: formData.get("peptide_name"),
     dose_amount: formData.get("dose_amount"),
     dose_unit: formData.get("dose_unit"),
-    default_freq: formData.get("default_freq") ?? undefined,
+    frequency:
+      formData.get("frequency") ?? formData.get("default_freq") ?? undefined,
+    frequency_detail: formData.get("frequency_detail") ?? undefined,
+    route: formData.get("route") ?? undefined,
     taken_at: formData.get("taken_at"),
     injection_site: formData.get("injection_site") ?? undefined,
     notes: formData.get("notes") ?? undefined,
@@ -85,8 +98,10 @@ export async function logDoseAction(formData: FormData) {
   const peptideName = parsed.data.peptide_name.trim();
   const knownPeptide = findKnownPeptide(peptideName);
   const defaultFreq =
-    parsed.data.default_freq ?? knownPeptide?.defaultFreq ?? "custom";
+    parsed.data.frequency ?? knownPeptide?.defaultFreq ?? "custom";
   const storedDoseMg = toStoredMg(parsed.data.dose_amount, parsed.data.dose_unit);
+  const route = parsed.data.route ?? "subcutaneous";
+  const isInjectionRoute = route === "subcutaneous" || route === "intramuscular";
   if (storedDoseMg <= 0 || storedDoseMg > 100) {
     return { error: "validation_failed" as const };
   }
@@ -126,7 +141,13 @@ export async function logDoseAction(formData: FormData) {
     peptide_name: peptideName,
     taken_at: takenAt.toISOString(),
     dose_mg: storedDoseMg,
-    injection_site: parsed.data.injection_site ?? null,
+    frequency: defaultFreq,
+    frequency_detail:
+      parsed.data.frequency_detail && parsed.data.frequency_detail.length > 0
+        ? parsed.data.frequency_detail
+        : null,
+    route,
+    injection_site: isInjectionRoute ? (parsed.data.injection_site ?? null) : null,
     notes,
   });
 
