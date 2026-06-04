@@ -600,11 +600,12 @@ export default async function DashboardPage({
     {
       metric: "steps",
       icon: "walk",
-      value: t("stat_empty"),
+      value: t("metric_coming_soon"),
       label: t("metric_steps"),
-      sublabel: t("metric_healthkit_later"),
+      sublabel: t("metric_iphone_app"),
       badge: undefined,
       href: undefined,
+      comingSoon: true,
     },
     {
       metric: "calories",
@@ -614,7 +615,7 @@ export default async function DashboardPage({
           ? `${Math.round(foodTodayTotals.calories)} kcal`
           : t("stat_empty"),
       label: t("metric_calories"),
-      sublabel: foodMetricSubLabel,
+      sublabel: t("metric_calories_consumed_today"),
       badge: foodToday.length > 0 ? t("metric_badge_today") : undefined,
       href: "/food",
     },
@@ -1293,6 +1294,7 @@ export default async function DashboardPage({
               sublabel={tile.sublabel}
               badge={tile.badge}
               href={tile.href}
+              comingSoon={"comingSoon" in tile ? tile.comingSoon : undefined}
             />
           ))}
         </div>

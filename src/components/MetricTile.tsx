@@ -16,6 +16,7 @@ export type MetricTileProps = {
   sublabel?: string;
   badge?: string;
   href?: string;
+  comingSoon?: boolean;
 };
 
 function splitValue(value: string) {
@@ -76,6 +77,7 @@ export function MetricTile({
   sublabel,
   badge,
   href,
+  comingSoon = false,
 }: MetricTileProps) {
   const { main, suffix } = splitValue(value);
   const content = (
@@ -95,7 +97,7 @@ export function MetricTile({
     </span>
   );
 
-  if (href) {
+  if (href && !comingSoon) {
     return (
       <Link href={href} className="pp-metric-tile" data-metric={metric}>
         {content}
@@ -104,7 +106,11 @@ export function MetricTile({
   }
 
   return (
-    <div className="pp-metric-tile" data-metric={metric}>
+    <div
+      className="pp-metric-tile"
+      data-metric={metric}
+      data-coming-soon={comingSoon ? "true" : undefined}
+    >
       {content}
     </div>
   );

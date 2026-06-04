@@ -347,6 +347,22 @@
   --pp-metric-copy: var(--pp-metric-symptom-text);
 }
 
+.pp-metric-tile[data-coming-soon="true"] {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.pp-metric-tile[data-coming-soon="true"] .pp-metric-tile-value {
+  color: var(--pp-metric-copy);
+  font-family: var(--pp-font-sans);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
 .pp-metric-tile:hover,
 .pp-metric-tile:focus-visible {
   box-shadow:
@@ -355,6 +371,16 @@
     0 0 0 0.5px rgba(255, 255, 255, 0.12),
     0 6px 16px rgba(0, 0, 0, 0.58);
   transform: translateY(-1px);
+}
+
+.pp-metric-tile[data-coming-soon="true"]:hover,
+.pp-metric-tile[data-coming-soon="true"]:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 0.5px rgba(255, 255, 255, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  transform: none;
 }
 
 .pp-metric-tile:focus-visible {
