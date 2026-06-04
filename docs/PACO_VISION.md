@@ -132,37 +132,33 @@ shows fake or placeholder numbers destroys trust. This rule governs
 which metric tiles appear on web vs native.
 
 WEB (PWA at pacopeptide.com) — can only track what the user logs:
-  - Food (calories CONSUMED, macros) — from manual + photo + barcode entry
-  - Weight — from manual entry or future Bluetooth scale
-  - Doses — from manual log
-  - Sleep — from manual log
-  - Symptoms — from manual log
-  - Water — from manual log
-  A web app running in Safari CANNOT read the iPhone pedometer, heart 
-  rate, or any HealthKit data. This is an Apple privacy boundary, not a 
-  bug. Do not build a steps tile, a calories-burned tile, an HRV tile, 
-  or any sensor-derived metric on web. They would have to show fake or 
-  manually-entered data.
+  - Food (calories CONSUMED, macros) — manual + photo + barcode entry
+  - Weight — manual entry or future Bluetooth scale
+  - Doses, Sleep, Symptoms, Water — manual log
+  A web app in Safari CANNOT read the iPhone pedometer, heart rate, or 
+  any HealthKit data. This is an Apple privacy boundary, not a bug. Do 
+  not build a steps tile, calories-burned tile, HRV tile, or any 
+  sensor-derived metric on web. They would only show fake data.
 
 NATIVE iOS (paco-mobile) — adds everything HealthKit provides:
-  - Steps (real, from HKQuantityType.stepCount)
-  - Calories BURNED (real, from .activeEnergyBurned + .basalEnergyBurned, 
-    computed by Apple from heart rate + weight + motion — NOT a crude 
+  - Steps (real, HKQuantityType.stepCount)
+  - Calories BURNED (real, .activeEnergyBurned + .basalEnergyBurned, 
+    computed by Apple from heart rate + weight + motion, NOT a crude 
     step multiplier)
-  - Heart rate, HRV, sleep stages, walk auto-detection, etc.
-  Only on native can PACO show the full "calories in vs calories out" 
+  - Heart rate, HRV, sleep stages, walk auto-detection
+  Only on native can PACO show the full calories-in vs calories-out 
   daily picture.
 
 TILE RULES:
   - The "calorías" metric on web is calories CONSUMED (from food), and 
     must be labeled so users never mistake it for calories burned.
-  - Steps and calories-burned tiles are NATIVE-ONLY. On web, either omit 
-    them entirely, or show a "próximamente con la app / coming soon with 
-    the app" placeholder that is clearly NOT a real number.
+  - Steps and calories-burned tiles are NATIVE-ONLY. On web, show a 
+    "próximamente con la app / coming soon with the app" placeholder 
+    that is clearly NOT a real number.
   - Never display a sensor-derived metric on web with placeholder data 
     styled to look real.
 
-This rule is a direct application of the product principle: PACO can only 
+This is a direct application of the product principle: PACO can only 
 observe what it can actually measure.
 
 ## Information Architecture
