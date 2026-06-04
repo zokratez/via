@@ -78,6 +78,23 @@ ALWAYS, regardless of tier:
 
 Sam confirmed this protocol June 4, 2026. Graduate toward fewer stops as the loop proves reliable; do NOT commit directly to main without showing pre-flight on risk-gate changes.
 
+## Premium Polish Backlog — apply when Today/web is near-final, before native
+
+Source: "5 invisible details that make an app feel premium." These are the "feels right" decisions to apply once core function is done. NOT to be done mid-launch. Web-fixable items first; native-only items deferred to the iOS build.
+
+WEB-FIXABLE (do as a polish pass before declaring web done):
+
+1. Keyboard behavior on loggers (dose/weight/water/sleep/symptom forms): verify the input is never covered by the keyboard, the save button stays visible, scroll accounts for keyboard height, dismiss feels intentional. This is the "separates serious devs" item — highest-value web polish. UNVERIFIED as of launch — must QA each logger form on a real phone.
+2. Loading states on Today + loggers: replace any spinner/blank with skeleton-shimmer that outlines the content shape. Empty states already good ("Toca para registrar", recede, "próximamente") — keep those.
+3. Press states: web tiles have hover/active lift+scale (decent). Verify the ~100ms physical press response feels right on tap, not just hover.
+
+NATIVE-ONLY (defer to iOS app build — impossible on web):
+
+4. Haptics: success on log-save, soft tick on toggle, confirm on dose-save. Rule: haptics confirm state changes/decisions ONLY — never nav/scroll/idle. (expo-haptics or react-native-pulsar when native.)
+5. True spring press physics: iOS 26 Liquid Glass gives this free natively; Android/older needs a press-animation lib. Native gets this automatically.
+
+Principle from the source: premium = stacking ~20 invisible decisions, not flashy animation. Subtle only — animate ONLY when motion answers a question the user just asked (150–300ms). PACO already avoids over-animation; keep it.
+
 ## Current Feature Map
 
 - Dashboard: command center with dose, sleep, food, progress, symptoms, coach, weekly rhythm signals.
