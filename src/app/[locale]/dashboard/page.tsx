@@ -10,6 +10,7 @@ import { type SymptomEntry } from "@/components/SymptomChart";
 import { type SleepEntry } from "@/components/SleepChart";
 import { type CoachThread } from "@/components/CoachHistory";
 import { DashboardTabs, type TabKey } from "@/components/DashboardTabs";
+import { DoseStrip, type DoseStripDose } from "@/components/DoseStrip";
 import {
   AlertBanner,
   type MedicationWithLastDose,
@@ -234,9 +235,7 @@ export default async function DashboardPage({
         ? t("greeting_afternoon", { name })
         : t("greeting_evening", { name });
 
-  const lastDose = lastDoseRes.data as
-    | { taken_at: string; injection_site: string | null; peptide_name: string | null }
-    | null;
+  const lastDose = lastDoseRes.data as DoseStripDose;
   let lastDoseStr: string;
   let lastDoseSubStr: string | null = null;
   if (!lastDose) {
@@ -258,12 +257,6 @@ export default async function DashboardPage({
       lastDoseSubStr = tDose(SITE_KEYS[lastDose.injection_site]);
     }
   }
-  const lastDoseName = lastDose?.peptide_name ?? t("dose_strip_unknown");
-  const doseStripDetail = lastDose
-    ? lastDoseSubStr
-      ? `${lastDoseName} · ${lastDoseSubStr}`
-      : lastDoseName
-    : t("dose_strip_empty_detail");
 
   type WeightRow = {
     measured_at: string;
@@ -926,27 +919,7 @@ export default async function DashboardPage({
           </div>
 
           <div className="pp-today-glass-stack">
-            <Link
-              href="/dashboard?tab=doses#dashboard-tabs"
-              className="pp-dose-strip pp-glass-edge-content"
-              aria-label={t("dose_strip_title")}
-            >
-              <span className="pp-dose-strip-mark" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M7 8h7a4 4 0 1 1 0 8H8a5 5 0 0 1-1-8ZM15 8l3-3M18 5l1 3" />
-                </svg>
-              </span>
-              <span className="pp-dose-strip-copy">
-                <span className="pp-dose-strip-eyebrow">
-                  {t("dose_strip_eyebrow")}
-                </span>
-                <span className="pp-dose-strip-value">{lastDoseStr}</span>
-                <span className="pp-dose-strip-detail">{doseStripDetail}</span>
-              </span>
-              <span className="pp-dose-strip-action">
-                {t("dose_strip_action")}
-              </span>
-            </Link>
+            <DoseStrip lastDose={lastDose} t={t} tDose={tDose} />
 
             <Link
               href="/coach"
