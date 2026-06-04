@@ -49,6 +49,35 @@ PACO Peptide should feel like a private, Spanish-first command center for peptid
 - Migration files committed to the repo are NOT auto-applied to production. Either apply via Supabase MCP or hand Sam the SQL to paste into the dashboard SQL Editor.
 - "Build passed" != "feature works." Verify the affected user flow in production before declaring shipped.
 
+## Commit Protocol (two-tier)
+
+Default to BUILD-AND-COMMIT in one shot, QA after. Pre-flight-and-confirm ONLY when a change hits a RISK GATE.
+
+RISK GATES (require pre-flight -> Sam confirms -> then build):
+
+- Schema changes / migrations (anything touching the database structure)
+- Shared components used by multiple routes (e.g. MobileBottomNav, layout)
+- Live routes real users hit (/dashboard, /coach, /food, /log/*, etc.)
+- Anything irreversible or hard to revert
+- Anything that could change behavior for paying users
+
+SAFE (build, commit, push, then Sam QAs - NO pre-flight stop):
+
+- New isolated files/components nothing else imports yet
+- Contained changes on flag-hidden routes (e.g. /today while flagged)
+- Copy/i18n edits, styling on non-shared elements
+- Single-file changes with no shared blast radius
+
+ALWAYS, regardless of tier:
+
+- Report git tip before building
+- Surgical scope, one logical change per commit
+- Read full files before editing, read diff before commit
+- Report any new i18n keys (ES+EN)
+- If a "safe" task turns out to touch a risk gate mid-build -> STOP and report
+
+Sam confirmed this protocol June 4, 2026. Graduate toward fewer stops as the loop proves reliable; do NOT commit directly to main without showing pre-flight on risk-gate changes.
+
 ## Current Feature Map
 
 - Dashboard: command center with dose, sleep, food, progress, symptoms, coach, weekly rhythm signals.
