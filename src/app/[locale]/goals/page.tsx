@@ -88,6 +88,7 @@ export default async function GoalsPage({
     sex: normalizeSex(profile?.sex),
     age,
     heightCm: numericValue(profile?.height_cm),
+    goalWeightKg: numericValue(profile?.goal_weight_kg),
     weightKg:
       numericValue(latestWeight?.weight_kg) ??
       numericValue(profile?.goal_weight_kg),
