@@ -95,6 +95,33 @@ NATIVE-ONLY (defer to iOS app build — impossible on web):
 
 Principle from the source: premium = stacking ~20 invisible decisions, not flashy animation. Subtle only — animate ONLY when motion answers a question the user just asked (150–300ms). PACO already avoids over-animation; keep it.
 
+## 2026-06-04 — Today screen SHIPPED GLOBALLY
+
+STATUS: Today is live for all authenticated users at pacopeptide.com.
+
+Launch mechanism:
+
+- app_flags table (key text PK, enabled bool, updated_at). RLS on, service-role only, no public policies. Migration 0019_app_flags.sql.
+- isTodayEnabled(userId): checks app_flags.today_global_enabled first → if true, ALL authed users get Today. Else falls back to today_users allowlist.
+- Current state: today_global_enabled = true (flipped 2026-06-05 00:25 UTC). LIVE.
+- Redirect (commit c2d7040): dashboard/page.tsx checks isTodayEnabled after auth+subscription, before heavy queries. Bare /dashboard → /today when enabled. /dashboard?tab= and ?ok= stay on old dashboard (deep-link + post-log guard preserved).
+- PANIC SWITCH: update public.app_flags set enabled = false where key = 'today_global_enabled';  (reverts everyone to old dashboard in ~10s, no redeploy.)
+
+Launch bug caught + fixed pre-global: flag alone made /today accessible but login was hardcoded to /dashboard (sign-in:168, sign-up:191, OAuth next, callback fallback). /today checked flag and bounced back to /dashboard; /dashboard never checked flag. Fix = guarded redirect at top of /dashboard. Verified on Sam's account via allowlist (real incognito login landed on /today) BEFORE flipping global flag.
+
+Today screen contents (commits 1–6b this session, all on main):
+
+- /[locale]/today route, flag-gated.
+- Bukowski verdict card (templated, zero LLM — live-LLM deferred behind revenue, drops into same slot later).
+- DoseStrip (extracted reusable, commit 3a), 6 metric tiles, empty-state hierarchy (loggable empties → "Toca para registrar"/"Tap to log"; "—" recedes; coming-soon full hue).
+- TodayBottomNav: Today/Log/Bukowski.
+- LogSheet: 8 verbs, 6 live (dosis/comida/peso/sueño/síntoma/progreso), agua live via water logger, nota disabled.
+- Water logger: /log/water + water_entries table (commit ac90456). Live on /today and /dashboard.
+- Tap-to-log routing (camera principle): sleep→/log/sleep, weight→/log/weight, water→/log/water. Steps non-tappable.
+- "+ registrar"/"+ log" tap cue on filled tappable tiles only (commit 29256be). i18n dashboard.metric_tap_cue ES+EN.
+
+NEXT: SAM-46 food command center (engagement surface — the money work). Fresh thread.
+
 ## Current Feature Map
 
 - Dashboard: command center with dose, sleep, food, progress, symptoms, coach, weekly rhythm signals.
