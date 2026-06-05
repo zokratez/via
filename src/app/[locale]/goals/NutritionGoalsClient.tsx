@@ -3,11 +3,14 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
+  cardStyle,
   errorMessageStyle,
   formGroupStyle,
+  inputStyle,
   labelStyle,
   saveBtnStyle,
   secondaryBtnStyle,
+  selectStyle,
 } from "@/lib/log-form-styles";
 import { saveNutritionGoalsAction } from "./actions";
 
@@ -296,9 +299,7 @@ export function NutritionGoalsClient({
   };
 
   const panelStyle: React.CSSProperties = {
-    background: "var(--pp-surface)",
-    border: "0.5px solid var(--pp-border)",
-    borderRadius: "16px",
+    ...cardStyle,
     padding: "1rem",
   };
 
@@ -318,28 +319,6 @@ export function NutritionGoalsClient({
     lineHeight: 1,
     color: "var(--pp-accent)",
     margin: "0.4rem 0 0",
-  };
-
-  const goalFieldStyle: React.CSSProperties = {
-    fontFamily: "var(--pp-font-serif)",
-    fontSize: "17px",
-    color: "var(--pp-text)",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)), var(--pp-surface)",
-    border: "1px solid color-mix(in srgb, var(--pp-accent) 34%, var(--pp-border))",
-    borderRadius: "14px",
-    padding: "14px 16px",
-    outline: "none",
-    width: "100%",
-    boxSizing: "border-box",
-    boxShadow:
-      "inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 0.5px rgba(201,150,107,0.10), 0 8px 22px rgba(0,0,0,0.18)",
-  };
-
-  const goalSelectStyle: React.CSSProperties = {
-    ...goalFieldStyle,
-    colorScheme: "dark",
-    cursor: "pointer",
   };
 
   return (
@@ -368,7 +347,7 @@ export function NutritionGoalsClient({
             required
             value={sex}
             onChange={(event) => setSex(event.target.value as Sex | "")}
-            style={goalSelectStyle}
+            style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           >
             <option value="">{t("choose")}</option>
@@ -391,7 +370,7 @@ export function NutritionGoalsClient({
             inputMode="numeric"
             value={age}
             onChange={(event) => setAge(event.target.value)}
-            style={goalFieldStyle}
+            style={inputStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           />
         </div>
@@ -410,7 +389,7 @@ export function NutritionGoalsClient({
             inputMode="decimal"
             value={heightCm}
             onChange={(event) => setHeightCm(event.target.value)}
-            style={goalFieldStyle}
+            style={inputStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           />
         </div>
@@ -429,7 +408,7 @@ export function NutritionGoalsClient({
             inputMode="decimal"
             value={weightKg}
             onChange={(event) => setWeightKg(event.target.value)}
-            style={goalFieldStyle}
+            style={inputStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           />
         </div>
@@ -444,7 +423,7 @@ export function NutritionGoalsClient({
             onChange={(event) =>
               setActivityLevel(event.target.value as ActivityLevel)
             }
-            style={goalSelectStyle}
+            style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           >
             <option value="sedentary">{t("activity_sedentary")}</option>
@@ -463,7 +442,7 @@ export function NutritionGoalsClient({
             id="goal-type"
             value={goalType}
             onChange={(event) => setGoalType(event.target.value as GoalType)}
-            style={goalSelectStyle}
+            style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
           >
             <option value="lose">{t("goal_lose")}</option>
@@ -560,7 +539,7 @@ export function NutritionGoalsClient({
               inputMode="numeric"
               value={dailyCalories}
               onChange={(event) => markCalorieEdited(event.target.value)}
-              style={goalFieldStyle}
+              style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
           </div>
@@ -577,7 +556,7 @@ export function NutritionGoalsClient({
               inputMode="numeric"
               value={proteinG}
               onChange={(event) => markMacroEdited(setProteinG, event.target.value)}
-              style={goalFieldStyle}
+              style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
           </div>
@@ -594,7 +573,7 @@ export function NutritionGoalsClient({
               inputMode="numeric"
               value={carbsG}
               onChange={(event) => markMacroEdited(setCarbsG, event.target.value)}
-              style={goalFieldStyle}
+              style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
           </div>
@@ -611,7 +590,7 @@ export function NutritionGoalsClient({
               inputMode="numeric"
               value={fatG}
               onChange={(event) => markMacroEdited(setFatG, event.target.value)}
-              style={goalFieldStyle}
+              style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
           </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { inputStyle } from "@/lib/log-form-styles";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SERIF = "var(--pp-font-serif)";
@@ -110,16 +111,9 @@ export function NewsletterSignup({ locale }: { locale: Locale }) {
             aria-label={t("newsletter_email_placeholder")}
             disabled={status === "submitting"}
             style={{
+              ...inputStyle,
               flex: "1 1 240px",
               minWidth: 0,
-              fontFamily: SERIF,
-              fontSize: "16px",
-              color: "var(--pp-text)",
-              background: "transparent",
-              border: "0.5px solid var(--pp-border)",
-              borderRadius: "4px",
-              padding: "12px 14px",
-              outline: "none",
             }}
           />
           <button

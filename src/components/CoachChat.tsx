@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { inputStyle } from "@/lib/log-form-styles";
 
 const CHARS_PER_FRAME = 30;
 const JSPDF_CDN =
@@ -694,13 +695,9 @@ export function CoachChat({
                 aria-label={t("input_placeholder")}
                 className="flex-1 min-w-0 outline-none placeholder:italic placeholder:text-[var(--pp-text-secondary)] focus:border-[var(--pp-accent)] transition-colors"
                 style={{
+                  ...inputStyle,
                   fontFamily: "var(--pp-font-serif)",
                   fontSize: "18px",
-                  color: "var(--pp-text)",
-                  backgroundColor: "var(--pp-surface)",
-                  border: "0.5px solid var(--pp-border)",
-                  borderRadius: "6px",
-                  padding: "14px 16px",
                 }}
               />
               {isStreaming ? (

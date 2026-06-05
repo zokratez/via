@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  cardStyle,
+  chipStyle as sharedChipStyle,
+  inputStyle as sharedInputStyle,
+  labelStyle as sharedLabelStyle,
+} from "@/lib/log-form-styles";
 
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";
@@ -33,12 +39,7 @@ function parsePositive(s: string): number {
 const sectionStyle: React.CSSProperties = { marginBottom: "2rem" };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: SANS,
-  fontSize: "11px",
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: "var(--pp-text-secondary)",
-  fontWeight: 500,
+  ...sharedLabelStyle,
 };
 
 const questionStyle: React.CSSProperties = {
@@ -58,48 +59,25 @@ const chipRow: React.CSSProperties = {
 
 function chipStyle(active: boolean): React.CSSProperties {
   return {
-    fontFamily: SANS,
-    fontSize: "12px",
-    letterSpacing: "0.12em",
-    padding: "10px 14px",
-    borderRadius: "4px",
-    border: `0.5px solid ${active ? "var(--pp-accent)" : "var(--pp-border)"}`,
-    background: active ? "var(--pp-accent)" : "transparent",
-    color: active ? "var(--pp-bg)" : "var(--pp-text-secondary)",
-    cursor: "pointer",
-    fontWeight: active ? 600 : 500,
+    ...sharedChipStyle(active),
     textTransform: "lowercase",
-    minHeight: "40px",
   };
 }
 
 const customInputStyle: React.CSSProperties = {
-  fontFamily: SERIF,
-  fontSize: "16px",
-  color: "var(--pp-text)",
-  background: "var(--pp-surface)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "4px",
-  padding: "10px 12px",
+  ...sharedInputStyle,
   marginTop: "0.5rem",
   width: "120px",
-  outline: "none",
 };
 
 const resultBlockStyle: React.CSSProperties = {
-  background: "var(--pp-surface)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "6px",
+  ...cardStyle,
   padding: "1.5rem",
 };
 
 const resultLabelStyle: React.CSSProperties = {
-  fontFamily: SANS,
+  ...sharedLabelStyle,
   fontSize: "10px",
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: "var(--pp-text-secondary)",
-  fontWeight: 500,
   marginBottom: "0.25rem",
 };
 
@@ -113,13 +91,11 @@ const resultValueStyle: React.CSSProperties = {
 };
 
 const exampleBtnStyle: React.CSSProperties = {
+  ...cardStyle,
   fontFamily: SERIF,
   fontStyle: "italic",
   fontSize: "15px",
   color: "var(--pp-text)",
-  background: "var(--pp-surface)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "6px",
   padding: "1rem 1.25rem",
   textAlign: "left",
   cursor: "pointer",

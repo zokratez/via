@@ -10,6 +10,13 @@
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";
 
+export const cardStyle: React.CSSProperties = {
+  background: "var(--pp-surface)",
+  border: "1px solid var(--pp-border)",
+  borderRadius: "16px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+};
+
 export const formGroupStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
