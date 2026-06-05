@@ -94,10 +94,10 @@
   --pp-border: #5f5045;
   --pp-border-strong: #776354;
   --pp-text: #f4ede0;
-  --pp-text-secondary: #b8a694;
-  --pp-text-tertiary: #8f7e70;
-  --pp-label: #b8a694;
-  --pp-helper: #8f7e70;
+  --pp-text-secondary: #c2b1a0;
+  --pp-text-tertiary: #9f8e80;
+  --pp-label: #c2b1a0;
+  --pp-helper: #9f8e80;
   --pp-accent: #c9966b;
   --pp-input-bg: #2c241f;
   --pp-input-border: #776354;
@@ -1139,7 +1139,7 @@ select option[value=""] {
   border: 0;
   border-radius: 18px;
   background: transparent;
-  color: rgba(244, 237, 224, 0.62);
+  color: rgba(244, 237, 224, 0.72);
   display: flex;
   flex-direction: column;
   align-items: center;
