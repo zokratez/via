@@ -149,6 +149,7 @@ export function NutritionGoalsClient({
   const tErrors = useTranslations("errors");
   const locale = useLocale();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showSaved, setShowSaved] = useState(saved);
   const [isSaving, startSave] = useTransition();
 
   const hasSavedCalories = initial.dailyCalories !== null;
@@ -201,6 +202,13 @@ export function NutritionGoalsClient({
     });
   }, [activeCalorieTarget, computed, initial.goalWeightKg]);
 
+  const canSaveTargets =
+    Boolean(computed) ||
+    parseOptionalTarget(dailyCalories) !== null ||
+    parseOptionalTarget(proteinG) !== null ||
+    parseOptionalTarget(carbsG) !== null ||
+    parseOptionalTarget(fatG) !== null;
+
   useEffect(() => {
     if (!computedMacros || macrosTouched) return;
     setProteinG(String(computedMacros.protein));
@@ -236,16 +244,30 @@ export function NutritionGoalsClient({
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMsg(null);
-    if (!computed || !sex) {
+    setShowSaved(false);
+
+    const parsedCalories = parseOptionalTarget(dailyCalories);
+    const parsedProtein = parseOptionalTarget(proteinG);
+    const parsedCarbs = parseOptionalTarget(carbsG);
+    const parsedFat = parseOptionalTarget(fatG);
+    const hasAnyTarget =
+      parsedCalories !== null ||
+      parsedProtein !== null ||
+      parsedCarbs !== null ||
+      parsedFat !== null;
+
+    if (!computed && !hasAnyTarget) {
       setErrorMsg(t("validation_failed"));
       return;
     }
 
     const source: NutritionSource =
-      parseOptionalTarget(dailyCalories) === computed.calories &&
-      parseOptionalTarget(proteinG) === computedMacros?.protein &&
-      parseOptionalTarget(carbsG) === computedMacros?.carbs &&
-      parseOptionalTarget(fatG) === computedMacros?.fat
+      computed &&
+      computedMacros &&
+      parsedCalories === computed.calories &&
+      parsedProtein === computedMacros.protein &&
+      parsedCarbs === computedMacros.carbs &&
+      parsedFat === computedMacros.fat
         ? "computed"
         : "manual";
 
@@ -263,7 +285,9 @@ export function NutritionGoalsClient({
       if (result?.error) {
         console.error("Nutrition goals save failed", result.error);
         setErrorMsg(tErrors("generic"));
+        return;
       }
+      setShowSaved(true);
     });
   }
 
@@ -300,7 +324,7 @@ export function NutritionGoalsClient({
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      {saved && (
+      {showSaved && (
         <p
           role="status"
           style={{
@@ -576,7 +600,7 @@ export function NutritionGoalsClient({
 
       <button
         type="submit"
-        disabled={isSaving || !computed}
+        disabled={isSaving || !canSaveTargets}
         style={{ ...saveBtnStyle, marginTop: "1rem" }}
         className="disabled:opacity-45"
       >

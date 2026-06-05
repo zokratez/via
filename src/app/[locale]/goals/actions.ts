@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const LOCALES = ["es", "en"] as const;
@@ -64,5 +63,5 @@ export async function saveNutritionGoalsAction(formData: FormData) {
     return { error: "db_failed" as const };
   }
 
-  redirect({ href: "/goals?saved=1", locale: parsed.data.locale });
+  return { ok: true as const };
 }
