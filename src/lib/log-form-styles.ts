@@ -22,7 +22,7 @@ export const labelStyle: React.CSSProperties = {
   fontSize: "11px",
   letterSpacing: "0.22em",
   textTransform: "uppercase",
-  color: "var(--pp-text-secondary)",
+  color: "var(--pp-label)",
   fontWeight: 500,
 };
 
@@ -31,7 +31,7 @@ export const labelHintStyle: React.CSSProperties = {
   fontSize: "10px",
   letterSpacing: "0.18em",
   textTransform: "uppercase",
-  color: "var(--pp-text-tertiary)",
+  color: "var(--pp-helper)",
   fontWeight: 400,
   marginLeft: "0.5rem",
 };
@@ -40,13 +40,16 @@ export const inputStyle: React.CSSProperties = {
   fontFamily: SERIF,
   fontSize: "16px",
   color: "var(--pp-text)",
-  background: "var(--pp-surface)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "6px",
-  padding: "12px 14px",
+  background:
+    "linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)), var(--pp-input-bg)",
+  border: "1px solid var(--pp-input-border)",
+  borderRadius: "14px",
+  padding: "14px 16px",
   outline: "none",
   width: "100%",
   boxSizing: "border-box",
+  boxShadow:
+    "inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 0.5px rgba(201,150,107,0.10), 0 8px 22px rgba(0,0,0,0.18)",
 };
 
 export const textareaStyle: React.CSSProperties = {
@@ -84,11 +87,11 @@ export const secondaryBtnStyle: React.CSSProperties = {
   letterSpacing: "0.22em",
   textTransform: "uppercase",
   fontWeight: 500,
-  background: "transparent",
-  color: "var(--pp-text-secondary)",
-  border: "0.5px solid var(--pp-border)",
-  padding: "10px 14px",
-  borderRadius: "6px",
+  background: "var(--pp-secondary-button-bg)",
+  color: "var(--pp-label)",
+  border: "1px solid var(--pp-secondary-button-border)",
+  padding: "11px 15px",
+  borderRadius: "12px",
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
@@ -99,10 +102,10 @@ export function chipStyle(active: boolean): React.CSSProperties {
     fontSize: "12px",
     letterSpacing: "0.12em",
     padding: "12px 14px",
-    borderRadius: "6px",
-    border: `0.5px solid ${active ? "var(--pp-accent)" : "var(--pp-border)"}`,
+    borderRadius: "12px",
+    border: `1px solid ${active ? "var(--pp-accent)" : "var(--pp-border-strong)"}`,
     background: active ? "var(--pp-accent)" : "transparent",
-    color: active ? "var(--pp-bg)" : "var(--pp-text-secondary)",
+    color: active ? "var(--pp-bg)" : "var(--pp-label)",
     cursor: "pointer",
     fontWeight: active ? 600 : 500,
     textAlign: "center",
@@ -113,8 +116,8 @@ export function chipStyle(active: boolean): React.CSSProperties {
 export function emojiChipStyle(active: boolean): React.CSSProperties {
   return {
     background: active ? "var(--pp-surface)" : "transparent",
-    border: `0.5px solid ${active ? "var(--pp-accent)" : "var(--pp-border)"}`,
-    borderRadius: "6px",
+    border: `1px solid ${active ? "var(--pp-accent)" : "var(--pp-border-strong)"}`,
+    borderRadius: "12px",
     padding: "12px 0",
     fontSize: "26px",
     cursor: "pointer",

@@ -89,13 +89,21 @@
    marketing, and legal pages keep their existing styling. */
 :root {
   --pp-bg: #1a1614;
-  --pp-surface: #221c19;
-  --pp-border: #3d342e;
+  --pp-surface: #2a231f;
+  --pp-surface-raised: #2c241f;
+  --pp-border: #5f5045;
+  --pp-border-strong: #776354;
   --pp-text: #f4ede0;
-  --pp-text-secondary: #a89788;
-  --pp-text-tertiary: #6b5d52;
+  --pp-text-secondary: #b8a694;
+  --pp-text-tertiary: #8f7e70;
+  --pp-label: #b8a694;
+  --pp-helper: #8f7e70;
   --pp-accent: #c9966b;
-  --pp-user-bubble-bg: #2a2320;
+  --pp-input-bg: #2c241f;
+  --pp-input-border: #776354;
+  --pp-secondary-button-bg: #2a231f;
+  --pp-secondary-button-border: #776354;
+  --pp-user-bubble-bg: #332a25;
   --pp-user-bubble-text: #e8ddc8;
   --pp-font-serif: "Iowan Old Style", "Palatino Linotype", Palatino,
     "Hoefler Text", Georgia, serif;
