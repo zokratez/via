@@ -338,6 +338,7 @@ export function NutritionGoalsClient({
 
   const goalSelectStyle: React.CSSProperties = {
     ...goalFieldStyle,
+    colorScheme: "dark",
     cursor: "pointer",
   };
 

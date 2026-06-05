@@ -184,6 +184,20 @@
   text-decoration: underline;
 }
 
+select {
+  color-scheme: dark;
+}
+
+select option,
+select optgroup {
+  background-color: var(--pp-input-bg);
+  color: var(--pp-text);
+}
+
+select option[value=""] {
+  color: var(--pp-helper);
+}
+
 @keyframes pp-fade-up {
   from {
     opacity: 0;

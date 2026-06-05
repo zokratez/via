@@ -63,6 +63,7 @@ export const textareaStyle: React.CSSProperties = {
 
 export const selectStyle: React.CSSProperties = {
   ...inputStyle,
+  colorScheme: "dark",
   cursor: "pointer",
 };
 
