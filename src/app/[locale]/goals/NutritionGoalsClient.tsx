@@ -48,6 +48,11 @@ function parseNumber(value: string) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function parseOptionalTarget(value: string) {
+  if (value.trim() === "") return null;
+  return parseNumber(value);
+}
+
 function calculateTargets({
   sex,
   age,
@@ -175,10 +180,10 @@ export function NutritionGoalsClient({
     }
 
     const source: NutritionSource =
-      Number(dailyCalories) === computed.calories &&
-      Number(proteinG) === computed.protein &&
-      Number(carbsG) === computed.carbs &&
-      Number(fatG) === computed.fat
+      parseOptionalTarget(dailyCalories) === computed.calories &&
+      parseOptionalTarget(proteinG) === computed.protein &&
+      parseOptionalTarget(carbsG) === computed.carbs &&
+      parseOptionalTarget(fatG) === computed.fat
         ? "computed"
         : "manual";
 
@@ -192,8 +197,16 @@ export function NutritionGoalsClient({
     fd.set("locale", locale);
 
     startSave(async () => {
-      const result = await saveNutritionGoalsAction(fd);
-      if (result?.error) setErrorMsg(tErrors("generic"));
+      try {
+        const result = await saveNutritionGoalsAction(fd);
+        if (result?.error) {
+          console.error("Nutrition goals save failed", result.error);
+          setErrorMsg(tErrors("generic"));
+        }
+      } catch (error) {
+        console.error("Nutrition goals save threw", error);
+        setErrorMsg(tErrors("generic"));
+      }
     });
   }
 
@@ -440,7 +453,6 @@ export function NutritionGoalsClient({
             </label>
             <input
               id="target-calories"
-              required
               type="number"
               min="1"
               max="10000"
@@ -460,7 +472,6 @@ export function NutritionGoalsClient({
             </label>
             <input
               id="target-protein"
-              required
               type="number"
               min="1"
               max="1000"
@@ -478,7 +489,6 @@ export function NutritionGoalsClient({
             </label>
             <input
               id="target-carbs"
-              required
               type="number"
               min="0"
               max="1000"
@@ -496,7 +506,6 @@ export function NutritionGoalsClient({
             </label>
             <input
               id="target-fat"
-              required
               type="number"
               min="1"
               max="1000"

@@ -6,11 +6,20 @@ import { createClient } from "@/lib/supabase/server";
 
 const LOCALES = ["es", "en"] as const;
 
+const nullableInteger = (max: number, min = 1) =>
+  z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) return null;
+      return value;
+    },
+    z.coerce.number().int().min(min).max(max).nullable(),
+  );
+
 const goalsSchema = z.object({
-  daily_calorie_target: z.coerce.number().int().positive().max(10000),
-  protein_target_g: z.coerce.number().int().positive().max(1000),
-  carbs_target_g: z.coerce.number().int().min(0).max(1000),
-  fat_target_g: z.coerce.number().int().positive().max(1000),
+  daily_calorie_target: nullableInteger(10000),
+  protein_target_g: nullableInteger(1000),
+  carbs_target_g: nullableInteger(1000, 0),
+  fat_target_g: nullableInteger(1000),
   nutrition_goal_type: z.enum(["lose", "maintain", "gain"]),
   nutrition_targets_source: z.enum(["computed", "manual"]),
   locale: z.enum(LOCALES),
@@ -27,7 +36,10 @@ export async function saveNutritionGoalsAction(formData: FormData) {
     locale: formData.get("locale"),
   });
 
-  if (!parsed.success) return { error: "validation_failed" as const };
+  if (!parsed.success) {
+    console.error("Nutrition goals validation failed", parsed.error.flatten());
+    return { error: "validation_failed" as const };
+  }
 
   const supabase = await createClient();
   const {
@@ -47,7 +59,10 @@ export async function saveNutritionGoalsAction(formData: FormData) {
     })
     .eq("id", user.id);
 
-  if (error) return { error: "db_failed" as const };
+  if (error) {
+    console.error("Nutrition goals profile update failed", error);
+    return { error: "db_failed" as const };
+  }
 
   redirect({ href: "/goals?saved=1", locale: parsed.data.locale });
 }
