@@ -7,6 +7,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  cardStyle,
+  inputStyle,
+  labelStyle,
+  secondaryBtnStyle,
+} from "@/lib/log-form-styles";
 
 const SERIF = "var(--pp-font-serif)";
 const SANS = "var(--pp-font-sans)";
@@ -49,23 +55,6 @@ const primaryButtonStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
-const secondaryButtonStyle: React.CSSProperties = {
-  fontFamily: SANS,
-  fontSize: "13px",
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  fontWeight: 500,
-  background: "transparent",
-  color: "var(--pp-text)",
-  padding: "14px 24px",
-  borderRadius: "4px",
-  border: "0.5px solid var(--pp-border)",
-  width: "100%",
-  cursor: "pointer",
-  display: "block",
-  textAlign: "center",
-};
-
 const ghostLinkStyle: React.CSSProperties = {
   fontFamily: SERIF,
   fontStyle: "italic",
@@ -78,30 +67,6 @@ const ghostLinkStyle: React.CSSProperties = {
   textAlign: "center",
   display: "block",
   width: "100%",
-};
-
-const labelStyle: React.CSSProperties = {
-  fontFamily: SANS,
-  fontSize: "11px",
-  letterSpacing: "0.22em",
-  textTransform: "uppercase",
-  color: "var(--pp-text-secondary)",
-  fontWeight: 500,
-  display: "block",
-  marginBottom: "8px",
-};
-
-const inputStyle: React.CSSProperties = {
-  fontFamily: SANS,
-  fontSize: "15px",
-  background: "var(--pp-surface)",
-  color: "var(--pp-text)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "4px",
-  padding: "12px 14px",
-  width: "100%",
-  outline: "none",
-  boxSizing: "border-box",
 };
 
 const errorStyle: React.CSSProperties = {
@@ -123,9 +88,7 @@ const bottomLinkStyle: React.CSSProperties = {
 };
 
 const planCardStyle: React.CSSProperties = {
-  background: "var(--pp-surface)",
-  border: "0.5px solid var(--pp-border)",
-  borderRadius: "8px",
+  ...cardStyle,
   padding: "1rem",
   textAlign: "center",
 };
@@ -313,7 +276,7 @@ export default function SignUpPage() {
               }}
             >
               <div>
-                <label htmlFor="email" style={labelStyle}>
+                <label htmlFor="email" style={{ ...labelStyle, display: "block", marginBottom: "8px" }}>
                   {t("email")}
                 </label>
                 <input
@@ -327,7 +290,7 @@ export default function SignUpPage() {
               </div>
 
               <div>
-                <label htmlFor="password" style={labelStyle}>
+                <label htmlFor="password" style={{ ...labelStyle, display: "block", marginBottom: "8px" }}>
                   {t("password")}
                 </label>
                 <input
@@ -344,7 +307,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                style={{ ...secondaryButtonStyle, opacity: isSubmitting ? 0.5 : 1 }}
+                style={{ ...secondaryBtnStyle, width: "100%", display: "block", textAlign: "center", opacity: isSubmitting ? 0.5 : 1 }}
               >
                 {t("sign_up")}
               </button>

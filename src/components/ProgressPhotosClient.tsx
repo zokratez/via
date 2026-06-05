@@ -3,6 +3,12 @@
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import {
+  inputStyle,
+  labelStyle,
+  selectStyle,
+  textareaStyle,
+} from "@/lib/log-form-styles";
 
 type ProgressPhoto = {
   id: string;
@@ -798,17 +804,7 @@ export function ProgressPhotosClient({
             "linear-gradient(135deg, rgba(201, 150, 107, 0.12), rgba(34, 28, 25, 0.96))",
         }}
       >
-        <label
-          style={{
-            display: "block",
-            fontFamily: SANS,
-            fontSize: "11px",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "var(--pp-text-secondary)",
-            marginBottom: "0.65rem",
-          }}
-        >
+        <label style={{ ...labelStyle, display: "block", marginBottom: "0.65rem" }}>
           {t("file")}
         </label>
         <input
@@ -832,15 +828,7 @@ export function ProgressPhotosClient({
               id="progress-angle"
               value={angle}
               onChange={(e) => setAngle(e.target.value as Angle)}
-              style={{
-                width: "100%",
-                background: "rgba(26, 22, 20, 0.82)",
-                border: "0.5px solid var(--pp-border)",
-                borderRadius: "8px",
-                color: "var(--pp-text)",
-                fontFamily: SANS,
-                padding: "0.8rem",
-              }}
+              style={selectStyle}
             >
               {ANGLES.map((item) => (
                 <option key={item} value={item}>
@@ -855,15 +843,7 @@ export function ProgressPhotosClient({
             value={capturedAt}
             onChange={(e) => setCapturedAt(e.target.value)}
             aria-label={t("captured_at")}
-            style={{
-              width: "100%",
-              background: "rgba(26, 22, 20, 0.82)",
-              border: "0.5px solid var(--pp-border)",
-              borderRadius: "8px",
-              color: "var(--pp-text)",
-              fontFamily: SANS,
-              padding: "0.8rem",
-            }}
+            style={inputStyle}
           />
         </div>
 
@@ -872,18 +852,7 @@ export function ProgressPhotosClient({
           onChange={(e) => setNotes(e.target.value)}
           placeholder={t("notes_placeholder")}
           rows={3}
-          style={{
-            width: "100%",
-            marginTop: "1rem",
-            background: "rgba(26, 22, 20, 0.82)",
-            border: "0.5px solid var(--pp-border)",
-            borderRadius: "8px",
-            color: "var(--pp-text)",
-            fontFamily: SERIF,
-            fontSize: "15px",
-            padding: "0.85rem",
-            resize: "vertical",
-          }}
+          style={{ ...textareaStyle, marginTop: "1rem" }}
         />
 
         <button

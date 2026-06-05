@@ -3,6 +3,14 @@
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import {
+  cardStyle,
+  inputStyle,
+  labelStyle,
+  selectStyle,
+  secondaryBtnStyle,
+  textareaStyle,
+} from "@/lib/log-form-styles";
 
 type FoodPhoto = {
   id: string;
@@ -1018,17 +1026,7 @@ export function FoodPhotosClient({
             "linear-gradient(135deg, rgba(136, 211, 159, 0.12), rgba(34, 28, 25, 0.96))",
         }}
       >
-        <label
-          style={{
-            display: "block",
-            fontFamily: SANS,
-            fontSize: "11px",
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "var(--pp-text-secondary)",
-            marginBottom: "0.65rem",
-          }}
-        >
+        <label style={{ ...labelStyle, display: "block", marginBottom: "0.65rem" }}>
           {t("file")}
         </label>
         <input
@@ -1048,24 +1046,14 @@ export function FoodPhotosClient({
 
         <div
           style={{
-            border: "0.5px solid rgba(214, 160, 111, 0.24)",
-            borderRadius: "12px",
+            ...cardStyle,
             padding: "0.9rem",
             marginTop: "1rem",
-            background: "rgba(8, 6, 5, 0.24)",
           }}
         >
           <label
             htmlFor="food-barcode"
-            style={{
-              display: "block",
-              fontFamily: SANS,
-              color: "var(--pp-text-tertiary)",
-              fontSize: "10px",
-              letterSpacing: "0.16em",
-              marginBottom: "0.45rem",
-              textTransform: "uppercase",
-            }}
+            style={{ ...labelStyle, display: "block", marginBottom: "0.45rem" }}
           >
             {t("barcode")}
           </label>
@@ -1080,35 +1068,14 @@ export function FoodPhotosClient({
                 setBarcodeProduct(null);
               }}
               placeholder={t("barcode_placeholder")}
-              style={{
-                width: "100%",
-                background: "rgba(26, 22, 20, 0.82)",
-                border: "0.5px solid var(--pp-border)",
-                borderRadius: "999px",
-                color: "var(--pp-text)",
-                fontFamily: SANS,
-                padding: "0.85rem 1rem",
-              }}
+              style={{ ...inputStyle, borderRadius: "999px" }}
             />
             <button
               type="button"
               onClick={onBarcodeLookup}
               disabled={isPending || isLookingUpBarcode}
               className="pp-action-card"
-              style={{
-                border: "0.5px solid rgba(214, 160, 111, 0.66)",
-                borderRadius: "999px",
-                background: "rgba(214, 160, 111, 0.12)",
-                color: "#d6a06f",
-                fontFamily: SANS,
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                padding: "0.85rem 1rem",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
+              style={{ ...secondaryBtnStyle, borderRadius: "999px", padding: "0.85rem 1rem" }}
             >
               {isLookingUpBarcode ? t("barcode_lookup_loading") : t("barcode_lookup")}
             </button>
@@ -1136,15 +1103,7 @@ export function FoodPhotosClient({
             value={mealType}
             onChange={(e) => setMealType(e.target.value as MealType)}
             aria-label={t("meal_type")}
-            style={{
-              width: "100%",
-              background: "rgba(26, 22, 20, 0.82)",
-              border: "0.5px solid var(--pp-border)",
-              borderRadius: "8px",
-              color: "var(--pp-text)",
-              fontFamily: SANS,
-              padding: "0.8rem",
-            }}
+            style={selectStyle}
           >
             {MEAL_TYPES.map((item) => (
               <option key={item} value={item}>
@@ -1158,15 +1117,7 @@ export function FoodPhotosClient({
             value={eatenAt}
             onChange={(e) => setEatenAt(e.target.value)}
             aria-label={t("eaten_at")}
-            style={{
-              width: "100%",
-              background: "rgba(26, 22, 20, 0.82)",
-              border: "0.5px solid var(--pp-border)",
-              borderRadius: "8px",
-              color: "var(--pp-text)",
-              fontFamily: SANS,
-              padding: "0.8rem",
-            }}
+            style={inputStyle}
           />
         </div>
 
@@ -1175,18 +1126,7 @@ export function FoodPhotosClient({
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t("description_placeholder")}
           rows={3}
-          style={{
-            width: "100%",
-            marginTop: "1rem",
-            background: "rgba(26, 22, 20, 0.82)",
-            border: "0.5px solid var(--pp-border)",
-            borderRadius: "8px",
-            color: "var(--pp-text)",
-            fontFamily: SERIF,
-            fontSize: "15px",
-            padding: "0.85rem",
-            resize: "vertical",
-          }}
+          style={{ ...textareaStyle, marginTop: "1rem" }}
         />
 
         <div className="grid gap-3 sm:grid-cols-4" style={{ marginTop: "1rem" }}>
@@ -1221,18 +1161,14 @@ export function FoodPhotosClient({
             <label
               key={field.label}
               style={{
+                ...labelStyle,
                 display: "block",
-                fontFamily: SANS,
               }}
             >
               <span
                 style={{
                   display: "block",
-                  color: "var(--pp-text-tertiary)",
-                  fontSize: "10px",
-                  letterSpacing: "0.16em",
                   marginBottom: "0.35rem",
-                  textTransform: "uppercase",
                 }}
               >
                 {field.label}
@@ -1245,15 +1181,7 @@ export function FoodPhotosClient({
                 onChange={(e) => field.setValue(e.target.value)}
                 placeholder={field.label}
                 aria-label={field.label}
-                style={{
-                  width: "100%",
-                  background: "rgba(26, 22, 20, 0.82)",
-                  border: "0.5px solid var(--pp-border)",
-                  borderRadius: "8px",
-                  color: "var(--pp-text)",
-                  fontFamily: SANS,
-                  padding: "0.8rem",
-                }}
+                style={inputStyle}
               />
             </label>
           ))}
@@ -1552,15 +1480,7 @@ export function FoodPhotosClient({
                                   setEditMealType(e.target.value as MealType)
                                 }
                                 aria-label={t("meal_type")}
-                                style={{
-                                  width: "100%",
-                                  background: "rgba(26, 22, 20, 0.82)",
-                                  border: "0.5px solid var(--pp-border)",
-                                  borderRadius: "8px",
-                                  color: "var(--pp-text)",
-                                  fontFamily: SANS,
-                                  padding: "0.7rem",
-                                }}
+                                style={selectStyle}
                               >
                                 {MEAL_TYPES.map((item) => (
                                   <option key={item} value={item}>
@@ -1573,31 +1493,14 @@ export function FoodPhotosClient({
                                 value={editEatenAt}
                                 onChange={(e) => setEditEatenAt(e.target.value)}
                                 aria-label={t("eaten_at")}
-                                style={{
-                                  width: "100%",
-                                  background: "rgba(26, 22, 20, 0.82)",
-                                  border: "0.5px solid var(--pp-border)",
-                                  borderRadius: "8px",
-                                  color: "var(--pp-text)",
-                                  fontFamily: SANS,
-                                  padding: "0.7rem",
-                                }}
+                                style={inputStyle}
                               />
                             </div>
                             <textarea
                               value={editDescription}
                               onChange={(e) => setEditDescription(e.target.value)}
                               rows={3}
-                              style={{
-                                width: "100%",
-                                marginTop: "0.7rem",
-                                background: "rgba(26, 22, 20, 0.82)",
-                                border: "0.5px solid var(--pp-border)",
-                                borderRadius: "8px",
-                                color: "var(--pp-text)",
-                                fontFamily: SERIF,
-                                padding: "0.75rem",
-                              }}
+                              style={{ ...textareaStyle, marginTop: "0.7rem" }}
                             />
                             <div
                               className="grid gap-2 sm:grid-cols-4"
@@ -1658,15 +1561,7 @@ export function FoodPhotosClient({
                                     }
                                     placeholder={field.label}
                                     aria-label={field.label}
-                                    style={{
-                                      width: "100%",
-                                      background: "rgba(26, 22, 20, 0.82)",
-                                      border: "0.5px solid var(--pp-border)",
-                                      borderRadius: "8px",
-                                      color: "var(--pp-text)",
-                                      fontFamily: SANS,
-                                      padding: "0.7rem",
-                                    }}
+                                    style={inputStyle}
                                   />
                                 </label>
                               ))}

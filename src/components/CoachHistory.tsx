@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { inputStyle } from "@/lib/log-form-styles";
 
 export type CoachMessage = {
   role: "user" | "assistant" | "system";
@@ -117,16 +118,9 @@ export function CoachHistory({
         placeholder={t("coach_history_search_placeholder")}
         aria-label={t("coach_history_search_placeholder")}
         style={{
+          ...inputStyle,
           width: "100%",
-          fontFamily: SERIF,
-          fontSize: "15px",
-          color: "var(--pp-text)",
-          background: "var(--pp-bg)",
-          border: "0.5px solid var(--pp-border)",
-          borderRadius: "6px",
-          padding: "10px 12px",
           marginBottom: "1rem",
-          outline: "none",
         }}
       />
 
