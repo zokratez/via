@@ -3,7 +3,9 @@ import { redirect } from "@/i18n/navigation";
 import { BukowskiObservation } from "@/components/BukowskiObservation";
 import { DoseStrip, type DoseStripDose } from "@/components/DoseStrip";
 import { MetricTile } from "@/components/MetricTile";
+import { MiMeta } from "@/components/MiMeta";
 import { TodayBottomNav } from "@/components/TodayBottomNav";
+import { getMiMetaSignalState } from "@/lib/mimeta/signals";
 import { createClient } from "@/lib/supabase/server";
 import { isTodayEnabled } from "@/lib/today/flag";
 
@@ -30,7 +32,10 @@ export default async function TodayPage({
     redirect({ href: "/dashboard", locale });
   }
 
-  const t = await getTranslations("dashboard");
+  const [t, tMiMeta] = await Promise.all([
+    getTranslations("dashboard"),
+    getTranslations("mimeta"),
+  ]);
   const now = new Date();
   const todayKey = now.toISOString().slice(0, 10);
   const cutoff7 = new Date(now.getTime() - 7 * 86_400_000)
@@ -46,6 +51,7 @@ export default async function TodayPage({
     waterTodayRes,
     sleep7Res,
     weights90Res,
+    profileTargetsRes,
   ] = await Promise.all([
     supabase
       .from("doses")
@@ -73,8 +79,53 @@ export default async function TodayPage({
       .select("measured_at, weight_kg")
       .gte("measured_at", cutoff90)
       .order("measured_at", { ascending: true }),
+    supabase
+      .from("profiles")
+      .select(
+        "daily_calorie_target, protein_target_g, carbs_target_g, fat_target_g, nutrition_goal_type",
+      )
+      .eq("id", user!.id)
+      .maybeSingle(),
   ]);
   const lastDose = lastDoseRes.data as DoseStripDose;
+  const nutritionTargets = profileTargetsRes.data;
+  const miMetaSignal = await getMiMetaSignalState({
+    supabase,
+    userId: user!.id,
+    locale: locale as "es" | "en",
+    nutritionTargets: {
+      dailyCalories: nutritionTargets?.daily_calorie_target,
+      proteinG: nutritionTargets?.protein_target_g,
+      carbsG: nutritionTargets?.carbs_target_g,
+      fatG: nutritionTargets?.fat_target_g,
+      goalType: nutritionTargets?.nutrition_goal_type,
+    },
+    now,
+  });
+  const miMetaActionLabel = (href: string) => {
+    if (href === "/log/weight") return tMiMeta("action_log_weight");
+    if (href === "/log/dose") return tMiMeta("action_log_dose");
+    if (href === "/log/sleep") return tMiMeta("action_log_sleep");
+    if (href === "/calculadora" || href === "/calculator") {
+      return tMiMeta("action_calculator");
+    }
+    if (href === "/diario" || href === "/journal") {
+      return tMiMeta("action_journal");
+    }
+    if (href === "/coach") return tMiMeta("action_coach");
+    return "";
+  };
+  const signalState = {
+    ...miMetaSignal,
+    statusSentence:
+      miMetaSignal.statusSentence.trim().length > 0
+        ? miMetaSignal.statusSentence
+        : tMiMeta("empty_state_sentence"),
+    nextActions: miMetaSignal.nextActions.map((action) => ({
+      ...action,
+      label: miMetaActionLabel(action.href) || action.label,
+    })),
+  };
 
   type FoodRow = {
     eaten_at: string;
@@ -323,6 +374,7 @@ export default async function TodayPage({
           ))}
         </div>
       </section>
+      <MiMeta signal={signalState} surface="today" />
       <TodayBottomNav />
     </main>
   );

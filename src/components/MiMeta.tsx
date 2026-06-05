@@ -26,7 +26,13 @@ function TargetIcon() {
   );
 }
 
-export function MiMeta({ signal }: { signal: SignalState }) {
+export function MiMeta({
+  signal,
+  surface = "dashboard",
+}: {
+  signal: SignalState;
+  surface?: "dashboard" | "today";
+}) {
   const t = useTranslations("mimeta");
   const [open, setOpen] = useState(false);
   const [hasUnseenSignal, setHasUnseenSignal] = useState(false);
@@ -75,6 +81,7 @@ export function MiMeta({ signal }: { signal: SignalState }) {
     <>
       <div
         className="pp-mimeta-anchor"
+        data-surface={surface}
         style={{ opacity: scrolling ? 0.3 : 1 }}
       >
         <button

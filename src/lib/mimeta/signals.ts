@@ -26,6 +26,14 @@ export type SignalState = {
   nextActions: NextAction[];
 };
 
+export type NutritionTargets = {
+  dailyCalories?: number | string | null;
+  proteinG?: number | string | null;
+  carbsG?: number | string | null;
+  fatG?: number | string | null;
+  goalType?: string | null;
+};
+
 type WeightRow = {
   id?: string;
   measured_at: string;
@@ -124,6 +132,38 @@ function emptySentence(locale: Locale): string {
   return locale === "es"
     ? "Aún no hay suficiente para observar."
     : "Not enough yet to observe.";
+}
+
+function positiveNumber(value: number | string | null | undefined): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function nutritionTargetSentence(
+  locale: Locale,
+  targets: NutritionTargets | null | undefined,
+): string | null {
+  const calories = positiveNumber(targets?.dailyCalories);
+  const protein = positiveNumber(targets?.proteinG);
+  if (!calories && !protein) return null;
+
+  const roundedCalories = calories ? Math.round(calories).toLocaleString(locale) : null;
+  const roundedProtein = protein ? Math.round(protein).toLocaleString(locale) : null;
+
+  if (locale === "es") {
+    if (roundedCalories && roundedProtein) {
+      return `Tu meta marca ${roundedCalories} kcal y ${roundedProtein} g de proteína al día.`;
+    }
+    if (roundedCalories) return `Tu meta marca ${roundedCalories} kcal al día.`;
+    return `Tu meta marca ${roundedProtein} g de proteína al día.`;
+  }
+
+  if (roundedCalories && roundedProtein) {
+    return `Your goal marks ${roundedCalories} kcal and ${roundedProtein} g protein per day.`;
+  }
+  if (roundedCalories) return `Your goal marks ${roundedCalories} kcal per day.`;
+  return `Your goal marks ${roundedProtein} g protein per day.`;
 }
 
 function doseMilestoneSentence(locale: Locale, count: number): string {
@@ -256,11 +296,13 @@ export async function getMiMetaSignalState({
   supabase,
   userId,
   locale,
+  nutritionTargets,
   now = new Date(),
 }: {
   supabase: SupabaseLike;
   userId: string;
   locale: Locale;
+  nutritionTargets?: NutritionTargets | null;
   now?: Date;
 }): Promise<SignalState> {
   const [weights, doses, symptoms, sleep] = await Promise.all([
@@ -395,6 +437,17 @@ export async function getMiMetaSignalState({
         nextActions: defaultActions(locale),
       };
     }
+  }
+
+  const nutritionSentence = nutritionTargetSentence(locale, nutritionTargets);
+  if (nutritionSentence) {
+    return {
+      hasNewSignal: false,
+      signalId: null,
+      statusSentence: nutritionSentence,
+      progressFraction: 0.35,
+      nextActions: defaultActions(locale),
+    };
   }
 
   return {
