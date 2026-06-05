@@ -1,0 +1,53 @@
+"use server";
+
+import { z } from "zod";
+import { redirect } from "@/i18n/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+const LOCALES = ["es", "en"] as const;
+
+const goalsSchema = z.object({
+  daily_calorie_target: z.coerce.number().int().positive().max(10000),
+  protein_target_g: z.coerce.number().int().positive().max(1000),
+  carbs_target_g: z.coerce.number().int().min(0).max(1000),
+  fat_target_g: z.coerce.number().int().positive().max(1000),
+  nutrition_goal_type: z.enum(["lose", "maintain", "gain"]),
+  nutrition_targets_source: z.enum(["computed", "manual"]),
+  locale: z.enum(LOCALES),
+});
+
+export async function saveNutritionGoalsAction(formData: FormData) {
+  const parsed = goalsSchema.safeParse({
+    daily_calorie_target: formData.get("daily_calorie_target"),
+    protein_target_g: formData.get("protein_target_g"),
+    carbs_target_g: formData.get("carbs_target_g"),
+    fat_target_g: formData.get("fat_target_g"),
+    nutrition_goal_type: formData.get("nutrition_goal_type"),
+    nutrition_targets_source: formData.get("nutrition_targets_source"),
+    locale: formData.get("locale"),
+  });
+
+  if (!parsed.success) return { error: "validation_failed" as const };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "unauthenticated" as const };
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      daily_calorie_target: parsed.data.daily_calorie_target,
+      protein_target_g: parsed.data.protein_target_g,
+      carbs_target_g: parsed.data.carbs_target_g,
+      fat_target_g: parsed.data.fat_target_g,
+      nutrition_goal_type: parsed.data.nutrition_goal_type,
+      nutrition_targets_source: parsed.data.nutrition_targets_source,
+    })
+    .eq("id", user.id);
+
+  if (error) return { error: "db_failed" as const };
+
+  redirect({ href: "/goals?saved=1", locale: parsed.data.locale });
+}
