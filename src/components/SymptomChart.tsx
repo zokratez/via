@@ -215,11 +215,12 @@ export function SymptomChart({
 
   return (
     <div>
-      <ResponsiveContainer width="100%" height={240}>
-        <BarChart
-          data={buckets}
-          margin={{ top: 8, right: 16, bottom: 0, left: 0 }}
-        >
+      <div data-swipe-nav-ignore="true">
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart
+            data={buckets}
+            margin={{ top: 8, right: 16, bottom: 0, left: 0 }}
+          >
           <CartesianGrid
             strokeDasharray="2 2"
             stroke="var(--pp-border)"
@@ -255,8 +256,9 @@ export function SymptomChart({
               animationEasing="ease-out"
             />
           ))}
-        </BarChart>
-      </ResponsiveContainer>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
       <div
         style={{

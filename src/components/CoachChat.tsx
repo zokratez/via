@@ -895,6 +895,7 @@ function MessageBubble({
           ),
           pre: (props) => (
             <pre
+              data-swipe-nav-ignore="true"
               className="overflow-x-auto rounded p-3 mb-7 last:mb-0"
               style={{
                 fontFamily:

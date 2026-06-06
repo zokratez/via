@@ -243,11 +243,12 @@ export function SleepChart({
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
-        <BarChart
-          data={points}
-          margin={{ top: 8, right: 16, bottom: 0, left: 0 }}
-        >
+      <div data-swipe-nav-ignore="true">
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart
+            data={points}
+            margin={{ top: 8, right: 16, bottom: 0, left: 0 }}
+          >
           <CartesianGrid
             strokeDasharray="2 2"
             stroke="var(--pp-border)"
@@ -285,8 +286,9 @@ export function SleepChart({
               />
             ))}
           </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -1366,6 +1366,7 @@ export function FoodPhotosClient({
           </div>
 
           <div
+            data-swipe-nav-ignore="true"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(7, minmax(0, 1fr))",

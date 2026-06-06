@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { FooterGate } from "@/components/FooterGate";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { SwipeNavClient } from "@/components/SwipeNavClient";
 import { routing } from "@/i18n/routing";
 import { SITE_URL } from "@/lib/seo";
 
@@ -61,6 +62,7 @@ export default async function LocaleLayout({
       <GlobalSearch />
       <AuthenticatedChromeClient />
       <MobileBottomNav />
+      <SwipeNavClient />
     </NextIntlClientProvider>
   );
 }

@@ -6,6 +6,11 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LogSheet } from "@/components/LogSheet";
 import { createClient } from "@/lib/supabase/client";
+import {
+  getMainTabs,
+  openMainTabSearch,
+  type MainTabKind,
+} from "@/lib/navigation/main-tabs";
 
 const HIDDEN_PATH_RE =
   /^\/(es|en)\/(auth|privacy|terms|reviews\/submit)(\/.*)?$/;
@@ -14,7 +19,7 @@ function Icon({
   kind,
   active,
 }: {
-  kind: "panel" | "check" | "coach" | "calc" | "search";
+  kind: MainTabKind;
   active: boolean;
 }) {
   const color = active ? "var(--pp-bg)" : "currentColor";
@@ -114,40 +119,7 @@ export function MobileBottomNav() {
   if (HIDDEN_PATH_RE.test(pathname)) return null;
   if (!isAuthenticated) return null;
 
-  const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
-  const items = [
-    {
-      href: "/dashboard",
-      label: t("dashboard"),
-      kind: "panel" as const,
-      active:
-        pathname === `/${locale}/dashboard` || pathname === `/${locale}/today`,
-    },
-    {
-      href: "/check-in",
-      label: t("checkin"),
-      kind: "check" as const,
-      active: pathname === `/${locale}/check-in`,
-    },
-    {
-      href: "/coach",
-      label: t("coach"),
-      kind: "coach" as const,
-      active: pathname === `/${locale}/coach`,
-    },
-    {
-      href: calculatorHref,
-      label: t("calculator"),
-      kind: "calc" as const,
-      active:
-        pathname === `/${locale}/calculadora` ||
-        pathname === `/${locale}/calculator`,
-    },
-  ];
-
-  function openSearch() {
-    window.dispatchEvent(new Event("paco:open-search"));
-  }
+  const items = getMainTabs(locale);
 
   return (
     <>
@@ -163,26 +135,32 @@ export function MobileBottomNav() {
           <span aria-hidden="true">+</span>
         </button>
         {items.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={
-              item.active ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"
-            }
-            aria-current={item.active ? "page" : undefined}
-          >
-            <Icon kind={item.kind} active={item.active} />
-            <span>{item.label}</span>
-          </Link>
+          item.href ? (
+            <Link
+              key={item.kind}
+              href={item.href}
+              className={
+                item.matches(pathname, locale)
+                  ? "pp-mobile-nav-item is-active"
+                  : "pp-mobile-nav-item"
+              }
+              aria-current={item.matches(pathname, locale) ? "page" : undefined}
+            >
+              <Icon kind={item.kind} active={item.matches(pathname, locale)} />
+              <span>{t(item.labelKey)}</span>
+            </Link>
+          ) : (
+            <button
+              key={item.kind}
+              type="button"
+              onClick={openMainTabSearch}
+              className="pp-mobile-nav-item"
+            >
+              <Icon kind={item.kind} active={false} />
+              <span>{t(item.labelKey)}</span>
+            </button>
+          )
         ))}
-        <button
-          type="button"
-          onClick={openSearch}
-          className="pp-mobile-nav-item"
-        >
-          <Icon kind="search" active={false} />
-          <span>{t("search")}</span>
-        </button>
       </nav>
       <LogSheet
         open={isLogSheetOpen}
