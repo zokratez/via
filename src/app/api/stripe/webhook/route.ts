@@ -30,6 +30,7 @@ type ProfileTier = "free" | "pro" | "trialing" | "past_due_grace";
 type ProfileUpdate = {
   stripe_price_id?: string | null;
   subscription_tier?: ProfileTier;
+  subscription_expires_at?: string | null;
 };
 
 /**
@@ -90,6 +91,24 @@ function priceIdFromSubscription(sub: Stripe.Subscription): string | null {
   return typeof price === "string" ? price : price.id;
 }
 
+function periodEndFromSubscription(sub: Stripe.Subscription): string | null {
+  const periodEnd = sub.items?.data?.[0]?.current_period_end;
+  return typeof periodEnd === "number"
+    ? new Date(periodEnd * 1000).toISOString()
+    : null;
+}
+
+async function subscriptionFromInvoice(
+  stripe: Stripe,
+  invoice: Stripe.Invoice,
+): Promise<Stripe.Subscription | null> {
+  const subscription = invoice.parent?.subscription_details?.subscription;
+  if (!subscription) return null;
+  const subscriptionId =
+    typeof subscription === "string" ? subscription : subscription.id;
+  return stripe.subscriptions.retrieve(subscriptionId);
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
@@ -141,6 +160,12 @@ export async function POST(req: NextRequest) {
           const sub = await stripe.subscriptions.retrieve(subId);
           priceId = priceIdFromSubscription(sub);
           tier = tierFromSubscriptionStatus(sub.status);
+          await applyToProfile(customerId, supabaseUserId, {
+            stripe_price_id: priceId,
+            subscription_tier: tier,
+            subscription_expires_at: periodEndFromSubscription(sub),
+          });
+          break;
         } else {
           console.warn(
             "[stripe/webhook] checkout.session.completed without subscription",
@@ -151,6 +176,21 @@ export async function POST(req: NextRequest) {
         await applyToProfile(customerId, supabaseUserId, {
           stripe_price_id: priceId,
           subscription_tier: tier,
+          subscription_expires_at: null,
+        });
+        break;
+      }
+      case "customer.subscription.created": {
+        const sub = event.data.object as Stripe.Subscription;
+        const customerId =
+          typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+        const priceId = priceIdFromSubscription(sub);
+        const supabaseUserId =
+          (sub.metadata?.supabase_user_id as string | undefined) ?? null;
+        await applyToProfile(customerId, supabaseUserId, {
+          stripe_price_id: priceId,
+          subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_expires_at: periodEndFromSubscription(sub),
         });
         break;
       }
@@ -162,6 +202,7 @@ export async function POST(req: NextRequest) {
         await applyToProfile(customerId, null, {
           stripe_price_id: priceId,
           subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_expires_at: periodEndFromSubscription(sub),
         });
         break;
       }
@@ -172,6 +213,23 @@ export async function POST(req: NextRequest) {
         await applyToProfile(customerId, null, {
           stripe_price_id: null,
           subscription_tier: "free",
+          subscription_expires_at: null,
+        });
+        break;
+      }
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId =
+          typeof invoice.customer === "string"
+            ? invoice.customer
+            : invoice.customer?.id ?? null;
+        if (!customerId) break;
+        const sub = await subscriptionFromInvoice(stripe, invoice);
+        if (!sub) break;
+        await applyToProfile(customerId, null, {
+          stripe_price_id: priceIdFromSubscription(sub),
+          subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_expires_at: periodEndFromSubscription(sub),
         });
         break;
       }
