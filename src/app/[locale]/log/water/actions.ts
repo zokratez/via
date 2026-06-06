@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const LOCALES = ["es", "en"] as const;
 
@@ -65,6 +66,13 @@ export async function logWaterAction(formData: FormData) {
   } catch {
     // Calendar mirror is best-effort; never block water log.
   }
+
+  await trackServerEvent({
+    eventName: "first_log",
+    locale: parsed.data.locale,
+    userId: user.id,
+    props: { log_type: "water" },
+  });
 
   redirect({ href: "/dashboard?ok=water", locale: parsed.data.locale });
 }

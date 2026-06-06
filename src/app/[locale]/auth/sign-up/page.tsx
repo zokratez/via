@@ -7,6 +7,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { Link, useRouter } from "@/i18n/navigation";
+import { track } from "@/lib/analytics/client";
+import type { AnalyticsLocale, AnalyticsProps } from "@/lib/analytics/events";
 import {
   cardStyle,
   inputStyle,
@@ -104,7 +106,7 @@ type PlanIntent = "annual" | "monthly" | null;
 export default function SignUpPage() {
   const t = useTranslations("auth");
   const tErrors = useTranslations("errors");
-  const locale = useLocale();
+  const locale = useLocale() as AnalyticsLocale;
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -132,6 +134,10 @@ export default function SignUpPage() {
       return;
     }
 
+    const props: AnalyticsProps = { method: "email" };
+    if (plan) props.plan = plan;
+    track("signup_started", { locale, props });
+
     const supabase = createClient();
     const { error: signUpError } = await supabase.auth.signUp({
       email: parsed.data.email,
@@ -151,17 +157,26 @@ export default function SignUpPage() {
       return;
     }
 
+    track("signup_completed", { locale, props });
     router.push("/dashboard");
     router.refresh();
   }
 
   async function signInWithGoogle() {
     setErrorMsg(null);
+    const props: AnalyticsProps = { method: "google" };
+    if (plan) props.plan = plan;
+    track("signup_started", { locale, props });
     const supabase = createClient();
+    const search = new URLSearchParams({
+      next: `/${locale}/dashboard`,
+      source: "signup",
+    });
+    if (plan) search.set("plan", plan);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/${locale}/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?${search.toString()}`,
       },
     });
     if (error) setErrorMsg(tErrors("generic"));

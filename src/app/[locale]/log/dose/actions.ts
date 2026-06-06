@@ -6,6 +6,7 @@ import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 import { KNOWN_PEPTIDES } from "@/lib/peptides/known-peptides";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const SITES = [
   "abdomen_left",
@@ -179,6 +180,13 @@ export async function logDoseAction(formData: FormData) {
   } catch {
     // Calendar mirror is best-effort; never block dose log.
   }
+
+  await trackServerEvent({
+    eventName: "first_log",
+    locale: parsed.data.locale,
+    userId: user.id,
+    props: { log_type: "dose" },
+  });
 
   redirect({ href: "/dashboard?ok=dose", locale: parsed.data.locale });
 }

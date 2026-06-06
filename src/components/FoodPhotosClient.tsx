@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { CustomSelect } from "@/components/CustomSelect";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/analytics/client";
+import type { AnalyticsLocale } from "@/lib/analytics/events";
 import {
   cardStyle,
   inputStyle,
@@ -141,7 +143,7 @@ export function FoodPhotosClient({
   nutritionTargets: NutritionTargets;
 }) {
   const t = useTranslations("food");
-  const locale = useLocale();
+  const locale = useLocale() as AnalyticsLocale;
   const [photos, setPhotos] = useState(initialPhotos);
   const [mealType, setMealType] = useState<MealType>("meal");
   const [eatenAt, setEatenAt] = useState(nowLocalDateTime());
@@ -433,6 +435,7 @@ export function FoodPhotosClient({
       setMealType("meal");
       setEatenAt(nowLocalDateTime());
       setMessage(t("saved"));
+      track("first_log", { locale, props: { log_type: "food" } });
       await refreshPhotos(user.id);
     });
   }
@@ -641,6 +644,7 @@ export function FoodPhotosClient({
       }
 
       setMessage(t("repeated"));
+      track("first_log", { locale, props: { log_type: "food" } });
       await refreshPhotos(user.id);
     });
   }

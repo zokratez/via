@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const LOCALES = ["es", "en"] as const;
 
@@ -82,6 +83,13 @@ export async function logWeightAction(formData: FormData) {
   } catch {
     // Calendar mirror is best-effort; never block weight log.
   }
+
+  await trackServerEvent({
+    eventName: "first_log",
+    locale: parsed.data.locale,
+    userId: user.id,
+    props: { log_type: "weight" },
+  });
 
   redirect({ href: "/dashboard?ok=weight", locale: parsed.data.locale });
 }

@@ -11,6 +11,7 @@ import {
 import { findReferrals, buildReferralInjection } from "@/lib/coach/referrals";
 import { isActiveSubscriber } from "@/lib/subscription";
 import { coachRateLimit } from "@/lib/rate-limit";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -178,6 +179,12 @@ export async function POST(req: NextRequest) {
     if (userMsgErr) {
       return jsonResponse(500, { error: "generic" });
     }
+    await trackServerEvent({
+      eventName: "coach_message_sent",
+      locale,
+      userId: user.id,
+      props: { surface: "coach" },
+    });
   }
 
   const guardrail: GuardrailHit | null = checkUserMessage(

@@ -146,3 +146,65 @@ NEXT: SAM-46 food command center (engagement surface — the money work). Fresh 
 - Add a single daily check-in flow that gathers food, progress, sleep, symptoms, weight, and Bukowski question in one pass.
 - Add richer chart drilldowns from dashboard tiles into the underlying logs.
 - Build the Cal AI-style nutrition command center on web next: macro goals, remaining targets, visual rings/cards, meal drilldowns, portion uncertainty prompts, and Bukowski food context. Defer live barcode camera, HealthKit, and depth/LiDAR to native.
+
+## SAM-59 — Funnel + acquisition instrumentation source
+
+STATUS: In review on `feat/instrumentation`. This is analytics-only; no paywall or onboarding behavior changed.
+
+Approach: PACO uses a privacy-first Supabase `analytics_events` table plus typed `track()` helpers instead of a third-party analytics vendor. This keeps funnel visibility in the existing trusted data stack and avoids ad-tech trackers for a sensitive health brand.
+
+Single event source:
+
+- Migration: `0021_analytics_events.sql`.
+- Table: `public.analytics_events`.
+- Writer: service-role only via `/api/analytics/track` and `trackServerEvent`.
+- Client helper: `src/lib/analytics/client.ts`.
+- Server helper: `src/lib/analytics/server.ts`.
+- Taxonomy/sanitizer: `src/lib/analytics/events.ts`.
+
+Privacy rule: events are metadata only. Never put dose amounts, weight numbers, food descriptions, nutrition values, coach message text, names, emails, Stripe customer IDs, or other PII/health data in `props`.
+
+Events:
+
+- `landing_view`: once per browser session from locale layout; captures `pathname`, `referrer`, and `utm_*` params only.
+- `signup_started`, `signup_completed`: method and optional plan only.
+- `onboarding_completed`: reserved for future onboarding.
+- `first_log`: deduped activation event; `log_type` only (`dose`, `weight`, `food`, `water`, `sleep`, `symptom`).
+- `coach_message_sent`: `surface` only, no message content.
+- `paywall_viewed`: currently coach quota card.
+- `checkout_started`: after Stripe Checkout session creation succeeds.
+- `trial_started`, `subscription_active`: from Stripe webhook subscription lifecycle, deduped by user/event.
+
+Sample funnel query:
+
+```sql
+with firsts as (
+  select
+    coalesce(user_id::text, anon_id) as actor_id,
+    min(created_at) filter (where event_name = 'signup_completed') as signup_completed_at,
+    min(created_at) filter (where event_name = 'first_log') as first_log_at,
+    min(created_at) filter (where event_name = 'checkout_started') as checkout_started_at,
+    min(created_at) filter (where event_name = 'subscription_active') as subscription_active_at
+  from public.analytics_events
+  where created_at >= now() - interval '30 days'
+  group by 1
+)
+select
+  count(*) filter (where signup_completed_at is not null) as signup_completed,
+  count(*) filter (
+    where first_log_at is not null
+      and signup_completed_at is not null
+      and first_log_at >= signup_completed_at
+  ) as activated_first_log,
+  count(*) filter (
+    where checkout_started_at is not null
+      and signup_completed_at is not null
+      and checkout_started_at >= signup_completed_at
+  ) as checkout_started,
+  count(*) filter (
+    where subscription_active_at is not null
+      and checkout_started_at is not null
+      and subscription_active_at >= checkout_started_at
+  ) as subscription_active
+from firsts;
+```
