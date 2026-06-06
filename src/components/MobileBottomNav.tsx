@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { LogSheet } from "@/components/LogSheet";
 
 const HIDDEN_PATH_RE =
   /^\/(es|en)\/(auth|privacy|terms|reviews\/submit)(\/.*)?$/;
@@ -83,6 +85,8 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("mobile_nav");
+  const tLogSheet = useTranslations("log_sheet");
+  const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
 
   if (!pathname.startsWith(`/${locale}`)) return null;
   if (HIDDEN_PATH_RE.test(pathname)) return null;
@@ -123,26 +127,44 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="pp-mobile-nav" aria-label={t("label")}>
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={item.active ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"}
-          aria-current={item.active ? "page" : undefined}
+    <>
+      <nav className="pp-mobile-nav" aria-label={t("label")}>
+        <button
+          type="button"
+          className="pp-mobile-nav-log-action"
+          onClick={() => setIsLogSheetOpen(true)}
+          aria-label={tLogSheet("title")}
+          aria-haspopup="dialog"
+          aria-expanded={isLogSheetOpen}
         >
-          <Icon kind={item.kind} active={item.active} />
-          <span>{item.label}</span>
-        </Link>
-      ))}
-      <button
-        type="button"
-        onClick={openSearch}
-        className="pp-mobile-nav-item"
-      >
-        <Icon kind="search" active={false} />
-        <span>{t("search")}</span>
-      </button>
-    </nav>
+          <span aria-hidden="true">+</span>
+        </button>
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={
+              item.active ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"
+            }
+            aria-current={item.active ? "page" : undefined}
+          >
+            <Icon kind={item.kind} active={item.active} />
+            <span>{item.label}</span>
+          </Link>
+        ))}
+        <button
+          type="button"
+          onClick={openSearch}
+          className="pp-mobile-nav-item"
+        >
+          <Icon kind="search" active={false} />
+          <span>{t("search")}</span>
+        </button>
+      </nav>
+      <LogSheet
+        open={isLogSheetOpen}
+        onClose={() => setIsLogSheetOpen(false)}
+      />
+    </>
   );
 }
