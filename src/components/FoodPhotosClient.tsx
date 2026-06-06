@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   cardStyle,
@@ -58,6 +59,12 @@ type NutritionTotals = {
   carbs: number;
   fat: number;
   mealsWithNutrition: number;
+};
+type NutritionTargets = {
+  dailyCalories: number | null;
+  proteinG: number | null;
+  carbsG: number | null;
+  fatG: number | null;
 };
 
 function fileExtension(file: File): string {
@@ -127,8 +134,10 @@ function formatNumber(value: number, fractionDigits = 0): string {
 
 export function FoodPhotosClient({
   initialPhotos,
+  nutritionTargets,
 }: {
   initialPhotos: FoodPhoto[];
+  nutritionTargets: NutritionTargets;
 }) {
   const t = useTranslations("food");
   const locale = useLocale();
@@ -289,6 +298,32 @@ export function FoodPhotosClient({
           },
         ]
       : [];
+  const calorieTarget = nutritionTargets.dailyCalories;
+  const caloriesRemaining =
+    calorieTarget === null ? null : calorieTarget - todayTotals.calories;
+  const macroTargets = [
+    {
+      key: "protein",
+      label: t("protein"),
+      consumed: todayTotals.protein,
+      target: nutritionTargets.proteinG,
+      color: "#88d39f",
+    },
+    {
+      key: "carbs",
+      label: t("carbs"),
+      consumed: todayTotals.carbs,
+      target: nutritionTargets.carbsG,
+      color: "#d6a06f",
+    },
+    {
+      key: "fat",
+      label: t("fat"),
+      consumed: todayTotals.fat,
+      target: nutritionTargets.fatG,
+      color: "#b58cff",
+    },
+  ] as const;
 
   async function refreshPhotos(userId: string) {
     const supabase = createClient();
@@ -614,6 +649,421 @@ export function FoodPhotosClient({
 
   return (
     <div>
+      <section
+        className="pp-fade-up"
+        style={{
+          border: "0.5px solid rgba(214, 160, 111, 0.34)",
+          borderRadius: "18px",
+          padding: "1rem",
+          marginBottom: "1rem",
+          background:
+            "radial-gradient(circle at 82% 0%, rgba(214, 160, 111, 0.18), transparent 36%), linear-gradient(150deg, rgba(58, 37, 25, 0.78), rgba(24, 19, 17, 0.98) 48%, rgba(12, 10, 9, 0.92))",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 48px rgba(0,0,0,0.24)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "1rem",
+            alignItems: "start",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "var(--pp-text-tertiary)",
+                fontSize: "10px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {t("command_eyebrow")}
+            </p>
+            <h2
+              style={{
+                fontFamily: SERIF,
+                color: "var(--pp-text)",
+                fontSize: "clamp(30px, 9vw, 58px)",
+                fontStyle: "italic",
+                fontWeight: 400,
+                letterSpacing: "-0.03em",
+                lineHeight: 0.95,
+                margin: "0.6rem 0 0",
+              }}
+            >
+              {t("command_title")}
+            </h2>
+          </div>
+          <p
+            style={{
+              fontFamily: SANS,
+              color: "#d6a06f",
+              fontSize: "11px",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              margin: 0,
+            }}
+          >
+            {todayPhotos.length > 0
+              ? t("command_meals_today", { count: todayPhotos.length })
+              : t("command_no_meals")}
+          </p>
+        </div>
+
+        <div
+          style={{
+            border: "0.5px solid rgba(255,255,255,0.08)",
+            borderRadius: "16px",
+            padding: "1rem",
+            marginTop: "1rem",
+            background:
+              "linear-gradient(145deg, rgba(214,160,111,0.12), rgba(8,6,5,0.28))",
+          }}
+        >
+          {calorieTarget === null ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "1rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
+                    fontSize: "10px",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    margin: 0,
+                  }}
+                >
+                  {t("remaining_label")}
+                </p>
+                <p
+                  style={{
+                    fontFamily: SERIF,
+                    color: "var(--pp-text)",
+                    fontSize: "clamp(30px, 9vw, 52px)",
+                    fontStyle: "italic",
+                    lineHeight: 1,
+                    margin: "0.5rem 0 0",
+                  }}
+                >
+                  {t("target_missing_title")}
+                </p>
+                <p
+                  style={{
+                    fontFamily: SERIF,
+                    color: "var(--pp-text-secondary)",
+                    fontSize: "15px",
+                    lineHeight: 1.5,
+                    margin: "0.55rem 0 0",
+                  }}
+                >
+                  {t("target_missing_body")}
+                </p>
+              </div>
+              <Link
+                href="/goals"
+                className="pp-action-card"
+                style={{
+                  border: "0.5px solid rgba(214,160,111,0.7)",
+                  borderRadius: "999px",
+                  color: "#d6a06f",
+                  fontFamily: SANS,
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  padding: "0.85rem 1rem",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t("set_goal_cta")}
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-tertiary)",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  margin: 0,
+                }}
+              >
+                {t("remaining_label")}
+              </p>
+              <p
+                style={{
+                  fontFamily: SERIF,
+                  color:
+                    caloriesRemaining !== null && caloriesRemaining < 0
+                      ? "#e08aa8"
+                      : "#d6a06f",
+                  fontSize: "clamp(46px, 16vw, 92px)",
+                  fontStyle: "italic",
+                  letterSpacing: "-0.05em",
+                  lineHeight: 0.9,
+                  margin: "0.55rem 0 0",
+                }}
+              >
+                {formatNumber(caloriesRemaining ?? 0)}
+              </p>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-text-secondary)",
+                  fontSize: "11px",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  margin: "0.75rem 0 0",
+                }}
+              >
+                {t("remaining_hint", {
+                  consumed: formatNumber(todayTotals.calories),
+                  target: formatNumber(calorieTarget),
+                })}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3" style={{ marginTop: "1rem" }}>
+          {macroTargets.map((macro) => {
+            const progress =
+              macro.target && macro.target > 0
+                ? Math.min(100, (macro.consumed / macro.target) * 100)
+                : 100;
+            return (
+              <div
+                key={macro.key}
+                style={{
+                  border: "0.5px solid rgba(255,255,255,0.08)",
+                  borderRadius: "14px",
+                  padding: "0.85rem",
+                  background: "rgba(8, 6, 5, 0.24)",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: macro.color,
+                    fontSize: "10px",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    margin: 0,
+                  }}
+                >
+                  {macro.label}
+                </p>
+                <p
+                  style={{
+                    fontFamily: SERIF,
+                    color: "var(--pp-text)",
+                    fontSize: "28px",
+                    fontStyle: "italic",
+                    lineHeight: 1,
+                    margin: "0.55rem 0 0",
+                  }}
+                >
+                  {formatNumber(macro.consumed, 1)}g
+                </p>
+                <div
+                  aria-label={macro.label}
+                  style={{
+                    height: "7px",
+                    borderRadius: "999px",
+                    background: "rgba(255,255,255,0.07)",
+                    overflow: "hidden",
+                    marginTop: "0.7rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${progress}%`,
+                      height: "100%",
+                      borderRadius: "999px",
+                      background: macro.color,
+                      opacity: macro.target === null ? 0.45 : 0.95,
+                    }}
+                  />
+                </div>
+                <p
+                  style={{
+                    fontFamily: SANS,
+                    color: "var(--pp-text-tertiary)",
+                    fontSize: "10px",
+                    lineHeight: 1.4,
+                    margin: "0.55rem 0 0",
+                  }}
+                >
+                  {macro.target === null
+                    ? t("macro_consumed_only")
+                    : t("macro_vs_target", {
+                        consumed: formatNumber(macro.consumed, 1),
+                        target: formatNumber(macro.target),
+                      })}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            borderTop: "0.5px solid rgba(255,255,255,0.08)",
+            marginTop: "1rem",
+            paddingTop: "1rem",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              alignItems: "baseline",
+              marginBottom: "0.75rem",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "var(--pp-text-tertiary)",
+                fontSize: "10px",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              {t("today_meals_title")}
+            </p>
+            <p
+              style={{
+                fontFamily: SANS,
+                color: "var(--pp-text-tertiary)",
+                fontSize: "10px",
+                margin: 0,
+              }}
+            >
+              {t("today_local_hint")}
+            </p>
+          </div>
+          {todayPhotos.length === 0 ? (
+            <p
+              style={{
+                border: "0.5px solid rgba(255,255,255,0.08)",
+                borderRadius: "12px",
+                color: "var(--pp-text-secondary)",
+                fontFamily: SERIF,
+                fontStyle: "italic",
+                margin: 0,
+                padding: "0.9rem",
+              }}
+            >
+              {t("today_meals_empty")}
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {todayPhotos.map((photo) => (
+                <article
+                  key={photo.id}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr auto",
+                    gap: "0.8rem",
+                    border: "0.5px solid rgba(255,255,255,0.08)",
+                    borderRadius: "12px",
+                    padding: "0.85rem",
+                    background: "rgba(8, 6, 5, 0.22)",
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        fontFamily: SANS,
+                        color: "#88d39f",
+                        fontSize: "10px",
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        margin: 0,
+                      }}
+                    >
+                      {t(`meal_${photo.meal_type}`)} ·{" "}
+                      {new Intl.DateTimeFormat(locale, {
+                        timeStyle: "short",
+                      }).format(new Date(photo.eaten_at))}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: SERIF,
+                        color: "var(--pp-text-secondary)",
+                        fontSize: "14px",
+                        lineHeight: 1.45,
+                        margin: "0.45rem 0 0",
+                      }}
+                    >
+                      {photo.description ?? t("meal_no_description")}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: SANS,
+                        color: "var(--pp-text-tertiary)",
+                        fontSize: "11px",
+                        margin: "0.5rem 0 0",
+                      }}
+                    >
+                      P {formatNumber(photo.protein_g ?? 0, 1)} · C{" "}
+                      {formatNumber(photo.carbs_g ?? 0, 1)} · F{" "}
+                      {formatNumber(photo.fat_g ?? 0, 1)}
+                    </p>
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: SERIF,
+                      color: "#d6a06f",
+                      fontSize: "24px",
+                      fontStyle: "italic",
+                      lineHeight: 1,
+                      margin: 0,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {photo.calories_estimate === null
+                      ? "—"
+                      : formatNumber(photo.calories_estimate)}
+                    <span
+                      style={{
+                        fontFamily: SANS,
+                        color: "var(--pp-text-tertiary)",
+                        fontSize: "10px",
+                        fontStyle: "normal",
+                        letterSpacing: "0.12em",
+                        marginLeft: "0.25rem",
+                      }}
+                    >
+                      kcal
+                    </span>
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       <section
         className="pp-fade-up"
         style={{

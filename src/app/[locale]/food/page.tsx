@@ -21,6 +21,19 @@ type FoodPhotoRow = {
   fat_g: number | null;
 };
 
+type NutritionTargets = {
+  dailyCalories: number | null;
+  proteinG: number | null;
+  carbsG: number | null;
+  fatG: number | null;
+};
+
+function numericValue(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export default async function FoodPage({
   params,
 }: {
@@ -39,7 +52,9 @@ export default async function FoodPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_tier")
+    .select(
+      "subscription_tier,daily_calorie_target,protein_target_g,carbs_target_g,fat_target_g",
+    )
     .eq("id", user!.id)
     .maybeSingle();
 
@@ -70,6 +85,13 @@ export default async function FoodPage({
       return { ...photo, signedUrl: signed?.signedUrl ?? null };
     }),
   );
+
+  const nutritionTargets: NutritionTargets = {
+    dailyCalories: numericValue(profile?.daily_calorie_target),
+    proteinG: numericValue(profile?.protein_target_g),
+    carbsG: numericValue(profile?.carbs_target_g),
+    fatG: numericValue(profile?.fat_target_g),
+  };
 
   const navLinkStyle: React.CSSProperties = {
     fontFamily: SANS,
@@ -185,7 +207,10 @@ export default async function FoodPage({
           </p>
         </section>
 
-        <FoodPhotosClient initialPhotos={photos} />
+        <FoodPhotosClient
+          initialPhotos={photos}
+          nutritionTargets={nutritionTargets}
+        />
       </main>
     </div>
   );
