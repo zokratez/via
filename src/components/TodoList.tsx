@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import { useRouter } from "@/i18n/navigation";
 import {
   errorMessageStyle,
@@ -130,6 +131,7 @@ export function TodoList({
     const bd = b.due_date ?? "9999-12-31";
     return ad.localeCompare(bd);
   });
+  const selectedPriority = form.watch("priority");
 
   return (
     <div style={cardStyle}>
@@ -306,16 +308,25 @@ export function TodoList({
             <label htmlFor="todo-priority" style={labelStyle}>
               {t("priority")}
             </label>
-            <select
+            <input type="hidden" {...form.register("priority")} />
+            <CustomSelect
               id="todo-priority"
-              style={{ ...selectStyle, marginTop: "0.5rem" }}
+              value={selectedPriority}
+              onBlur={() => form.trigger("priority")}
+              onChange={(value) =>
+                form.setValue("priority", value as TodoFormValues["priority"], {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              options={[
+                { value: "1", label: t("priority_high") },
+                { value: "2", label: t("priority_medium") },
+                { value: "3", label: t("priority_low") },
+              ]}
               className="focus:border-[var(--pp-accent)] transition-colors"
-              {...form.register("priority")}
-            >
-              <option value="1">{t("priority_high")}</option>
-              <option value="2">{t("priority_medium")}</option>
-              <option value="3">{t("priority_low")}</option>
-            </select>
+              style={{ ...selectStyle, marginTop: "0.5rem" }}
+            />
           </div>
         </div>
 

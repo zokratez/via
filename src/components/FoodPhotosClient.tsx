@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -1549,18 +1550,16 @@ export function FoodPhotosClient({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2" style={{ marginTop: "1rem" }}>
-          <select
+          <CustomSelect
             value={mealType}
-            onChange={(e) => setMealType(e.target.value as MealType)}
-            aria-label={t("meal_type")}
+            onChange={(value) => setMealType(value as MealType)}
+            ariaLabel={t("meal_type")}
             style={selectStyle}
-          >
-            {MEAL_TYPES.map((item) => (
-              <option key={item} value={item}>
-                {t(`meal_${item}`)}
-              </option>
-            ))}
-          </select>
+            options={MEAL_TYPES.map((item) => ({
+              value: item,
+              label: t(`meal_${item}`),
+            }))}
+          />
 
           <input
             type="datetime-local"
@@ -1924,20 +1923,18 @@ export function FoodPhotosClient({
                         {isEditing ? (
                           <div>
                             <div className="grid gap-2 sm:grid-cols-2">
-                              <select
+                              <CustomSelect
                                 value={editMealType}
-                                onChange={(e) =>
-                                  setEditMealType(e.target.value as MealType)
+                                onChange={(value) =>
+                                  setEditMealType(value as MealType)
                                 }
-                                aria-label={t("meal_type")}
+                                ariaLabel={t("meal_type")}
                                 style={selectStyle}
-                              >
-                                {MEAL_TYPES.map((item) => (
-                                  <option key={item} value={item}>
-                                    {t(`meal_${item}`)}
-                                  </option>
-                                ))}
-                              </select>
+                                options={MEAL_TYPES.map((item) => ({
+                                  value: item,
+                                  label: t(`meal_${item}`),
+                                }))}
+                              />
                               <input
                                 type="datetime-local"
                                 value={editEatenAt}

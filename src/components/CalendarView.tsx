@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
   errorMessageStyle,
@@ -217,6 +218,8 @@ export function CalendarView({
   const selectedEvents = selectedDate
     ? eventsByDay.get(selectedDate) ?? []
     : [];
+  const selectedEventType = form.watch("event_type");
+  const selectedMedicationId = form.watch("related_medication_id");
 
   return (
     <div>
@@ -475,18 +478,25 @@ export function CalendarView({
               <label htmlFor="event-type" style={labelStyle}>
                 {t("form_type")}
               </label>
-              <select
+              <input type="hidden" {...form.register("event_type", { required: true })} />
+              <CustomSelect
                 id="event-type"
-                style={selectStyle}
+                required
+                value={selectedEventType}
+                onBlur={() => form.trigger("event_type")}
+                onChange={(value) =>
+                  form.setValue("event_type", value as EventType, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                options={EVENT_TYPES.map((ty) => ({
+                  value: ty,
+                  label: t(`type_${ty}`),
+                }))}
                 className="focus:border-[var(--pp-accent)] transition-colors"
-                {...form.register("event_type", { required: true })}
-              >
-                {EVENT_TYPES.map((ty) => (
-                  <option key={ty} value={ty}>
-                    {t(`type_${ty}`)}
-                  </option>
-                ))}
-              </select>
+                style={selectStyle}
+              />
             </div>
 
             <div style={formGroupStyle}>
@@ -510,19 +520,27 @@ export function CalendarView({
                 <label htmlFor="event-med" style={labelStyle}>
                   {t("form_medication")}
                 </label>
-                <select
+                <input type="hidden" {...form.register("related_medication_id")} />
+                <CustomSelect
                   id="event-med"
-                  style={selectStyle}
+                  value={selectedMedicationId}
+                  onBlur={() => form.trigger("related_medication_id")}
+                  onChange={(value) =>
+                    form.setValue("related_medication_id", value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  options={[
+                    { value: "", label: t("form_medication_none") },
+                    ...medications.map((m) => ({
+                      value: m.id,
+                      label: m.name,
+                    })),
+                  ]}
                   className="focus:border-[var(--pp-accent)] transition-colors"
-                  {...form.register("related_medication_id")}
-                >
-                  <option value="">{t("form_medication_none")}</option>
-                  {medications.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
+                  style={selectStyle}
+                />
               </div>
             )}
 

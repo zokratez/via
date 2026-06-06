@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import { createClient } from "@/lib/supabase/client";
 import {
   inputStyle,
@@ -824,18 +825,16 @@ export function ProgressPhotosClient({
             <label className="sr-only" htmlFor="progress-angle">
               {t("angle")}
             </label>
-            <select
+            <CustomSelect
               id="progress-angle"
               value={angle}
-              onChange={(e) => setAngle(e.target.value as Angle)}
+              onChange={(value) => setAngle(value as Angle)}
               style={selectStyle}
-            >
-              {ANGLES.map((item) => (
-                <option key={item} value={item}>
-                  {t(`angle_${item}`)}
-                </option>
-              ))}
-            </select>
+              options={ANGLES.map((item) => ({
+                value: item,
+                label: t(`angle_${item}`),
+              }))}
+            />
           </div>
 
           <input

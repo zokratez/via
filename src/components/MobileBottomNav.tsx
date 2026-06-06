@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const HIDDEN_PATH_RE =
-  /^\/(es|en)\/(auth|admin|privacy|terms|reviews\/submit|today)(\/.*)?$/;
+  /^\/(es|en)\/(auth|privacy|terms|reviews\/submit)(\/.*)?$/;
 
 function Icon({
   kind,
@@ -93,7 +93,8 @@ export function MobileBottomNav() {
       href: "/dashboard",
       label: t("dashboard"),
       kind: "panel" as const,
-      active: pathname === `/${locale}/dashboard`,
+      active:
+        pathname === `/${locale}/dashboard` || pathname === `/${locale}/today`,
     },
     {
       href: "/check-in",
