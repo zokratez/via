@@ -999,7 +999,7 @@ select option[value=""] {
   position: relative;
   width: 88px;
   height: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 16px;
   padding: 0 10px;
   display: inline-flex;
@@ -1007,11 +1007,12 @@ select option[value=""] {
   justify-content: center;
   gap: 6px;
   background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(201, 150, 107, 0.82);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
     0 4px 16px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   font-family: var(--pp-font-serif);
@@ -1036,7 +1037,7 @@ select option[value=""] {
 
 .pp-mimeta-pill-icon {
   display: inline-flex;
-  color: rgba(201, 150, 107, 0.6);
+  color: rgba(201, 150, 107, 0.86);
 }
 
 .pp-mimeta-signal-dot {
@@ -1254,19 +1255,19 @@ select option[value=""] {
   z-index: 2;
   width: 56px;
   height: 56px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.34), transparent 34%),
-    linear-gradient(145deg, var(--pp-accent), #9c6a45);
-  color: var(--pp-bg);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(201, 150, 107, 0.92);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
   display: grid;
   place-items: center;
   box-shadow:
     0 18px 36px rgba(0, 0, 0, 0.34),
     0 10px 28px rgba(201, 150, 107, 0.26),
-    inset 0 1px 1px rgba(255, 255, 255, 0.42),
-    inset 0 -10px 16px rgba(0, 0, 0, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.18);
   cursor: pointer;
   font-family: var(--pp-font-sans);
   font-size: 34px;

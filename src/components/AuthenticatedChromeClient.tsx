@@ -1,29 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useLocale } from "next-intl";
 import { MiMeta } from "@/components/MiMeta";
 import { type SignalState } from "@/lib/mimeta/signals";
 
-const APP_SURFACE_RE =
-  /^\/(es|en)\/(today|dashboard|check-in|coach|calendar|goals|food|progress|log|admin|calculadora|calculator)(\/.*)?$/;
+function publicSignal(locale: string): SignalState {
+  return {
+    hasNewSignal: false,
+    signalId: null,
+    statusSentence:
+      locale === "es"
+        ? "Tu meta empieza cuando creas tu registro."
+        : "Your goal starts when you create your record.",
+    progressFraction: 0,
+    nextActions: [],
+  };
+}
 
 export function AuthenticatedChromeClient() {
-  const pathname = usePathname();
   const locale = useLocale();
-  const [signal, setSignal] = useState<SignalState | null>(null);
-
-  const shouldShow = APP_SURFACE_RE.test(pathname);
+  const [signal, setSignal] = useState<SignalState>(() => publicSignal(locale));
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (!shouldShow) {
-      setSignal(null);
-      return;
-    }
-
     const controller = new AbortController();
-    setSignal(null);
+    setSignal(publicSignal(locale));
+    setIsAuthenticated(false);
+
     void (async () => {
       try {
         const res = await fetch("/api/mimeta/signal", {
@@ -32,20 +36,29 @@ export function AuthenticatedChromeClient() {
           body: JSON.stringify({ locale }),
           signal: controller.signal,
         });
+        if (res.status === 401) return;
         if (!res.ok) return;
         const payload = (await res.json()) as { signal?: SignalState };
-        setSignal(payload.signal ?? null);
+        if (payload.signal) {
+          setSignal(payload.signal);
+          setIsAuthenticated(true);
+        }
       } catch (err) {
         if ((err as { name?: string })?.name !== "AbortError") {
-          setSignal(null);
+          setSignal(publicSignal(locale));
+          setIsAuthenticated(false);
         }
       }
     })();
 
     return () => controller.abort();
-  }, [locale, shouldShow]);
+  }, [locale]);
 
-  if (!shouldShow || !signal) return null;
-
-  return <MiMeta signal={signal} surface="today" />;
+  return (
+    <MiMeta
+      signal={signal}
+      surface="today"
+      signupHref={isAuthenticated ? undefined : "/auth/sign-up"}
+    />
+  );
 }

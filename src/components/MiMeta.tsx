@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { type SignalState } from "@/lib/mimeta/signals";
 import { MiMetaSheet } from "@/components/MiMetaSheet";
+import { useRouter } from "@/i18n/navigation";
 
 const LAST_SEEN_SIGNAL_KEY = "mimeta_last_seen_signal_id";
 
@@ -29,11 +30,14 @@ function TargetIcon() {
 export function MiMeta({
   signal,
   surface = "dashboard",
+  signupHref,
 }: {
   signal: SignalState;
   surface?: "dashboard" | "today";
+  signupHref?: string;
 }) {
   const t = useTranslations("mimeta");
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [hasUnseenSignal, setHasUnseenSignal] = useState(false);
   const [scrolling, setScrolling] = useState(false);
@@ -66,6 +70,11 @@ export function MiMeta({
   }, []);
 
   function openSheet() {
+    if (signupHref) {
+      router.push(signupHref);
+      return;
+    }
+
     if (signal.signalId) {
       window.localStorage.setItem(LAST_SEEN_SIGNAL_KEY, signal.signalId);
     }

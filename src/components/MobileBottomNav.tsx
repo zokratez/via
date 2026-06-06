@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LogSheet } from "@/components/LogSheet";
+import { createClient } from "@/lib/supabase/client";
 
 const HIDDEN_PATH_RE =
   /^\/(es|en)\/(auth|privacy|terms|reviews\/submit)(\/.*)?$/;
@@ -87,9 +88,31 @@ export function MobileBottomNav() {
   const t = useTranslations("mobile_nav");
   const tLogSheet = useTranslations("log_sheet");
   const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+
+    void supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setIsAuthenticated(Boolean(data.user));
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (!pathname.startsWith(`/${locale}`)) return null;
   if (HIDDEN_PATH_RE.test(pathname)) return null;
+  if (!isAuthenticated) return null;
 
   const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
   const items = [
