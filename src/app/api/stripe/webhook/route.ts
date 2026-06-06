@@ -234,21 +234,27 @@ export async function POST(req: NextRequest) {
         break;
       }
       case "invoice.payment_failed": {
-        // Defense-in-depth: Stripe will also emit customer.subscription.updated
-        // with status='past_due' alongside this event. Either handler reaching
-        // the DB first lands the user in past_due_grace; the second is a
-        // no-op write of the same value. Stays in grace until either:
-        //   • next charge attempt succeeds → subscription.updated active → 'pro'
-        //   • dunning gives up             → subscription.deleted        → 'free'
+        // Payment failure keeps access only while Stripe still reports the
+        // subscription as past_due. Terminal/non-pro statuses map to free via
+        // tierFromSubscriptionStatus so failed dunning cannot leak Pro access.
         const invoice = event.data.object as Stripe.Invoice;
         const customerId =
           typeof invoice.customer === "string"
             ? invoice.customer
             : invoice.customer?.id ?? null;
         if (!customerId) break;
-        await applyToProfile(customerId, null, {
-          subscription_tier: "past_due_grace",
-        });
+        const sub = await subscriptionFromInvoice(stripe, invoice);
+        if (sub) {
+          await applyToProfile(customerId, null, {
+            stripe_price_id: priceIdFromSubscription(sub),
+            subscription_tier: tierFromSubscriptionStatus(sub.status),
+            subscription_expires_at: periodEndFromSubscription(sub),
+          });
+        } else {
+          await applyToProfile(customerId, null, {
+            subscription_tier: "past_due_grace",
+          });
+        }
         break;
       }
       default: {
