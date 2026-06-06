@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { LogSheet } from "@/components/LogSheet";
+import { createClient } from "@/lib/supabase/client";
 
 const HIDDEN_PATH_RE =
-  /^\/(es|en)\/(auth|admin|privacy|terms|reviews\/submit|today)(\/.*)?$/;
+  /^\/(es|en)\/(auth|privacy|terms|reviews\/submit)(\/.*)?$/;
 
 function Icon({
   kind,
@@ -83,9 +86,33 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("mobile_nav");
+  const tLogSheet = useTranslations("log_sheet");
+  const [isLogSheetOpen, setIsLogSheetOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+
+    void supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setIsAuthenticated(Boolean(data.user));
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   if (!pathname.startsWith(`/${locale}`)) return null;
   if (HIDDEN_PATH_RE.test(pathname)) return null;
+  if (!isAuthenticated) return null;
 
   const calculatorHref = locale === "es" ? "/calculadora" : "/calculator";
   const items = [
@@ -93,7 +120,8 @@ export function MobileBottomNav() {
       href: "/dashboard",
       label: t("dashboard"),
       kind: "panel" as const,
-      active: pathname === `/${locale}/dashboard`,
+      active:
+        pathname === `/${locale}/dashboard` || pathname === `/${locale}/today`,
     },
     {
       href: "/check-in",
@@ -122,26 +150,44 @@ export function MobileBottomNav() {
   }
 
   return (
-    <nav className="pp-mobile-nav" aria-label={t("label")}>
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={item.active ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"}
-          aria-current={item.active ? "page" : undefined}
+    <>
+      <nav className="pp-mobile-nav" aria-label={t("label")}>
+        <button
+          type="button"
+          className="pp-mobile-nav-log-action"
+          onClick={() => setIsLogSheetOpen(true)}
+          aria-label={tLogSheet("title")}
+          aria-haspopup="dialog"
+          aria-expanded={isLogSheetOpen}
         >
-          <Icon kind={item.kind} active={item.active} />
-          <span>{item.label}</span>
-        </Link>
-      ))}
-      <button
-        type="button"
-        onClick={openSearch}
-        className="pp-mobile-nav-item"
-      >
-        <Icon kind="search" active={false} />
-        <span>{t("search")}</span>
-      </button>
-    </nav>
+          <span aria-hidden="true">+</span>
+        </button>
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={
+              item.active ? "pp-mobile-nav-item is-active" : "pp-mobile-nav-item"
+            }
+            aria-current={item.active ? "page" : undefined}
+          >
+            <Icon kind={item.kind} active={item.active} />
+            <span>{item.label}</span>
+          </Link>
+        ))}
+        <button
+          type="button"
+          onClick={openSearch}
+          className="pp-mobile-nav-item"
+        >
+          <Icon kind="search" active={false} />
+          <span>{t("search")}</span>
+        </button>
+      </nav>
+      <LogSheet
+        open={isLogSheetOpen}
+        onClose={() => setIsLogSheetOpen(false)}
+      />
+    </>
   );
 }

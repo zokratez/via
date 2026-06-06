@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import {
   cardStyle,
   errorMessageStyle,
@@ -342,19 +343,20 @@ export function NutritionGoalsClient({
           <label htmlFor="goal-sex" style={labelStyle}>
             {t("sex")}
           </label>
-          <select
+          <CustomSelect
             id="goal-sex"
             required
             value={sex}
-            onChange={(event) => setSex(event.target.value as Sex | "")}
+            onChange={(value) => setSex(value as Sex | "")}
             style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
-          >
-            <option value="">{t("choose")}</option>
-            <option value="female">{t("sex_female")}</option>
-            <option value="male">{t("sex_male")}</option>
-            <option value="other">{t("sex_other")}</option>
-          </select>
+            options={[
+              { value: "", label: t("choose") },
+              { value: "female", label: t("sex_female") },
+              { value: "male", label: t("sex_male") },
+              { value: "other", label: t("sex_other") },
+            ]}
+          />
         </div>
 
         <div style={formGroupStyle}>
@@ -417,38 +419,38 @@ export function NutritionGoalsClient({
           <label htmlFor="goal-activity" style={labelStyle}>
             {t("activity")}
           </label>
-          <select
+          <CustomSelect
             id="goal-activity"
             value={activityLevel}
-            onChange={(event) =>
-              setActivityLevel(event.target.value as ActivityLevel)
-            }
+            onChange={(value) => setActivityLevel(value as ActivityLevel)}
             style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
-          >
-            <option value="sedentary">{t("activity_sedentary")}</option>
-            <option value="light">{t("activity_light")}</option>
-            <option value="moderate">{t("activity_moderate")}</option>
-            <option value="active">{t("activity_active")}</option>
-            <option value="very_active">{t("activity_very_active")}</option>
-          </select>
+            options={[
+              { value: "sedentary", label: t("activity_sedentary") },
+              { value: "light", label: t("activity_light") },
+              { value: "moderate", label: t("activity_moderate") },
+              { value: "active", label: t("activity_active") },
+              { value: "very_active", label: t("activity_very_active") },
+            ]}
+          />
         </div>
 
         <div style={formGroupStyle}>
           <label htmlFor="goal-type" style={labelStyle}>
             {t("goal_type")}
           </label>
-          <select
+          <CustomSelect
             id="goal-type"
             value={goalType}
-            onChange={(event) => setGoalType(event.target.value as GoalType)}
+            onChange={(value) => setGoalType(value as GoalType)}
             style={selectStyle}
             className="focus:border-[var(--pp-accent)] transition-colors"
-          >
-            <option value="lose">{t("goal_lose")}</option>
-            <option value="maintain">{t("goal_maintain")}</option>
-            <option value="gain">{t("goal_gain")}</option>
-          </select>
+            options={[
+              { value: "lose", label: t("goal_lose") },
+              { value: "maintain", label: t("goal_maintain") },
+              { value: "gain", label: t("goal_gain") },
+            ]}
+          />
         </div>
       </section>
 

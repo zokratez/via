@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
+import { CustomSelect } from "@/components/CustomSelect";
 import { LogShell } from "@/components/LogShell";
 import { KNOWN_PEPTIDES } from "@/lib/peptides/known-peptides";
 import { createClient } from "@/lib/supabase/client";
@@ -225,6 +226,7 @@ export default function LogDosePage() {
   };
 
   const selectedSite = doseForm.watch("injection_site");
+  const selectedDoseUnit = doseForm.watch("dose_unit");
   const peptideName = doseForm.watch("peptide_name");
   const selectedFrequency = doseForm.watch("frequency");
   const selectedRoute = doseForm.watch("route");
@@ -377,18 +379,24 @@ export default function LogDosePage() {
                 {...doseForm.register("dose_amount", { required: true })}
                 aria-invalid={!!doseForm.formState.errors.dose_amount}
               />
-              <select
+              <input type="hidden" {...doseForm.register("dose_unit", { required: true })} />
+              <CustomSelect
                 aria-label={t("dose_unit")}
+                value={selectedDoseUnit}
+                onBlur={() => doseForm.trigger("dose_unit")}
+                onChange={(value) =>
+                  doseForm.setValue("dose_unit", value as DoseUnit, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
                 style={{ ...selectStyle, width: "108px" }}
                 className="focus:border-[var(--pp-accent)] transition-colors"
-                {...doseForm.register("dose_unit", { required: true })}
-              >
-                {unitOptions.map((unit) => (
-                  <option key={unit} value={unit}>
-                    {unit}
-                  </option>
-                ))}
-              </select>
+                options={unitOptions.map((unit) => ({
+                  value: unit,
+                  label: unit,
+                }))}
+              />
             </div>
           </div>
 

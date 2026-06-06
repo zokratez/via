@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { AuthenticatedChromeClient } from "@/components/AuthenticatedChromeClient";
 import { Footer } from "@/components/Footer";
 import { FooterGate } from "@/components/FooterGate";
 import { GlobalSearch } from "@/components/GlobalSearch";
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
         </FooterGate>
       </div>
       <GlobalSearch />
+      <AuthenticatedChromeClient />
       <MobileBottomNav />
     </NextIntlClientProvider>
   );

@@ -225,7 +225,7 @@ export function LogSheet({
   const backdropStyle: React.CSSProperties = {
     position: "fixed",
     inset: 0,
-    zIndex: 80,
+    zIndex: 1000,
     display: "flex",
     alignItems: "flex-end",
     justifyContent: "center",
