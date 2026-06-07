@@ -13,11 +13,15 @@ import {
   secondaryBtnStyle,
   selectStyle,
 } from "@/lib/log-form-styles";
+import {
+  calculateEnergy,
+  deriveNutritionTargets,
+  type ActivityLevel,
+  type GoalType,
+  type Sex,
+} from "@/lib/nutrition/targets";
 import { saveNutritionGoalsAction } from "./actions";
 
-type Sex = "male" | "female" | "other";
-type ActivityLevel = "sedentary" | "light" | "moderate" | "active" | "very_active";
-type GoalType = "lose" | "maintain" | "gain";
 type NutritionSource = "computed" | "manual";
 
 export type InitialNutritionGoals = {
@@ -34,105 +38,16 @@ export type InitialNutritionGoals = {
   source: NutritionSource | null;
 };
 
-const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
-  sedentary: 1.2,
-  light: 1.375,
-  moderate: 1.55,
-  active: 1.725,
-  very_active: 1.9,
-};
-
-function roundToNearest(value: number, nearest: number) {
-  return Math.round(value / nearest) * nearest;
-}
-
 function parseNumber(value: string) {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-function parseOptionalTarget(value: string) {
+function parseOptionalTarget(value: string, allowZero = false) {
   if (value.trim() === "") return null;
-  return parseNumber(value);
-}
-
-function calculateMacros({
-  calorieTarget,
-  currentWeightKg,
-  goalWeightKg,
-}: {
-  calorieTarget: number;
-  currentWeightKg: number;
-  goalWeightKg: number | null;
-}) {
-  const referenceWeightKg = Math.min(currentWeightKg, goalWeightKg ?? Infinity, 120);
-  let protein = Math.round(Math.min(180, Math.max(90, referenceWeightKg * 1.6)));
-  let desiredFat = Math.round((calorieTarget * 0.3) / 9);
-
-  while (protein > 90 && protein * 4 + desiredFat * 9 > calorieTarget) {
-    protein -= 1;
-  }
-
-  if (protein * 4 + desiredFat * 9 > calorieTarget) {
-    desiredFat = Math.max(0, Math.floor((calorieTarget - protein * 4) / 9));
-  }
-
-  let best: { fat: number; carbs: number; score: number } | null = null;
-  const maxFat = Math.max(0, Math.floor((calorieTarget - protein * 4) / 9));
-  for (let fat = 0; fat <= maxFat; fat += 1) {
-    const remainingCalories = calorieTarget - protein * 4 - fat * 9;
-    if (remainingCalories < 0 || remainingCalories % 4 !== 0) continue;
-    const score = Math.abs(fat - desiredFat);
-    if (!best || score < best.score) {
-      best = { fat, carbs: remainingCalories / 4, score };
-    }
-  }
-
-  if (best) return { protein, carbs: best.carbs, fat: best.fat };
-
-  const fat = maxFat;
-  const carbs = Math.max(0, Math.round((calorieTarget - protein * 4 - fat * 9) / 4));
-  return { protein, carbs, fat };
-}
-
-function calculateEnergy({
-  sex,
-  age,
-  heightCm,
-  weightKg,
-  activityLevel,
-  goalType,
-}: {
-  sex: Sex | "";
-  age: string;
-  heightCm: string;
-  weightKg: string;
-  activityLevel: ActivityLevel;
-  goalType: GoalType;
-}) {
-  if (!sex) return null;
-  const ageNum = parseNumber(age);
-  const heightNum = parseNumber(heightCm);
-  const weightNum = parseNumber(weightKg);
-  if (!ageNum || !heightNum || !weightNum) return null;
-
-  const sexConstant = sex === "male" ? 5 : sex === "female" ? -161 : -78;
-  const bmr = 10 * weightNum + 6.25 * heightNum - 5 * ageNum + sexConstant;
-  const tdee = bmr * ACTIVITY_MULTIPLIERS[activityLevel];
-  const adjusted =
-    goalType === "lose"
-      ? Math.max(1200, tdee - Math.min(500, tdee * 0.2))
-      : goalType === "gain"
-        ? tdee + 250
-        : tdee;
-  const calories = roundToNearest(adjusted, 10);
-
-  return {
-    bmr: roundToNearest(bmr, 1),
-    tdee: roundToNearest(tdee, 10),
-    calories,
-    weightKg: weightNum,
-  };
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return allowZero ? (parsed >= 0 ? parsed : null) : parsed > 0 ? parsed : null;
 }
 
 function initialString(value: number | null, decimals = 0) {
@@ -154,9 +69,21 @@ export function NutritionGoalsClient({
   const [showSaved, setShowSaved] = useState(saved);
   const [isSaving, startSave] = useTransition();
 
-  const hasSavedCalories = initial.dailyCalories !== null;
-  const hasSavedMacros =
-    initial.proteinG !== null || initial.carbsG !== null || initial.fatG !== null;
+  const isManualSource = initial.source === "manual";
+  const initialDerived = deriveNutritionTargets({
+    sex: initial.sex,
+    age: initial.age,
+    heightCm: initial.heightCm,
+    weightKg: initial.weightKg,
+    goalWeightKg: initial.goalWeightKg,
+    goalType: initial.goalType,
+    persistedTargets: {
+      dailyCalories: initial.dailyCalories,
+      proteinG: initial.proteinG,
+      carbsG: initial.carbsG,
+      fatG: initial.fatG,
+    },
+  });
 
   const [sex, setSex] = useState<Sex | "">(initial.sex ?? "");
   const [age, setAge] = useState(initialString(initial.age));
@@ -164,82 +91,131 @@ export function NutritionGoalsClient({
   const [weightKg, setWeightKg] = useState(initialString(initial.weightKg, 1));
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>("light");
   const [goalType, setGoalType] = useState<GoalType>(initial.goalType ?? "lose");
-  const [calorieTouched, setCalorieTouched] = useState(hasSavedCalories);
-  const [macrosTouched, setMacrosTouched] = useState(hasSavedMacros);
+  const [targetTouched, setTargetTouched] = useState({
+    dailyCalories: isManualSource && initial.dailyCalories !== null,
+    proteinG: isManualSource && initial.proteinG !== null,
+    carbsG: isManualSource && initial.carbsG !== null,
+    fatG: isManualSource && initial.fatG !== null,
+  });
   const [dailyCalories, setDailyCalories] = useState(
-    initialString(initial.dailyCalories),
+    initialString(initial.dailyCalories ?? initialDerived.targets.dailyCalories),
   );
-  const [proteinG, setProteinG] = useState(initialString(initial.proteinG));
-  const [carbsG, setCarbsG] = useState(initialString(initial.carbsG));
-  const [fatG, setFatG] = useState(initialString(initial.fatG));
+  const [proteinG, setProteinG] = useState(
+    initialString(initial.proteinG ?? initialDerived.targets.proteinG),
+  );
+  const [carbsG, setCarbsG] = useState(
+    initialString(initial.carbsG ?? initialDerived.targets.carbsG),
+  );
+  const [fatG, setFatG] = useState(
+    initialString(initial.fatG ?? initialDerived.targets.fatG),
+  );
 
   const computed = useMemo(
     () =>
       calculateEnergy({
-        sex,
-        age,
-        heightCm,
-        weightKg,
+        sex: sex || null,
+        age: parseNumber(age),
+        heightCm: parseNumber(heightCm),
+        weightKg: parseNumber(weightKg),
         activityLevel,
         goalType,
       }),
     [activityLevel, age, goalType, heightCm, sex, weightKg],
   );
 
-  useEffect(() => {
-    if (!computed || calorieTouched) return;
-    setDailyCalories(String(computed.calories));
-  }, [calorieTouched, computed]);
-
-  const activeCalorieTarget = useMemo(() => {
-    return parseOptionalTarget(dailyCalories) ?? computed?.calories ?? null;
-  }, [computed?.calories, dailyCalories]);
-
-  const computedMacros = useMemo(() => {
-    if (!computed || activeCalorieTarget === null) return null;
-    return calculateMacros({
-      calorieTarget: activeCalorieTarget,
-      currentWeightKg: computed.weightKg,
+  const recommended = useMemo(() => {
+    return deriveNutritionTargets({
+      sex: sex || null,
+      age: parseNumber(age),
+      heightCm: parseNumber(heightCm),
+      weightKg: parseNumber(weightKg),
       goalWeightKg: initial.goalWeightKg,
+      activityLevel,
+      goalType,
+      persistedTargets: {
+        dailyCalories: targetTouched.dailyCalories
+          ? parseOptionalTarget(dailyCalories)
+          : null,
+        proteinG: targetTouched.proteinG ? parseOptionalTarget(proteinG) : null,
+      },
     });
-  }, [activeCalorieTarget, computed, initial.goalWeightKg]);
+  }, [
+    activityLevel,
+    age,
+    dailyCalories,
+    goalType,
+    heightCm,
+    initial.goalWeightKg,
+    proteinG,
+    sex,
+    targetTouched.dailyCalories,
+    targetTouched.proteinG,
+    weightKg,
+  ]);
+
+  useEffect(() => {
+    if (!targetTouched.dailyCalories && recommended.targets.dailyCalories !== null) {
+      setDailyCalories(String(recommended.targets.dailyCalories));
+    }
+    if (!targetTouched.proteinG && recommended.targets.proteinG !== null) {
+      setProteinG(String(recommended.targets.proteinG));
+    }
+    if (!targetTouched.carbsG && recommended.targets.carbsG !== null) {
+      setCarbsG(String(recommended.targets.carbsG));
+    }
+    if (!targetTouched.fatG && recommended.targets.fatG !== null) {
+      setFatG(String(recommended.targets.fatG));
+    }
+  }, [
+    recommended.targets.carbsG,
+    recommended.targets.dailyCalories,
+    recommended.targets.fatG,
+    recommended.targets.proteinG,
+    targetTouched.carbsG,
+    targetTouched.dailyCalories,
+    targetTouched.fatG,
+    targetTouched.proteinG,
+  ]);
 
   const canSaveTargets =
-    Boolean(computed) ||
-    parseOptionalTarget(dailyCalories) !== null ||
-    parseOptionalTarget(proteinG) !== null ||
-    parseOptionalTarget(carbsG) !== null ||
+    parseOptionalTarget(dailyCalories) !== null &&
+    parseOptionalTarget(proteinG) !== null &&
+    parseOptionalTarget(carbsG, true) !== null &&
     parseOptionalTarget(fatG) !== null;
 
-  useEffect(() => {
-    if (!computedMacros || macrosTouched) return;
-    setProteinG(String(computedMacros.protein));
-    setCarbsG(String(computedMacros.carbs));
-    setFatG(String(computedMacros.fat));
-  }, [computedMacros, macrosTouched]);
-
   function useComputedTargets() {
-    if (!computed || !computedMacros) return;
-    setDailyCalories(String(computed.calories));
-    const resetMacros = calculateMacros({
-      calorieTarget: computed.calories,
-      currentWeightKg: computed.weightKg,
+    const reset = deriveNutritionTargets({
+      sex: sex || null,
+      age: parseNumber(age),
+      heightCm: parseNumber(heightCm),
+      weightKg: parseNumber(weightKg),
       goalWeightKg: initial.goalWeightKg,
+      activityLevel,
+      goalType,
     });
-    setProteinG(String(resetMacros.protein));
-    setCarbsG(String(resetMacros.carbs));
-    setFatG(String(resetMacros.fat));
-    setCalorieTouched(false);
-    setMacrosTouched(false);
+    setDailyCalories(String(reset.targets.dailyCalories));
+    setProteinG(String(reset.targets.proteinG));
+    setCarbsG(String(reset.targets.carbsG));
+    setFatG(String(reset.targets.fatG));
+    setTargetTouched({
+      dailyCalories: false,
+      proteinG: false,
+      carbsG: false,
+      fatG: false,
+    });
   }
 
   function markCalorieEdited(value: string) {
-    setCalorieTouched(true);
+    setTargetTouched((current) => ({ ...current, dailyCalories: true }));
     setDailyCalories(value);
   }
 
-  function markMacroEdited(setter: (value: string) => void, value: string) {
-    setMacrosTouched(true);
+  function markMacroEdited(
+    key: "proteinG" | "carbsG" | "fatG",
+    setter: (value: string) => void,
+    value: string,
+  ) {
+    setTargetTouched((current) => ({ ...current, [key]: true }));
     setter(value);
   }
 
@@ -250,34 +226,37 @@ export function NutritionGoalsClient({
 
     const parsedCalories = parseOptionalTarget(dailyCalories);
     const parsedProtein = parseOptionalTarget(proteinG);
-    const parsedCarbs = parseOptionalTarget(carbsG);
+    const parsedCarbs = parseOptionalTarget(carbsG, true);
     const parsedFat = parseOptionalTarget(fatG);
-    const hasAnyTarget =
-      parsedCalories !== null ||
-      parsedProtein !== null ||
-      parsedCarbs !== null ||
-      parsedFat !== null;
+    const finalCalories = parsedCalories ?? recommended.targets.dailyCalories;
+    const finalProtein = parsedProtein ?? recommended.targets.proteinG;
+    const finalCarbs = parsedCarbs ?? recommended.targets.carbsG;
+    const finalFat = parsedFat ?? recommended.targets.fatG;
 
-    if (!computed && !hasAnyTarget) {
+    if (
+      finalCalories === null ||
+      finalProtein === null ||
+      finalCarbs === null ||
+      finalFat === null
+    ) {
       setErrorMsg(t("validation_failed"));
       return;
     }
 
     const source: NutritionSource =
-      computed &&
-      computedMacros &&
-      parsedCalories === computed.calories &&
-      parsedProtein === computedMacros.protein &&
-      parsedCarbs === computedMacros.carbs &&
-      parsedFat === computedMacros.fat
+      !Object.values(targetTouched).some(Boolean) &&
+      finalCalories === recommended.targets.dailyCalories &&
+      finalProtein === recommended.targets.proteinG &&
+      finalCarbs === recommended.targets.carbsG &&
+      finalFat === recommended.targets.fatG
         ? "computed"
         : "manual";
 
     const fd = new FormData();
-    fd.set("daily_calorie_target", dailyCalories);
-    fd.set("protein_target_g", proteinG);
-    fd.set("carbs_target_g", carbsG);
-    fd.set("fat_target_g", fatG);
+    fd.set("daily_calorie_target", String(finalCalories));
+    fd.set("protein_target_g", String(finalProtein));
+    fd.set("carbs_target_g", String(finalCarbs));
+    fd.set("fat_target_g", String(finalFat));
     fd.set("nutrition_goal_type", goalType);
     fd.set("nutrition_targets_source", source);
     fd.set("locale", locale);
@@ -516,11 +495,21 @@ export function NutritionGoalsClient({
             >
               {t("manual_hint")}
             </p>
+            <p
+              style={{
+                color: "var(--pp-helper)",
+                fontFamily: "var(--pp-font-sans)",
+                fontSize: "11px",
+                lineHeight: 1.5,
+                margin: "0.45rem 0 0",
+              }}
+            >
+              {t("recommendation_note")}
+            </p>
           </div>
           <button
             type="button"
             onClick={useComputedTargets}
-            disabled={!computed}
             style={secondaryBtnStyle}
             className="hover:text-[var(--pp-accent)] hover:border-[var(--pp-accent)] transition-colors disabled:opacity-40"
           >
@@ -557,7 +546,9 @@ export function NutritionGoalsClient({
               max="1000"
               inputMode="numeric"
               value={proteinG}
-              onChange={(event) => markMacroEdited(setProteinG, event.target.value)}
+              onChange={(event) =>
+                markMacroEdited("proteinG", setProteinG, event.target.value)
+              }
               style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
@@ -574,7 +565,9 @@ export function NutritionGoalsClient({
               max="1000"
               inputMode="numeric"
               value={carbsG}
-              onChange={(event) => markMacroEdited(setCarbsG, event.target.value)}
+              onChange={(event) =>
+                markMacroEdited("carbsG", setCarbsG, event.target.value)
+              }
               style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
@@ -591,7 +584,9 @@ export function NutritionGoalsClient({
               max="1000"
               inputMode="numeric"
               value={fatG}
-              onChange={(event) => markMacroEdited(setFatG, event.target.value)}
+              onChange={(event) =>
+                markMacroEdited("fatG", setFatG, event.target.value)
+              }
               style={inputStyle}
               className="focus:border-[var(--pp-accent)] transition-colors"
             />
