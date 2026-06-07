@@ -106,10 +106,10 @@ export async function createCheckoutSession(
       success_url: `${origin}/${locale}/coach?upgraded=true`,
       cancel_url: `${origin}/${locale}/?canceled=true`,
       locale: locale === "es" ? "es" : "en",
-      metadata: { supabase_user_id: userId, plan },
+      metadata: { supabase_user_id: userId, plan, locale },
       subscription_data: {
         trial_period_days: CHECKOUT_TRIAL_DAYS,
-        metadata: { supabase_user_id: userId, plan },
+        metadata: { supabase_user_id: userId, plan, locale },
       },
       allow_promotion_codes: true,
       payment_method_collection: "always",

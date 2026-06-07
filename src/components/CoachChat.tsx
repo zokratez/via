@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { inputStyle } from "@/lib/log-form-styles";
+import { track } from "@/lib/analytics/client";
 
 const CHARS_PER_FRAME = 30;
 const JSPDF_CDN =
@@ -124,6 +125,7 @@ export function CoachChat({
   const streamDoneRef = useRef<boolean>(false);
   const wasGuardrailRef = useRef<boolean>(false);
   const isStuckToBottomRef = useRef<boolean>(true);
+  const paywallViewedRef = useRef<boolean>(false);
 
   function onScrollContainer() {
     const el = scrollRef.current;
@@ -152,6 +154,15 @@ export function CoachChat({
 
   const quotaExhausted = !isPro && quotaRemaining <= 0;
   const canSend = !quotaExhausted && input.trim().length > 0;
+
+  useEffect(() => {
+    if (!quotaExhausted || paywallViewedRef.current) return;
+    paywallViewedRef.current = true;
+    track("paywall_viewed", {
+      locale,
+      props: { surface: "coach_quota", plan: "annual" },
+    });
+  }, [locale, quotaExhausted]);
 
   function abortAndCleanup() {
     if (rafIdRef.current !== null) {

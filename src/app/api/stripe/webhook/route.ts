@@ -3,6 +3,8 @@ import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import * as Sentry from "@sentry/nextjs";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
+import { trackServerEvent } from "@/lib/analytics/server";
+import type { AnalyticsLocale, AnalyticsProps } from "@/lib/analytics/events";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -64,7 +66,7 @@ async function applyToProfile(
   customerId: string,
   fallbackUserId: string | null,
   update: ProfileUpdate,
-): Promise<void> {
+): Promise<string | null> {
   const admin = getAdminClient();
 
   const byCustomer = await admin
@@ -74,14 +76,19 @@ async function applyToProfile(
     .select("id")
     .maybeSingle();
 
-  if (byCustomer.data) return;
+  if (byCustomer.data) return byCustomer.data.id as string;
 
   if (fallbackUserId) {
-    await admin
+    const fallback = await admin
       .from("profiles")
       .update({ ...update, stripe_customer_id: customerId })
-      .eq("id", fallbackUserId);
+      .eq("id", fallbackUserId)
+      .select("id")
+      .maybeSingle();
+    return fallback.data ? (fallback.data.id as string) : null;
   }
+
+  return null;
 }
 
 function priceIdFromSubscription(sub: Stripe.Subscription): string | null {
@@ -96,6 +103,50 @@ function periodEndFromSubscription(sub: Stripe.Subscription): string | null {
   return typeof periodEnd === "number"
     ? new Date(periodEnd * 1000).toISOString()
     : null;
+}
+
+function localeFromMetadata(
+  metadata: Stripe.Metadata | null | undefined,
+): AnalyticsLocale {
+  return metadata?.locale === "en" ? "en" : "es";
+}
+
+function analyticsPropsFromMetadata(
+  source: string,
+  metadata: Stripe.Metadata | null | undefined,
+): AnalyticsProps {
+  return {
+    source,
+    plan:
+      metadata?.plan === "monthly" || metadata?.plan === "annual"
+        ? metadata.plan
+        : null,
+  };
+}
+
+async function trackSubscriptionConversion(input: {
+  tier: ProfileTier;
+  userId: string | null;
+  locale: AnalyticsLocale;
+  props: AnalyticsProps;
+}) {
+  if (!input.userId) return;
+  if (input.tier === "trialing") {
+    await trackServerEvent({
+      eventName: "trial_started",
+      locale: input.locale,
+      userId: input.userId,
+      props: input.props,
+    });
+  }
+  if (input.tier === "pro") {
+    await trackServerEvent({
+      eventName: "subscription_active",
+      locale: input.locale,
+      userId: input.userId,
+      props: input.props,
+    });
+  }
 }
 
 async function subscriptionFromInvoice(
@@ -160,10 +211,16 @@ export async function POST(req: NextRequest) {
           const sub = await stripe.subscriptions.retrieve(subId);
           priceId = priceIdFromSubscription(sub);
           tier = tierFromSubscriptionStatus(sub.status);
-          await applyToProfile(customerId, supabaseUserId, {
+          const profileId = await applyToProfile(customerId, supabaseUserId, {
             stripe_price_id: priceId,
             subscription_tier: tier,
             subscription_expires_at: periodEndFromSubscription(sub),
+          });
+          await trackSubscriptionConversion({
+            tier,
+            userId: profileId,
+            locale: localeFromMetadata(session.metadata),
+            props: analyticsPropsFromMetadata("checkout", session.metadata),
           });
           break;
         } else {
@@ -173,10 +230,16 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        await applyToProfile(customerId, supabaseUserId, {
+        const profileId = await applyToProfile(customerId, supabaseUserId, {
           stripe_price_id: priceId,
           subscription_tier: tier,
           subscription_expires_at: null,
+        });
+        await trackSubscriptionConversion({
+          tier,
+          userId: profileId,
+          locale: localeFromMetadata(session.metadata),
+          props: analyticsPropsFromMetadata("checkout", session.metadata),
         });
         break;
       }
@@ -187,10 +250,17 @@ export async function POST(req: NextRequest) {
         const priceId = priceIdFromSubscription(sub);
         const supabaseUserId =
           (sub.metadata?.supabase_user_id as string | undefined) ?? null;
-        await applyToProfile(customerId, supabaseUserId, {
+        const tier = tierFromSubscriptionStatus(sub.status);
+        const profileId = await applyToProfile(customerId, supabaseUserId, {
           stripe_price_id: priceId,
-          subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_tier: tier,
           subscription_expires_at: periodEndFromSubscription(sub),
+        });
+        await trackSubscriptionConversion({
+          tier,
+          userId: profileId,
+          locale: localeFromMetadata(sub.metadata),
+          props: analyticsPropsFromMetadata("subscription_created", sub.metadata),
         });
         break;
       }
@@ -199,10 +269,17 @@ export async function POST(req: NextRequest) {
         const customerId =
           typeof sub.customer === "string" ? sub.customer : sub.customer.id;
         const priceId = priceIdFromSubscription(sub);
-        await applyToProfile(customerId, null, {
+        const tier = tierFromSubscriptionStatus(sub.status);
+        const profileId = await applyToProfile(customerId, null, {
           stripe_price_id: priceId,
-          subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_tier: tier,
           subscription_expires_at: periodEndFromSubscription(sub),
+        });
+        await trackSubscriptionConversion({
+          tier,
+          userId: profileId,
+          locale: localeFromMetadata(sub.metadata),
+          props: analyticsPropsFromMetadata("subscription_updated", sub.metadata),
         });
         break;
       }
@@ -226,10 +303,17 @@ export async function POST(req: NextRequest) {
         if (!customerId) break;
         const sub = await subscriptionFromInvoice(stripe, invoice);
         if (!sub) break;
-        await applyToProfile(customerId, null, {
+        const tier = tierFromSubscriptionStatus(sub.status);
+        const profileId = await applyToProfile(customerId, null, {
           stripe_price_id: priceIdFromSubscription(sub),
-          subscription_tier: tierFromSubscriptionStatus(sub.status),
+          subscription_tier: tier,
           subscription_expires_at: periodEndFromSubscription(sub),
+        });
+        await trackSubscriptionConversion({
+          tier,
+          userId: profileId,
+          locale: localeFromMetadata(sub.metadata),
+          props: analyticsPropsFromMetadata("invoice_paid", sub.metadata),
         });
         break;
       }

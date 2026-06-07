@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent } from "@/lib/calendar-log";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const LOCALES = ["es", "en"] as const;
 
@@ -71,6 +72,13 @@ export async function logSleepAction(formData: FormData) {
   } catch {
     // Calendar mirror is best-effort; never block sleep log.
   }
+
+  await trackServerEvent({
+    eventName: "first_log",
+    locale: parsed.data.locale,
+    userId: user.id,
+    props: { log_type: "sleep" },
+  });
 
   redirect({ href: "/dashboard?ok=sleep", locale: parsed.data.locale });
 }

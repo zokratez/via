@@ -27,6 +27,7 @@ import {
   isCheckoutLocale,
   isCheckoutPlan,
 } from "@/lib/stripe/checkout-session";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,6 +64,13 @@ export async function GET(req: NextRequest) {
       new URL(`/${locale}/?error=checkout_failed`, origin),
     );
   }
+
+  await trackServerEvent({
+    eventName: "checkout_started",
+    locale,
+    userId: user.id,
+    props: { plan, surface: "guard" },
+  });
 
   return NextResponse.redirect(result.url, { status: 302 });
 }

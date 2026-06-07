@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const CATEGORIES = [
   "nausea",
@@ -84,6 +85,13 @@ export async function logSymptomAction(formData: FormData) {
   } catch {
     // Calendar mirror is best-effort; never block symptom log.
   }
+
+  await trackServerEvent({
+    eventName: "first_log",
+    locale: parsed.data.locale,
+    userId: user.id,
+    props: { log_type: "symptom" },
+  });
 
   redirect({ href: "/dashboard?ok=symptom", locale: parsed.data.locale });
 }
