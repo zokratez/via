@@ -142,9 +142,13 @@ function ChevronIcon() {
 export function LogSheet({
   open,
   onClose,
+  onboarding = false,
+  locale = "es",
 }: {
   open: boolean;
   onClose: () => void;
+  onboarding?: boolean;
+  locale?: "es" | "en";
 }) {
   const router = useRouter();
   const t = useTranslations("log_sheet");
@@ -221,6 +225,15 @@ export function LogSheet({
     dragStartRef.current = null;
     setDragOffset(0);
   }
+
+  const verbs = onboarding
+    ? VERBS.filter((verb) => verb.key === "dose" || verb.key === "weight").map(
+        (verb) => ({
+          ...verb,
+          href: `/api/onboarding/start-log?kind=${verb.key}&locale=${locale}`,
+        }),
+      )
+    : VERBS;
 
   const backdropStyle: React.CSSProperties = {
     position: "fixed",
@@ -337,7 +350,7 @@ export function LogSheet({
           </header>
 
           <div>
-            {VERBS.map((verb, index) => {
+            {verbs.map((verb, index) => {
               const disabled = verb.disabled || !verb.href;
               return (
                 <button

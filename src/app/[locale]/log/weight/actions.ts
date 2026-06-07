@@ -2,7 +2,12 @@
 
 import { z } from "zod";
 import { getTranslations } from "next-intl/server";
+import { cookies } from "next/headers";
 import { redirect } from "@/i18n/navigation";
+import {
+  clearOnboardingFirstLogCookie,
+  hasConsumedOnboardingFirstLog,
+} from "@/lib/onboarding/first-log";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 import { trackServerEvent } from "@/lib/analytics/server";
@@ -24,6 +29,7 @@ const weightSchema = z.object({
     { message: "out_of_range" },
   ),
   measured_at: z.string().min(1),
+  return_to: z.enum(["onboarding"]).optional(),
   locale: z.enum(LOCALES),
 });
 
@@ -33,6 +39,7 @@ export async function logWeightAction(formData: FormData) {
     waist_cm: formData.get("waist_cm") ?? undefined,
     body_fat_pct: formData.get("body_fat_pct") ?? undefined,
     measured_at: formData.get("measured_at"),
+    return_to: formData.get("return_to") ?? undefined,
     locale: formData.get("locale"),
   };
   const parsed = weightSchema.safeParse(raw);
@@ -48,6 +55,12 @@ export async function logWeightAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "unauthenticated" as const };
+  if (
+    parsed.data.return_to === "onboarding" &&
+    (await hasConsumedOnboardingFirstLog(supabase, user.id))
+  ) {
+    return { error: "db_failed" as const };
+  }
 
   const waist =
     typeof parsed.data.waist_cm === "number" ? parsed.data.waist_cm : null;
@@ -90,6 +103,15 @@ export async function logWeightAction(formData: FormData) {
     userId: user.id,
     props: { log_type: "weight" },
   });
+
+  if (parsed.data.return_to === "onboarding") {
+    const cookieStore = await cookies();
+    clearOnboardingFirstLogCookie(cookieStore, parsed.data.locale);
+    redirect({
+      href: "/onboarding?step=aha&logged=weight",
+      locale: parsed.data.locale,
+    });
+  }
 
   redirect({ href: "/dashboard?ok=weight", locale: parsed.data.locale });
 }

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { LogShell } from "@/components/LogShell";
 import {
   errorMessageStyle,
@@ -34,6 +35,8 @@ export default function LogWeightPage() {
   const t = useTranslations("weight");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const returnToOnboarding = searchParams.get("from") === "onboarding";
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, startSave] = useTransition();
@@ -56,6 +59,7 @@ export default function LogWeightPage() {
     if (v.body_fat_pct) fd.set("body_fat_pct", v.body_fat_pct);
     fd.set("measured_at", v.measured_at);
     fd.set("locale", locale);
+    if (returnToOnboarding) fd.set("return_to", "onboarding");
     startSave(async () => {
       const result = await logWeightAction(fd);
       if (result?.error) setErrorMsg(tErrors("generic"));
