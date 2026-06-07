@@ -68,6 +68,7 @@ type NutritionTargets = {
   proteinG: number | null;
   carbsG: number | null;
   fatG: number | null;
+  source: "profile" | "tdee" | "goal_fallback";
 };
 
 function fileExtension(file: File): string {
@@ -841,6 +842,21 @@ export function FoodPhotosClient({
                   consumed: formatNumber(todayTotals.calories),
                   target: formatNumber(calorieTarget),
                 })}
+              </p>
+              <p
+                style={{
+                  fontFamily: SANS,
+                  color: "var(--pp-helper)",
+                  fontSize: "11px",
+                  lineHeight: 1.5,
+                  margin: "0.55rem 0 0",
+                }}
+              >
+                {t(
+                  nutritionTargets.source === "profile"
+                    ? "target_saved_note"
+                    : "target_estimate_note",
+                )}
               </p>
             </div>
           )}

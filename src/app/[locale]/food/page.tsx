@@ -3,6 +3,11 @@ import { Link, redirect } from "@/i18n/navigation";
 import { FoodPhotosClient } from "@/components/FoodPhotosClient";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
+import {
+  deriveNutritionTargets,
+  type GoalType,
+  type Sex,
+} from "@/lib/nutrition/targets";
 import { createClient } from "@/lib/supabase/server";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
@@ -26,12 +31,26 @@ type NutritionTargets = {
   proteinG: number | null;
   carbsG: number | null;
   fatG: number | null;
+  source: "profile" | "tdee" | "goal_fallback";
 };
 
 function numericValue(value: unknown): number | null {
   if (value === null || value === undefined) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeSex(value: unknown): Sex | null {
+  if (value === "m" || value === "male") return "male";
+  if (value === "f" || value === "female") return "female";
+  if (value === "other") return "other";
+  return null;
+}
+
+function normalizeGoal(value: unknown): GoalType | null {
+  return value === "lose" || value === "maintain" || value === "gain"
+    ? value
+    : null;
 }
 
 export default async function FoodPage({
@@ -53,7 +72,7 @@ export default async function FoodPage({
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "subscription_tier,daily_calorie_target,protein_target_g,carbs_target_g,fat_target_g",
+      "subscription_tier,sex,birth_year,height_cm,goal_weight_kg,daily_calorie_target,protein_target_g,carbs_target_g,fat_target_g,nutrition_goal_type",
     )
     .eq("id", user!.id)
     .maybeSingle();
@@ -76,6 +95,14 @@ export default async function FoodPage({
     .order("eaten_at", { ascending: false })
     .limit(24);
 
+  const { data: latestWeight } = await supabase
+    .from("weight_entries")
+    .select("weight_kg")
+    .eq("user_id", user!.id)
+    .order("measured_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const photos = await Promise.all(
     ((data ?? []) as FoodPhotoRow[]).map(async (photo) => {
       if (!photo.storage_path) return { ...photo, signedUrl: null };
@@ -86,11 +113,31 @@ export default async function FoodPage({
     }),
   );
 
+  const currentYear = new Date().getFullYear();
+  const birthYear = numericValue(profile?.birth_year);
+  const age =
+    birthYear && birthYear > 1900 && birthYear < currentYear
+      ? currentYear - birthYear
+      : null;
+  const derivedTargets = deriveNutritionTargets({
+    sex: normalizeSex(profile?.sex),
+    age,
+    heightCm: numericValue(profile?.height_cm),
+    weightKg:
+      numericValue(latestWeight?.weight_kg) ??
+      numericValue(profile?.goal_weight_kg),
+    goalWeightKg: numericValue(profile?.goal_weight_kg),
+    goalType: normalizeGoal(profile?.nutrition_goal_type),
+    persistedTargets: {
+      dailyCalories: numericValue(profile?.daily_calorie_target),
+      proteinG: numericValue(profile?.protein_target_g),
+      carbsG: numericValue(profile?.carbs_target_g),
+      fatG: numericValue(profile?.fat_target_g),
+    },
+  });
   const nutritionTargets: NutritionTargets = {
-    dailyCalories: numericValue(profile?.daily_calorie_target),
-    proteinG: numericValue(profile?.protein_target_g),
-    carbsG: numericValue(profile?.carbs_target_g),
-    fatG: numericValue(profile?.fat_target_g),
+    ...derivedTargets.targets,
+    source: derivedTargets.source,
   };
 
   const navLinkStyle: React.CSSProperties = {
