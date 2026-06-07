@@ -17,6 +17,10 @@ function jsonResponse(status: number, body: unknown): Response {
   });
 }
 
+function checkoutSurface(value: unknown) {
+  return value === "onboarding" || value === "coach" ? value : "coach";
+}
+
 export async function POST(req: NextRequest) {
   let body: unknown;
   try {
@@ -25,9 +29,10 @@ export async function POST(req: NextRequest) {
     return jsonResponse(400, { error: "invalid_body" });
   }
 
-  const { locale, plan: planInput } = (body ?? {}) as {
+  const { locale, plan: planInput, surface: surfaceInput } = (body ?? {}) as {
     locale?: unknown;
     plan?: unknown;
+    surface?: unknown;
   };
   if (!isCheckoutLocale(locale)) {
     return jsonResponse(400, { error: "invalid_locale" });
@@ -36,6 +41,7 @@ export async function POST(req: NextRequest) {
     return jsonResponse(400, { error: "invalid_plan" });
   }
   const plan = planInput;
+  const surface = checkoutSurface(surfaceInput);
 
   const supabase = await createClient();
   const {
@@ -61,7 +67,7 @@ export async function POST(req: NextRequest) {
     eventName: "checkout_started",
     locale,
     userId: user.id,
-    props: { plan, surface: "coach" },
+    props: { plan, surface },
   });
   return jsonResponse(200, { url: result.url });
 }

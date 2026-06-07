@@ -158,7 +158,7 @@ export default function SignUpPage() {
     }
 
     track("signup_completed", { locale, props });
-    router.push("/dashboard");
+    router.push("/onboarding");
     router.refresh();
   }
 
@@ -169,7 +169,7 @@ export default function SignUpPage() {
     track("signup_started", { locale, props });
     const supabase = createClient();
     const search = new URLSearchParams({
-      next: `/${locale}/dashboard`,
+      next: `/${locale}/onboarding`,
       source: "signup",
     });
     if (plan) search.set("plan", plan);

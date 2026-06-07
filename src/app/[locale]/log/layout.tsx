@@ -14,7 +14,12 @@
  */
 
 import { redirect } from "@/i18n/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import {
+  hasConsumedOnboardingFirstLog,
+  ONBOARDING_FIRST_LOG_COOKIE,
+} from "@/lib/onboarding/first-log";
 import { enforceActiveSubscription } from "@/lib/subscription-guard";
 
 export default async function LogLayout({
@@ -40,10 +45,19 @@ export default async function LogLayout({
     .eq("id", user!.id)
     .maybeSingle();
 
-  await enforceActiveSubscription({
-    tier: profile?.subscription_tier,
-    locale: locale as "es" | "en",
-  });
+  const cookieStore = await cookies();
+  const hasBypassCookie =
+    cookieStore.get(ONBOARDING_FIRST_LOG_COOKIE)?.value === "1";
+  const canUseOnboardingFirstLog =
+    hasBypassCookie &&
+    !(await hasConsumedOnboardingFirstLog(supabase, user!.id));
+
+  if (!canUseOnboardingFirstLog) {
+    await enforceActiveSubscription({
+      tier: profile?.subscription_tier,
+      locale: locale as "es" | "en",
+    });
+  }
 
   return <>{children}</>;
 }

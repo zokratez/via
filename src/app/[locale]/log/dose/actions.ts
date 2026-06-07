@@ -2,7 +2,12 @@
 
 import { z } from "zod";
 import { getTranslations } from "next-intl/server";
+import { cookies } from "next/headers";
 import { redirect } from "@/i18n/navigation";
+import {
+  clearOnboardingFirstLogCookie,
+  hasConsumedOnboardingFirstLog,
+} from "@/lib/onboarding/first-log";
 import { createClient } from "@/lib/supabase/server";
 import { safeLogCalendarEvent, toDateOnly } from "@/lib/calendar-log";
 import { KNOWN_PEPTIDES } from "@/lib/peptides/known-peptides";
@@ -48,6 +53,7 @@ const doseSchema = z.object({
   taken_at: z.string().min(1),
   injection_site: z.enum(SITES).optional(),
   notes: z.string().trim().max(2000).optional(),
+  return_to: z.enum(["onboarding"]).optional(),
   locale: z.enum(LOCALES),
 });
 
@@ -83,6 +89,7 @@ export async function logDoseAction(formData: FormData) {
     taken_at: formData.get("taken_at"),
     injection_site: formText(formData, "injection_site"),
     notes: formText(formData, "notes"),
+    return_to: formText(formData, "return_to"),
     locale: formData.get("locale"),
   };
   const parsed = doseSchema.safeParse(raw);
@@ -98,6 +105,12 @@ export async function logDoseAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "unauthenticated" as const };
+  if (
+    parsed.data.return_to === "onboarding" &&
+    (await hasConsumedOnboardingFirstLog(supabase, user.id))
+  ) {
+    return { error: "db_failed" as const };
+  }
 
   const notes =
     parsed.data.notes && parsed.data.notes.length > 0
@@ -187,6 +200,15 @@ export async function logDoseAction(formData: FormData) {
     userId: user.id,
     props: { log_type: "dose" },
   });
+
+  if (parsed.data.return_to === "onboarding") {
+    const cookieStore = await cookies();
+    clearOnboardingFirstLogCookie(cookieStore, parsed.data.locale);
+    redirect({
+      href: "/onboarding?step=aha&logged=dose",
+      locale: parsed.data.locale,
+    });
+  }
 
   redirect({ href: "/dashboard?ok=dose", locale: parsed.data.locale });
 }

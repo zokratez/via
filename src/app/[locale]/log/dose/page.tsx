@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { CustomSelect } from "@/components/CustomSelect";
 import { LogShell } from "@/components/LogShell";
 import { KNOWN_PEPTIDES } from "@/lib/peptides/known-peptides";
@@ -128,6 +129,8 @@ export default function LogDosePage() {
   const t = useTranslations("dose");
   const tErrors = useTranslations("errors");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const returnToOnboarding = searchParams.get("from") === "onboarding";
 
   const [meds, setMeds] = useState<Medication[] | null>(null);
   const [userPeptides, setUserPeptides] = useState<UserPeptide[]>([]);
@@ -215,6 +218,7 @@ export default function LogDosePage() {
     if (v.injection_site) fd.set("injection_site", v.injection_site);
     if (v.notes) fd.set("notes", v.notes);
     fd.set("locale", locale);
+    if (returnToOnboarding) fd.set("return_to", "onboarding");
     startSaveDose(async () => {
       const result = await logDoseAction(fd);
       if (result?.error) setErrorMsg(tErrors("generic"));
