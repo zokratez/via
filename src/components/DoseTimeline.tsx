@@ -326,11 +326,12 @@ export function DoseTimeline({
         ))}
       </div>
 
-      <ResponsiveContainer width="100%" height={250}>
-        <LineChart
-          data={chartRows}
-          margin={{ top: 14, right: 20, bottom: 8, left: 0 }}
-        >
+      <div data-swipe-nav-ignore="true">
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart
+            data={chartRows}
+            margin={{ top: 14, right: 20, bottom: 8, left: 0 }}
+          >
           <CartesianGrid
             strokeDasharray="2 2"
             stroke="var(--pp-border)"
@@ -378,8 +379,9 @@ export function DoseTimeline({
               isAnimationActive={false}
             />
           ))}
-        </LineChart>
-      </ResponsiveContainer>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
 
       <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
         {series.map((item) => {

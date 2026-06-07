@@ -51,6 +51,7 @@ export function DashboardTabs({
     <div id="dashboard-tabs">
       <div
         role="tablist"
+        data-swipe-nav-ignore="true"
         style={{
           display: "flex",
           gap: "1.5rem",
