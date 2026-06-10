@@ -93,6 +93,11 @@ type Props = {
   isPro: boolean;
   initialThreadId?: string | null;
   initialMessages?: Message[];
+  contextCard?: {
+    title: string;
+    body: string;
+    prompts: string[];
+  } | null;
 };
 
 export function CoachChat({
@@ -101,6 +106,7 @@ export function CoachChat({
   isPro,
   initialThreadId = null,
   initialMessages = [],
+  contextCard = null,
 }: Props) {
   const t = useTranslations("coach");
   const tPaywall = useTranslations("paywall");
@@ -624,6 +630,60 @@ export function CoachChat({
             >
               {errorText}
             </p>
+          )}
+
+          {showEmptyState && contextCard && contextCard.prompts.length > 0 && (
+            <div
+              className="mb-10 rounded-[24px] border p-5"
+              style={{
+                backgroundColor: "var(--pp-surface)",
+                borderColor: "var(--pp-border)",
+                boxShadow: "0 18px 48px rgba(0, 0, 0, 0.24)",
+              }}
+            >
+              <p
+                className="uppercase"
+                style={{
+                  fontFamily: "var(--pp-font-sans)",
+                  fontSize: "10px",
+                  letterSpacing: "0.18em",
+                  color: "var(--pp-text-tertiary)",
+                }}
+              >
+                {contextCard.title}
+              </p>
+              <p
+                className="italic mt-2"
+                style={{
+                  fontFamily: "var(--pp-font-serif)",
+                  fontSize: "15px",
+                  lineHeight: 1.6,
+                  color: "var(--pp-text-secondary)",
+                }}
+              >
+                {contextCard.body}
+              </p>
+              <div className="mt-4 grid gap-2">
+                {contextCard.prompts.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() => setInput(prompt)}
+                    className="rounded-[16px] border px-4 py-3 text-left transition-colors hover:border-[var(--pp-accent)]"
+                    style={{
+                      backgroundColor: "var(--pp-surface-raised)",
+                      borderColor: "var(--pp-border)",
+                      color: "var(--pp-text)",
+                      fontFamily: "var(--pp-font-serif)",
+                      fontSize: "15px",
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CoachChat } from "@/components/CoachChat";
@@ -17,6 +17,12 @@ type InitialMessage = {
   content: string;
 };
 
+type CoachContextCard = {
+  title: string;
+  body: string;
+  prompts: string[];
+};
+
 function todayInMexicoCity(): string {
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Mexico_City",
@@ -25,6 +31,12 @@ function todayInMexicoCity(): string {
     day: "2-digit",
   });
   return fmt.format(new Date());
+}
+
+function numberOrNull(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export default async function CoachPage({
@@ -50,7 +62,9 @@ export default async function CoachPage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_tier")
+    .select(
+      "subscription_tier, daily_calorie_target, protein_target_g, carbs_target_g, fat_target_g, nutrition_goal_type",
+    )
     .eq("id", user!.id)
     .maybeSingle();
   const tier = profile?.subscription_tier ?? "free";
@@ -118,6 +132,90 @@ export default async function CoachPage({
     }
   }
 
+  const t = await getTranslations("coach");
+  const today = todayInMexicoCity();
+  const [foodTodayRes, waterTodayRes, dosesTodayRes] = await Promise.all([
+    supabase
+      .from("food_photos")
+      .select("eaten_at, calories_estimate, protein_g, carbs_g, fat_g")
+      .gte("eaten_at", today),
+    supabase
+      .from("water_entries")
+      .select("drank_at, amount_ml")
+      .gte("drank_at", today),
+    supabase.from("doses").select("taken_at, peptide_name").gte("taken_at", today),
+  ]);
+
+  const foodRows = ((foodTodayRes.data ?? []) as Array<{
+    eaten_at: string;
+    calories_estimate: number | string | null;
+    protein_g: number | string | null;
+    carbs_g: number | string | null;
+    fat_g: number | string | null;
+  }>).filter((row) => row.eaten_at.startsWith(today));
+  const foodTotals = foodRows.reduce(
+    (totals, row) => {
+      totals.calories += numberOrNull(row.calories_estimate) ?? 0;
+      totals.protein += numberOrNull(row.protein_g) ?? 0;
+      totals.carbs += numberOrNull(row.carbs_g) ?? 0;
+      totals.fat += numberOrNull(row.fat_g) ?? 0;
+      return totals;
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  );
+  const waterTotalMl = ((waterTodayRes.data ?? []) as Array<{
+    drank_at: string;
+    amount_ml: number | string | null;
+  }>)
+    .filter((row) => row.drank_at.startsWith(today))
+    .reduce((sum, row) => sum + (numberOrNull(row.amount_ml) ?? 0), 0);
+  const dosesToday = ((dosesTodayRes.data ?? []) as Array<{
+    taken_at: string;
+    peptide_name: string | null;
+  }>).filter((row) => row.taken_at.startsWith(today));
+
+  const calorieTarget = numberOrNull(profile?.daily_calorie_target);
+  const proteinTarget = numberOrNull(profile?.protein_target_g);
+  const contextPrompts: string[] = [];
+
+  if (!calorieTarget && !proteinTarget) {
+    contextPrompts.push(t("context_prompt_set_goal"));
+  }
+
+  if (proteinTarget && foodTotals.protein < proteinTarget) {
+    contextPrompts.push(
+      t("context_prompt_protein_gap", {
+        current: Math.round(foodTotals.protein),
+        target: Math.round(proteinTarget),
+      }),
+    );
+  }
+
+  if (dosesToday.length > 0 && waterTotalMl < 1500) {
+    contextPrompts.push(
+      t("context_prompt_dose_hydration", {
+        water: Math.round(waterTotalMl),
+      }),
+    );
+  }
+
+  if (foodRows.length > 0 || waterTotalMl > 0 || dosesToday.length > 0) {
+    contextPrompts.push(
+      t("context_prompt_daily_map", {
+        calories: Math.round(foodTotals.calories),
+        protein: Math.round(foodTotals.protein),
+        water: Math.round(waterTotalMl),
+        doses: dosesToday.length,
+      }),
+    );
+  }
+
+  const contextCard: CoachContextCard = {
+    title: t("context_card_title"),
+    body: t("context_card_body"),
+    prompts: Array.from(new Set(contextPrompts)).slice(0, 3),
+  };
+
   return (
     <CoachChat
       locale={locale as "es" | "en"}
@@ -125,6 +223,7 @@ export default async function CoachPage({
       initialQuotaRemaining={initialQuotaRemaining}
       initialThreadId={initialThreadId}
       initialMessages={initialMessages}
+      contextCard={contextCard}
     />
   );
 }
