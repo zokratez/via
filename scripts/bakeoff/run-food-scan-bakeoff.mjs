@@ -73,6 +73,7 @@ function usage() {
 Options:
   --limit=N       Run only the first N manifest photos.
   --dry-run       Validate manifest/photo presence without calling OpenAI.
+  --skip-missing  Skip manifest photos that are not present locally.
 
 Photos:
   Put Sam-owned or licensed files in scripts/bakeoff/photos/ matching manifest.json.
@@ -81,7 +82,7 @@ Photos:
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const options = { dryRun: false, limit: undefined };
+  const options = { dryRun: false, limit: undefined, skipMissing: false };
   for (const arg of args) {
     if (arg === "--help" || arg === "-h") {
       usage();
@@ -89,6 +90,10 @@ function parseArgs() {
     }
     if (arg === "--dry-run") {
       options.dryRun = true;
+      continue;
+    }
+    if (arg === "--skip-missing") {
+      options.skipMissing = true;
       continue;
     }
     if (arg.startsWith("--limit=")) {
@@ -341,7 +346,13 @@ function buildReport({ manifest, rows, actualCalls, estimatedCost }) {
 async function main() {
   const options = parseArgs();
   const manifest = JSON.parse(await readFile(MANIFEST_PATH, "utf8"));
-  const photos = manifest.photos.slice(0, options.limit ?? manifest.photos.length);
+  const manifestPhotos = manifest.photos.slice(0, options.limit ?? manifest.photos.length);
+  const missing = manifestPhotos
+    .map((photo) => ({ filename: photo.filename, filePath: path.join(PHOTOS_DIR, photo.filename) }))
+    .filter((photo) => !existsSync(photo.filePath));
+  const photos = options.skipMissing
+    ? manifestPhotos.filter((photo) => existsSync(path.join(PHOTOS_DIR, photo.filename)))
+    : manifestPhotos;
   const projectedCost = photos.length * ESTIMATED_COST_PER_SCAN_USD;
 
   if (photos.length > MAX_CALLS) {
@@ -353,14 +364,15 @@ async function main() {
     );
   }
 
-  const missing = photos
-    .map((photo) => ({ filename: photo.filename, filePath: path.join(PHOTOS_DIR, photo.filename) }))
-    .filter((photo) => !existsSync(photo.filePath));
   if (missing.length > 0) {
+    const label = options.skipMissing ? "Skipping missing bake-off photos:" : "Missing bake-off photos:";
     console.error("Missing bake-off photos:");
     for (const photo of missing) console.error(`- ${photo.filename}`);
-    console.error(`\nPlace images in: ${PHOTOS_DIR}`);
-    process.exit(2);
+    if (!options.skipMissing) {
+      console.error(`\nPlace images in: ${PHOTOS_DIR}`);
+      process.exit(2);
+    }
+    console.error(`\n${label} ${missing.length}. Running ${photos.length} available photos.`);
   }
 
   if (options.dryRun) {
