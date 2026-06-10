@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "name": "SAM-66 Latin food scanner bake-off v1",
+  "model": "gpt-4.1-mini",
+  "locale": "es",
+  "budget": {
+    "estimatedCostPerScanUsd": 0.003,
+    "maxCalls": 100,
+    "maxEstimatedCostUsd": 1
+  },
+  "notes": [
+    "Photos are intentionally not committed. Place Sam-owned or licensed images in scripts/bakeoff/photos/ using the filenames below.",
+    "Reference kcal ranges are deliberately broad common-reference ranges for real-world portions; tighten them as labeled test meals are collected."
+  ],
+  "photos": [
+    {
+      "filename": "tacos-al-pastor-plate.jpg",
+      "expectedDishNames": ["tacos al pastor"],
+      "referenceKcalRange": [450, 850],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "pozole-rojo-bowl.jpg",
+      "expectedDishNames": ["pozole rojo", "pozole"],
+      "referenceKcalRange": [350, 750],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "mole-poblano-rice.jpg",
+      "expectedDishNames": ["mole poblano", "pollo con mole", "arroz"],
+      "referenceKcalRange": [650, 1100],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "tamales-plate.jpg",
+      "expectedDishNames": ["tamales", "tamal"],
+      "referenceKcalRange": [450, 900],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "pupusas-curtido.jpg",
+      "expectedDishNames": ["pupusas", "curtido"],
+      "referenceKcalRange": [500, 1000],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "chilaquiles-verdes-eggs.jpg",
+      "expectedDishNames": ["chilaquiles verdes", "huevo"],
+      "referenceKcalRange": [550, 1050],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "enchiladas-rojas-rice-beans.jpg",
+      "expectedDishNames": ["enchiladas rojas", "arroz", "frijoles"],
+      "referenceKcalRange": [700, 1200],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "carnitas-tacos-salsa.jpg",
+      "expectedDishNames": ["carnitas", "tacos de carnitas"],
+      "referenceKcalRange": [550, 1050],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "carne-asada-plate.jpg",
+      "expectedDishNames": ["carne asada", "arroz", "frijoles"],
+      "referenceKcalRange": [750, 1300],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "quesabirria-consome.jpg",
+      "expectedDishNames": ["quesabirria", "consome", "consomé"],
+      "referenceKcalRange": [650, 1200],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "birria-tacos.jpg",
+      "expectedDishNames": ["birria", "tacos de birria"],
+      "referenceKcalRange": [550, 1050],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "torta-ahogada.jpg",
+      "expectedDishNames": ["torta ahogada"],
+      "referenceKcalRange": [650, 1100],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "sopes-mixed.jpg",
+      "expectedDishNames": ["sopes", "frijoles", "queso"],
+      "referenceKcalRange": [500, 950],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "gorditas-plate.jpg",
+      "expectedDishNames": ["gorditas"],
+      "referenceKcalRange": [500, 1000],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "flautas-crema.jpg",
+      "expectedDishNames": ["flautas", "crema"],
+      "referenceKcalRange": [600, 1100],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "tostadas-ceviche.jpg",
+      "expectedDishNames": ["tostadas", "ceviche"],
+      "referenceKcalRange": [350, 750],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "cochinita-pibil-plate.jpg",
+      "expectedDishNames": ["cochinita pibil", "arroz", "frijoles"],
+      "referenceKcalRange": [700, 1250],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "huevos-rancheros.jpg",
+      "expectedDishNames": ["huevos rancheros", "frijoles"],
+      "referenceKcalRange": [450, 850],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "menudo-bowl.jpg",
+      "expectedDishNames": ["menudo"],
+      "referenceKcalRange": [250, 650],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "caldo-de-res.jpg",
+      "expectedDishNames": ["caldo de res", "verduras"],
+      "referenceKcalRange": [350, 750],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "elote-preparado.jpg",
+      "expectedDishNames": ["elote", "mayonesa", "queso"],
+      "referenceKcalRange": [250, 550],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "esquites-cup.jpg",
+      "expectedDishNames": ["esquites"],
+      "referenceKcalRange": [250, 600],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "paella-mixta.jpg",
+      "expectedDishNames": ["paella mixta", "paella"],
+      "referenceKcalRange": [550, 1000],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "tortilla-espanola-salad.jpg",
+      "expectedDishNames": ["tortilla española", "ensalada"],
+      "referenceKcalRange": [450, 850],
+      "expectedItemCount": 2
+    },
+    {
+      "filename": "arepas-rellenas.jpg",
+      "expectedDishNames": ["arepas", "arepa"],
+      "referenceKcalRange": [450, 950],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "empanadas-plate.jpg",
+      "expectedDishNames": ["empanadas"],
+      "referenceKcalRange": [450, 950],
+      "expectedItemCount": 1
+    },
+    {
+      "filename": "platanos-frijoles-queso.jpg",
+      "expectedDishNames": ["plátanos", "frijoles", "queso"],
+      "referenceKcalRange": [500, 1000],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "mixed-home-plate-rice-beans-chicken.jpg",
+      "expectedDishNames": ["pollo", "arroz", "frijoles", "ensalada"],
+      "referenceKcalRange": [650, 1150],
+      "expectedItemCount": 4
+    },
+    {
+      "filename": "restaurant-combo-low-light.jpg",
+      "expectedDishNames": ["taco", "arroz", "frijoles"],
+      "referenceKcalRange": [700, 1300],
+      "expectedItemCount": 3
+    },
+    {
+      "filename": "weird-portion-leftovers.jpg",
+      "expectedDishNames": ["arroz", "carne", "verduras"],
+      "referenceKcalRange": [350, 850],
+      "expectedItemCount": 3
+    }
+  ]
+}
