@@ -175,6 +175,12 @@ function outputText(payload) {
   );
 }
 
+function redactSecrets(value) {
+  return String(value)
+    .replace(/sk-[A-Za-z0-9_*.-]{12,}/g, "sk-<redacted>")
+    .replace(/sk-proj-[A-Za-z0-9_*.-]{12,}/g, "sk-proj-<redacted>");
+}
+
 function roundMacro(value) {
   const number = Number(value);
   return Number.isFinite(number) ? Math.max(0, Math.round(number * 10) / 10) : 0;
@@ -261,7 +267,7 @@ async function analyzePhoto({ apiKey, photoPath, mimeType }) {
 
   if (!response.ok) {
     const body = await response.text().catch(() => "");
-    throw new Error(`OpenAI ${response.status}: ${body.slice(0, 1600)}`);
+    throw new Error(`OpenAI ${response.status}: ${redactSecrets(body).slice(0, 1600)}`);
   }
 
   const payload = await response.json();
