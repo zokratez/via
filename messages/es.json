@@ -728,6 +728,12 @@
     "example_1": "¿Qué comer si tengo náuseas?",
     "example_2": "Me salté una dosis, ¿qué hago?",
     "example_3": "¿Cómo rotar los sitios de inyección?",
+    "context_card_title": "contexto de hoy",
+    "context_card_body": "Bukowski puede leer tus metas y registros como mapa de conversación. Elige una pregunta o escribe la tuya.",
+    "context_prompt_set_goal": "Ayúdame a fijar una meta simple de calorías y proteína para empezar, sin prometer resultados médicos.",
+    "context_prompt_protein_gap": "Hoy llevo {current} g de proteína de {target} g. ¿Qué opciones prácticas podría considerar para cerrar la brecha?",
+    "context_prompt_dose_hydration": "Hoy registré dosis y llevo {water} ml de agua. ¿Qué señales conviene observar y qué le preguntaría a mi médico?",
+    "context_prompt_daily_map": "Lee mi mapa de hoy: {calories} kcal, {protein} g proteína, {water} ml agua, {doses} dosis. ¿Qué patrón ves?",
     "canned": {
       "crisis": "Lo que me cuentas es importante. Quiero asegurarme de que estés bien antes de seguir.\n\nSi estás en peligro o pensando en hacerte daño, por favor contacta:\n• México: Línea de la Vida 800-290-0024 (24/7, gratis)\n• EE.UU.: 988 Suicide & Crisis Lifeline (oprime 2 para español)\n• Emergencia médica: 911\n\n¿Estás a salvo en este momento? Estoy aquí.",
       "dose_advice": "Esa es una decisión entre tu médico y tú — yo no te puedo recomendar dosis. Lo que sí podemos hacer es preparar las preguntas para tu próxima cita: qué efectos has notado, qué quieres ajustar, qué necesitas saber. ¿Quieres que te ayude con eso?",

@@ -728,6 +728,12 @@
     "example_1": "What should I eat if I have nausea?",
     "example_2": "I missed a dose, what do I do?",
     "example_3": "How do I rotate injection sites?",
+    "context_card_title": "today's context",
+    "context_card_body": "Bukowski can read your goals and logs as a conversation map. Pick a question or write your own.",
+    "context_prompt_set_goal": "Help me set a simple calorie and protein goal to start, without promising medical results.",
+    "context_prompt_protein_gap": "I'm at {current} g protein out of {target} g today. What practical options could I consider to close the gap?",
+    "context_prompt_dose_hydration": "I logged a dose today and I'm at {water} ml of water. What should I observe and ask my doctor about?",
+    "context_prompt_daily_map": "Read my map for today: {calories} kcal, {protein} g protein, {water} ml water, {doses} doses. What pattern do you see?",
     "canned": {
       "crisis": "What you're telling me matters. I want to make sure you're okay before we continue.\n\nIf you're in danger or having thoughts of hurting yourself, please reach out:\n• US: 988 Suicide & Crisis Lifeline (press 2 for Spanish)\n• Mexico: Línea de la Vida 800-290-0024 (24/7, free)\n• Medical emergency: 911\n\nAre you safe right now? I'm here.",
       "dose_advice": "That's a decision between you and your doctor — I can't recommend doses. What we can do is prep your questions for your next appointment: what effects you've noticed, what you want to adjust, what you need to know. Want help with that?",
