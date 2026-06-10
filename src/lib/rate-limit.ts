@@ -25,3 +25,11 @@ export const foodScanRateLimit = new Ratelimit({
   analytics: false,
   prefix: "rl:food-scan",
 });
+
+export const fantasmaRateLimit = new Ratelimit({
+  redis,
+  // Generous dev window for SAM-70 piece 2. Trial/Pro gating lands later.
+  limiter: Ratelimit.slidingWindow(120, "1 d"),
+  analytics: false,
+  prefix: "rl:fantasma",
+});
