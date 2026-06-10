@@ -9,13 +9,14 @@ const MODEL = "gpt-4.1-mini";
 const ESTIMATED_COST_PER_SCAN_USD = 0.003;
 const MAX_CALLS = 100;
 const MAX_ESTIMATED_COST_USD = 1;
+const PROMPT_VERSION = "prompt-v2";
 const SCRIPT_DIR = path.dirname(new URL(import.meta.url).pathname);
 const MANIFEST_PATH = path.join(SCRIPT_DIR, "manifest.json");
 const PHOTOS_DIR = path.join(SCRIPT_DIR, "photos");
 const REPORTS_DIR = path.join(SCRIPT_DIR, "reports");
 const REPORT_PATH = path.join(
   REPORTS_DIR,
-  `${new Date().toISOString().slice(0, 10)}-latin-food-scan-bakeoff.md`,
+  `${new Date().toISOString().slice(0, 10)}-latin-food-scan-bakeoff-${PROMPT_VERSION}.md`,
 );
 
 const FOOD_SCAN_JSON_SCHEMA = {
@@ -239,7 +240,12 @@ async function analyzePhoto({ apiKey, photoPath, mimeType }) {
         {
           role: "system",
           content:
-            "You estimate food macros from meal photos for a nutrition journal. Return careful estimates, not medical advice.",
+            [
+              "You estimate food macros from meal photos for a nutrition journal. Return careful estimates, not medical advice.",
+              "Identifica el platillo por su nombre específico cuando sea reconocible (al pastor, birria, pozole, chilaquiles...) — no nombres genéricos como 'tacos de carne' si hay señales del platillo específico.",
+              "Agrupa por platillo, no por ingredientes — huevos rancheros es UN platillo, no huevos + salsa + tortilla.",
+              "Guarniciones (limón, rábanos, crema, salsa) NO cuentan como items separados.",
+            ].join(" "),
         },
         {
           role: "user",
@@ -307,6 +313,7 @@ function buildReport({ manifest, rows, actualCalls, estimatedCost }) {
     "",
     `Generated: ${new Date().toISOString()}`,
     `Model: ${MODEL}`,
+    `Prompt: ${PROMPT_VERSION}`,
     `Manifest: ${manifest.name}`,
     `Actual OpenAI calls: ${actualCalls}`,
     `Estimated cost: $${estimatedCost.toFixed(3)} (${actualCalls} x $${ESTIMATED_COST_PER_SCAN_USD.toFixed(3)})`,

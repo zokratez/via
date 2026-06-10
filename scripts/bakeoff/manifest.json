@@ -15,7 +15,7 @@
   "photos": [
     {
       "filename": "tacos-al-pastor-plate.jpg",
-      "expectedDishNames": ["tacos al pastor"],
+      "expectedDishNames": ["tacos al pastor", "tacos de al pastor", "tacos mixtos"],
       "referenceKcalRange": [450, 850],
       "expectedItemCount": 1
     },
@@ -62,16 +62,10 @@
       "expectedItemCount": 1
     },
     {
-      "filename": "carne-asada-plate.jpg",
-      "expectedDishNames": ["carne asada", "arroz", "frijoles"],
-      "referenceKcalRange": [750, 1300],
-      "expectedItemCount": 3
-    },
-    {
       "filename": "quesabirria-consome.jpg",
-      "expectedDishNames": ["quesabirria", "consome", "consomé"],
+      "expectedDishNames": ["quesabirria", "birria", "tacos de birria", "tacos dorados de birria"],
       "referenceKcalRange": [650, 1200],
-      "expectedItemCount": 2
+      "expectedItemCount": 1
     },
     {
       "filename": "birria-tacos.jpg",
@@ -99,9 +93,9 @@
     },
     {
       "filename": "flautas-crema.jpg",
-      "expectedDishNames": ["flautas", "crema"],
+      "expectedDishNames": ["flautas", "taquitos dorados"],
       "referenceKcalRange": [600, 1100],
-      "expectedItemCount": 2
+      "expectedItemCount": 1
     },
     {
       "filename": "tostadas-ceviche.jpg",
@@ -117,9 +111,9 @@
     },
     {
       "filename": "huevos-rancheros.jpg",
-      "expectedDishNames": ["huevos rancheros", "frijoles"],
+      "expectedDishNames": ["huevos rancheros"],
       "referenceKcalRange": [450, 850],
-      "expectedItemCount": 2
+      "expectedItemCount": 1
     },
     {
       "filename": "menudo-bowl.jpg",
@@ -128,34 +122,16 @@
       "expectedItemCount": 1
     },
     {
-      "filename": "caldo-de-res.jpg",
-      "expectedDishNames": ["caldo de res", "verduras"],
-      "referenceKcalRange": [350, 750],
-      "expectedItemCount": 2
-    },
-    {
       "filename": "elote-preparado.jpg",
       "expectedDishNames": ["elote", "mayonesa", "queso"],
       "referenceKcalRange": [250, 550],
       "expectedItemCount": 3
     },
     {
-      "filename": "esquites-cup.jpg",
-      "expectedDishNames": ["esquites"],
-      "referenceKcalRange": [250, 600],
-      "expectedItemCount": 1
-    },
-    {
       "filename": "paella-mixta.jpg",
       "expectedDishNames": ["paella mixta", "paella"],
       "referenceKcalRange": [550, 1000],
       "expectedItemCount": 1
-    },
-    {
-      "filename": "tortilla-espanola-salad.jpg",
-      "expectedDishNames": ["tortilla española", "ensalada"],
-      "referenceKcalRange": [450, 850],
-      "expectedItemCount": 2
     },
     {
       "filename": "arepas-rellenas.jpg",

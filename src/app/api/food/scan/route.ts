@@ -272,7 +272,12 @@ export async function POST(req: Request) {
           {
             role: "system",
             content:
-              "You estimate food macros from meal photos for a nutrition journal. Return careful estimates, not medical advice.",
+              [
+                "You estimate food macros from meal photos for a nutrition journal. Return careful estimates, not medical advice.",
+                "Identifica el platillo por su nombre específico cuando sea reconocible (al pastor, birria, pozole, chilaquiles...) — no nombres genéricos como 'tacos de carne' si hay señales del platillo específico.",
+                "Agrupa por platillo, no por ingredientes — huevos rancheros es UN platillo, no huevos + salsa + tortilla.",
+                "Guarniciones (limón, rábanos, crema, salsa) NO cuentan como items separados.",
+              ].join(" "),
           },
           {
             role: "user",
