@@ -51,7 +51,18 @@ const FOOD_SCAN_JSON_SCHEMA = {
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["name", "calories", "protein", "carbs", "fat", "confidence"],
+          required: [
+            "name",
+            "calories",
+            "protein",
+            "carbs",
+            "fat",
+            "confidence",
+            "quantity",
+            "unit",
+            "servingDescription",
+            "fdcId",
+          ],
           properties: {
             name: { type: "string" },
             calories: { type: "number" },
@@ -59,10 +70,10 @@ const FOOD_SCAN_JSON_SCHEMA = {
             carbs: { type: "number" },
             fat: { type: "number" },
             confidence: { type: "number", minimum: 0, maximum: 1 },
-            quantity: { type: "number" },
-            unit: { type: "string" },
-            servingDescription: { type: "string" },
-            fdcId: { type: "number" },
+            quantity: { type: ["number", "null"] },
+            unit: { type: ["string", "null"] },
+            servingDescription: { type: ["string", "null"] },
+            fdcId: { type: ["number", "null"] },
           },
         },
       },
@@ -136,6 +147,32 @@ function outputText(payload: {
       ?.text ??
     ""
   );
+}
+
+function parseOpenAiError(body: string) {
+  try {
+    const parsed = JSON.parse(body) as {
+      error?: {
+        code?: unknown;
+        message?: unknown;
+        param?: unknown;
+        type?: unknown;
+      };
+    };
+    const error = parsed.error;
+    if (!error) return null;
+    return {
+      code: typeof error.code === "string" ? error.code : "openai_error",
+      message:
+        typeof error.message === "string"
+          ? error.message.slice(0, 500)
+          : "OpenAI request failed.",
+      param: typeof error.param === "string" ? error.param : undefined,
+      type: typeof error.type === "string" ? error.type : undefined,
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function getBearerUser(authHeader: string | null) {
@@ -262,8 +299,19 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      console.error("[food/scan] openai", response.status, body.slice(0, 500));
-      return jsonResponse(502, { error: "analysis_failed" }, rateHeaders);
+      const upstream = parseOpenAiError(body);
+      console.error("[food/scan] openai", response.status, upstream ?? body.slice(0, 1200));
+      return jsonResponse(
+        502,
+        {
+          error: "analysis_failed",
+          upstream: upstream ?? {
+            code: "openai_error",
+            message: body.slice(0, 500) || "OpenAI request failed.",
+          },
+        },
+        rateHeaders,
+      );
     }
 
     const payload = (await response.json()) as {
