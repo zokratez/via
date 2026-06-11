@@ -54,7 +54,10 @@ function isFantasmaMessage(value: unknown): value is FantasmaMessage {
 }
 
 function sanitizeMessages(messages: FantasmaMessage[]) {
-  return messages.slice(-MAX_MESSAGES).map((message) => ({
+  const firstUserIndex = messages.findIndex((message) => message.role === "user");
+  if (firstUserIndex < 0) return [];
+
+  return messages.slice(firstUserIndex).slice(-MAX_MESSAGES).map((message) => ({
     role: message.role,
     content: message.content.slice(0, MAX_MESSAGE_CHARS),
   }));
