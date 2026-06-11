@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 
 import { fantasmaRateLimit } from "@/lib/rate-limit";
+import { isActiveSubscriber } from "@/lib/subscription";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -13,6 +14,7 @@ const MODEL = "claude-haiku-4-5-20251001";
 const MAX_TOKENS = 700;
 const MAX_MESSAGES = 16;
 const MAX_MESSAGE_CHARS = 1800;
+const FANTASMA_TRIAL_MS = 24 * 60 * 60 * 1000;
 
 type Locale = "es" | "en";
 type FantasmaRole = "user" | "assistant";
@@ -37,6 +39,11 @@ type UserContextSnapshot = {
 
 type AuthenticatedUser = {
   id: string;
+};
+
+type FantasmaProfile = {
+  subscription_tier: string | null;
+  fantasma_trial_started_at: string | null;
 };
 
 function jsonResponse(status: number, body: unknown, headers?: HeadersInit) {
@@ -195,6 +202,31 @@ function rateHeaders(input: { limit: number; remaining: number; reset: number })
   };
 }
 
+async function loadProfileWithTrial(userId: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error("missing_supabase_service_role_env");
+
+  const admin = createSupabaseJsClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await admin
+    .from("profiles")
+    .select("subscription_tier, fantasma_trial_started_at")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return { profile: data as FantasmaProfile | null, admin };
+}
+
+function isTrialActive(startedAt: string | null, nowMs: number) {
+  if (!startedAt) return false;
+  const startMs = new Date(startedAt).getTime();
+  if (!Number.isFinite(startMs)) return false;
+  return nowMs < startMs + FANTASMA_TRIAL_MS;
+}
+
 export async function POST(req: NextRequest) {
   let body: unknown;
   try {
@@ -239,6 +271,39 @@ export async function POST(req: NextRequest) {
     return jsonResponse(500, { error: "auth_failed" });
   }
   if (!user) return jsonResponse(401, { error: "unauthorized" });
+
+  let profile: FantasmaProfile | null;
+  try {
+    const loaded = await loadProfileWithTrial(user.id);
+    profile = loaded.profile;
+    if (!profile) {
+      throw new Error("profile_missing");
+    }
+
+    if (!profile?.fantasma_trial_started_at) {
+      const trialStartedAt = new Date().toISOString();
+      const { data: updated, error: updateError } = await loaded.admin
+        .from("profiles")
+        .update({ fantasma_trial_started_at: trialStartedAt })
+        .eq("id", user.id)
+        .select("subscription_tier, fantasma_trial_started_at")
+        .maybeSingle();
+
+      if (updateError) throw updateError;
+      if (!updated) throw new Error("profile_trial_update_missing");
+      profile = updated as FantasmaProfile;
+    }
+  } catch (error) {
+    console.error("[fantasma] profile", error);
+    Sentry.captureException(error);
+    return jsonResponse(500, { error: "profile_failed" });
+  }
+
+  const isPro = isActiveSubscriber(profile?.subscription_tier);
+  const trialActive = isTrialActive(profile?.fantasma_trial_started_at ?? null, Date.now());
+  if (!isPro && !trialActive) {
+    return jsonResponse(403, { error: "trial_expired" });
+  }
 
   const remaining = await fantasmaRateLimit.getRemaining(user.id);
   if (remaining.remaining <= 0) {
