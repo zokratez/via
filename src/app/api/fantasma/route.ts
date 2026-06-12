@@ -15,10 +15,25 @@ const MAX_TOKENS = 700;
 const MAX_MESSAGES = 16;
 const MAX_MESSAGE_CHARS = 1800;
 const FANTASMA_TRIAL_MESSAGE_LIMIT = 3;
+const ACTION_START = "<paco_action>";
+const ACTION_END = "</paco_action>";
 
 type Locale = "es" | "en";
 type FantasmaRole = "user" | "assistant";
 type FantasmaMessage = { role: FantasmaRole; content: string };
+type ProposedMealType = "breakfast" | "lunch" | "dinner" | "snack" | "meal";
+type ProposedAction =
+  | { type: "water"; amount_ml: number; note?: string | null }
+  | {
+      type: "food";
+      description: string;
+      meal_type: ProposedMealType;
+      calories: number | null;
+      protein_g: number | null;
+      carbs_g: number | null;
+      fat_g: number | null;
+    }
+  | { type: "weight"; weight_kg: number };
 
 type UserContextSnapshot = {
   caloriesIn?: unknown;
@@ -69,6 +84,94 @@ function sanitizeMessages(messages: FantasmaMessage[]) {
     role: message.role,
     content: message.content.slice(0, MAX_MESSAGE_CHARS),
   }));
+}
+
+function finiteNumber(value: unknown) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function optionalMacro(value: unknown) {
+  const number = finiteNumber(value);
+  if (number === null || number < 0) return null;
+  return Math.round(number * 10) / 10;
+}
+
+function validMealType(value: unknown): ProposedMealType {
+  if (
+    value === "breakfast" ||
+    value === "lunch" ||
+    value === "dinner" ||
+    value === "snack" ||
+    value === "meal"
+  ) {
+    return value;
+  }
+  return "meal";
+}
+
+function normalizeProposedAction(value: unknown): ProposedAction | null {
+  if (!value || typeof value !== "object") return null;
+  const action = value as Record<string, unknown>;
+
+  if (action.type === "water") {
+    const amountMl = finiteNumber(action.amount_ml);
+    if (amountMl === null || amountMl <= 0 || amountMl > 3000) return null;
+    return {
+      type: "water",
+      amount_ml: Math.round(amountMl),
+      note:
+        typeof action.note === "string" && action.note.trim()
+          ? action.note.slice(0, 180)
+          : null,
+    };
+  }
+
+  if (action.type === "food") {
+    const description = typeof action.description === "string" ? action.description.trim() : "";
+    if (!description) return null;
+    return {
+      type: "food",
+      description: description.slice(0, 180),
+      meal_type: validMealType(action.meal_type),
+      calories: optionalMacro(action.calories),
+      protein_g: optionalMacro(action.protein_g),
+      carbs_g: optionalMacro(action.carbs_g),
+      fat_g: optionalMacro(action.fat_g),
+    };
+  }
+
+  if (action.type === "weight") {
+    const weightKg = finiteNumber(action.weight_kg);
+    if (weightKg === null || weightKg <= 0 || weightKg > 500) return null;
+    return {
+      type: "weight",
+      weight_kg: Math.round(weightKg * 10) / 10,
+    };
+  }
+
+  return null;
+}
+
+function extractProposedAction(rawText: string) {
+  const start = rawText.indexOf(ACTION_START);
+  const end = rawText.indexOf(ACTION_END, start + ACTION_START.length);
+  let proposedAction: ProposedAction | null = null;
+
+  if (start >= 0 && end > start) {
+    const json = rawText.slice(start + ACTION_START.length, end).trim();
+    try {
+      proposedAction = normalizeProposedAction(JSON.parse(json));
+    } catch {
+      proposedAction = null;
+    }
+  }
+
+  const cleanText = rawText
+    .replace(new RegExp(`${ACTION_START}[\\s\\S]*?${ACTION_END}`, "g"), "")
+    .trim();
+
+  return { cleanText, proposedAction };
 }
 
 function numberOrDash(value: unknown, suffix = "") {
@@ -159,6 +262,15 @@ function systemPrompt(locale: Locale, context: UserContextSnapshot) {
     "- You may explain general literature patterns, help prepare questions, and suggest non-medical tracking actions like logging water, food, sleep, symptoms, or weight.",
     "- Keep answers short, concrete, and warm. No theatrics. No vendor recommendations.",
     "- Responde en texto plano, sin markdown, sin asteriscos, sin encabezados.",
+    "",
+    "Confirmable action protocol:",
+    "- You may propose at most ONE log action per reply, only when it naturally helps the user's stated goal.",
+    "- The user must explicitly confirm before anything is written. You never say that you logged it yourself.",
+    "- Allowed action types: water, food, weight. NEVER propose medication, peptide, supplement, vitamin, or dose actions.",
+    "- If proposing an action, append exactly one machine-readable block after your plain-text reply. Do not describe the JSON.",
+    `- Water example: ${ACTION_START}{"type":"water","amount_ml":500,"note":"Sugerido por El Fantasma"}${ACTION_END}`,
+    `- Food example: ${ACTION_START}{"type":"food","description":"tacos de asada","meal_type":"meal","calories":520,"protein_g":34,"carbs_g":48,"fat_g":22}${ACTION_END}`,
+    `- Weight example: ${ACTION_START}{"type":"weight","weight_kg":88.4}${ACTION_END}`,
     "",
     contextBlock(context),
   ].join("\n");
@@ -361,6 +473,10 @@ export async function POST(req: NextRequest) {
       .join("")
       .trim();
     if (!text) return jsonResponse(502, { error: "empty_model_response" }, rateHeaders(remaining));
+    const { cleanText, proposedAction } = extractProposedAction(text);
+    if (!cleanText) {
+      return jsonResponse(502, { error: "empty_model_response" }, rateHeaders(remaining));
+    }
 
     let trialRemainingAfter = trialRemainingBefore;
     if (!isPro) {
@@ -390,10 +506,11 @@ export async function POST(req: NextRequest) {
       {
         message: {
           role: "assistant",
-          content: text,
+          content: cleanText,
         },
         model: MODEL,
         trial_messages_remaining: trialRemainingAfter,
+        proposed_action: proposedAction,
       },
       { ...rateHeaders(committed), ...trialHeaders(trialRemainingAfter) },
     );
