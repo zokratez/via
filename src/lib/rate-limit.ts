@@ -28,7 +28,8 @@ export const foodScanRateLimit = new Ratelimit({
 
 export const fantasmaRateLimit = new Ratelimit({
   redis,
-  // Generous dev window for SAM-70 piece 2. Trial/Pro gating lands later.
+  // Generous safety window. The SAM-70 3-message trial / Pro gate lives
+  // in /api/fantasma and this counter is consumed only after model success.
   limiter: Ratelimit.slidingWindow(120, "1 d"),
   analytics: false,
   prefix: "rl:fantasma",
