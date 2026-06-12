@@ -14,7 +14,7 @@ const MODEL = "claude-haiku-4-5-20251001";
 const MAX_TOKENS = 700;
 const MAX_MESSAGES = 16;
 const MAX_MESSAGE_CHARS = 1800;
-const FANTASMA_TRIAL_MS = 24 * 60 * 60 * 1000;
+const FANTASMA_TRIAL_MESSAGE_LIMIT = 3;
 
 type Locale = "es" | "en";
 type FantasmaRole = "user" | "assistant";
@@ -44,6 +44,7 @@ type AuthenticatedUser = {
 type FantasmaProfile = {
   subscription_tier: string | null;
   fantasma_trial_started_at: string | null;
+  fantasma_trial_messages_used: number | null;
 };
 
 function jsonResponse(status: number, body: unknown, headers?: HeadersInit) {
@@ -202,17 +203,28 @@ function rateHeaders(input: { limit: number; remaining: number; reset: number })
   };
 }
 
-async function loadProfileWithTrial(userId: string) {
+function trialHeaders(remaining: number | null): Record<string, string> {
+  if (remaining === null) return {};
+  return {
+    "X-Fantasma-Trial-Remaining": String(remaining),
+  };
+}
+
+function getProfileAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error("missing_supabase_service_role_env");
 
-  const admin = createSupabaseJsClient(url, key, {
+  return createSupabaseJsClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+}
+
+async function loadProfileWithTrial(userId: string) {
+  const admin = getProfileAdminClient();
   const { data, error } = await admin
     .from("profiles")
-    .select("subscription_tier, fantasma_trial_started_at")
+    .select("subscription_tier, fantasma_trial_started_at, fantasma_trial_messages_used")
     .eq("id", userId)
     .maybeSingle();
 
@@ -220,11 +232,14 @@ async function loadProfileWithTrial(userId: string) {
   return { profile: data as FantasmaProfile | null, admin };
 }
 
-function isTrialActive(startedAt: string | null, nowMs: number) {
-  if (!startedAt) return false;
-  const startMs = new Date(startedAt).getTime();
-  if (!Number.isFinite(startMs)) return false;
-  return nowMs < startMs + FANTASMA_TRIAL_MS;
+function safeTrialMessagesUsed(value: number | null | undefined) {
+  const number = Number(value ?? 0);
+  if (!Number.isFinite(number)) return 0;
+  return Math.max(0, Math.floor(number));
+}
+
+function trialMessagesRemaining(used: number) {
+  return Math.max(0, FANTASMA_TRIAL_MESSAGE_LIMIT - used);
 }
 
 export async function POST(req: NextRequest) {
@@ -273,9 +288,11 @@ export async function POST(req: NextRequest) {
   if (!user) return jsonResponse(401, { error: "unauthorized" });
 
   let profile: FantasmaProfile | null;
+  let profileAdmin: ReturnType<typeof getProfileAdminClient> | null = null;
   try {
     const loaded = await loadProfileWithTrial(user.id);
     profile = loaded.profile;
+    profileAdmin = loaded.admin;
     if (!profile) {
       throw new Error("profile_missing");
     }
@@ -286,7 +303,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .update({ fantasma_trial_started_at: trialStartedAt })
         .eq("id", user.id)
-        .select("subscription_tier, fantasma_trial_started_at")
+        .select("subscription_tier, fantasma_trial_started_at, fantasma_trial_messages_used")
         .maybeSingle();
 
       if (updateError) throw updateError;
@@ -300,18 +317,28 @@ export async function POST(req: NextRequest) {
   }
 
   const isPro = isActiveSubscriber(profile?.subscription_tier);
-  const trialActive = isTrialActive(profile?.fantasma_trial_started_at ?? null, Date.now());
-  if (!isPro && !trialActive) {
-    return jsonResponse(403, { error: "trial_expired" });
+  const trialMessagesUsed = safeTrialMessagesUsed(profile?.fantasma_trial_messages_used);
+  const trialRemainingBefore = isPro ? null : trialMessagesRemaining(trialMessagesUsed);
+  if (!isPro && trialMessagesUsed >= FANTASMA_TRIAL_MESSAGE_LIMIT) {
+    return jsonResponse(
+      403,
+      { error: "trial_expired", trial_messages_remaining: 0 },
+      trialHeaders(0),
+    );
   }
 
   const remaining = await fantasmaRateLimit.getRemaining(user.id);
   if (remaining.remaining <= 0) {
     return jsonResponse(
       429,
-      { error: "quota_exhausted", retry_after: remaining.reset },
+      {
+        error: "quota_exhausted",
+        retry_after: remaining.reset,
+        trial_messages_remaining: trialRemainingBefore,
+      },
       {
         ...rateHeaders({ ...remaining, remaining: 0 }),
+        ...trialHeaders(trialRemainingBefore),
         "Retry-After": String(Math.max(1, Math.ceil((remaining.reset - Date.now()) / 1000))),
       },
     );
@@ -335,6 +362,26 @@ export async function POST(req: NextRequest) {
       .trim();
     if (!text) return jsonResponse(502, { error: "empty_model_response" }, rateHeaders(remaining));
 
+    let trialRemainingAfter = trialRemainingBefore;
+    if (!isPro) {
+      if (!profileAdmin) throw new Error("missing_profile_admin");
+      const nextUsed = trialMessagesUsed + 1;
+      const { data: updated, error: trialUpdateError } = await profileAdmin
+        .from("profiles")
+        .update({ fantasma_trial_messages_used: nextUsed })
+        .eq("id", user.id)
+        .select("fantasma_trial_messages_used")
+        .maybeSingle();
+
+      if (trialUpdateError || !updated) {
+        throw trialUpdateError ?? new Error("fantasma_trial_counter_update_missing");
+      }
+
+      trialRemainingAfter = trialMessagesRemaining(
+        safeTrialMessagesUsed(updated.fantasma_trial_messages_used),
+      );
+    }
+
     // SAM-82: quota is consumed only after a successful model call.
     const committed = await fantasmaRateLimit.limit(user.id);
 
@@ -346,8 +393,9 @@ export async function POST(req: NextRequest) {
           content: text,
         },
         model: MODEL,
+        trial_messages_remaining: trialRemainingAfter,
       },
-      rateHeaders(committed),
+      { ...rateHeaders(committed), ...trialHeaders(trialRemainingAfter) },
     );
   } catch (error: unknown) {
     console.error("[fantasma]", error);
@@ -357,6 +405,10 @@ export async function POST(req: NextRequest) {
         ? (error as { status?: number }).status
         : undefined;
     const code = status === 429 ? "provider_rate_limited" : "model_failed";
-    return jsonResponse(502, { error: code }, rateHeaders(remaining));
+    return jsonResponse(
+      502,
+      { error: code, trial_messages_remaining: trialRemainingBefore },
+      { ...rateHeaders(remaining), ...trialHeaders(trialRemainingBefore) },
+    );
   }
 }
