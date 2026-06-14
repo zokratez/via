@@ -62,7 +62,7 @@ async function getBearerUser(authHeader: string | null): Promise<AuthenticatedUs
 }
 
 function isFolder(entry: StorageEntry) {
-  return entry.id === null || entry.metadata === null || entry.metadata === undefined;
+  return entry.id === null;
 }
 
 async function listStoragePaths(
@@ -88,27 +88,27 @@ async function listStoragePaths(
     if (entries.length === 0) break;
 
     for (const entry of entries) {
-      const fullPath = `${prefix}/${entry.name}`;
+      const fullPath = `${prefix}${entry.name}`;
       if (isFolder(entry)) {
-        paths.push(...(await listStoragePaths(admin, bucket, fullPath)));
+        paths.push(...(await listStoragePaths(admin, bucket, `${fullPath}/`)));
       } else {
         paths.push(fullPath);
       }
     }
 
     if (entries.length < STORAGE_REMOVE_CHUNK_SIZE) break;
-    offset += entries.length;
+    offset += STORAGE_REMOVE_CHUNK_SIZE;
   }
 
   return paths;
 }
 
-async function removeStoragePrefix(
+async function deleteAllUserObjects(
   admin: ReturnType<typeof getAdminClient>,
   bucket: (typeof STORAGE_BUCKETS)[number],
   userId: string,
 ) {
-  const paths = await listStoragePaths(admin, bucket, userId);
+  const paths = await listStoragePaths(admin, bucket, `${userId}/`);
   for (let i = 0; i < paths.length; i += STORAGE_REMOVE_CHUNK_SIZE) {
     const chunk = paths.slice(i, i + STORAGE_REMOVE_CHUNK_SIZE);
     const { error } = await admin.storage.from(bucket).remove(chunk);
@@ -156,7 +156,7 @@ export async function DELETE(req: NextRequest) {
   try {
     // Delete user-owned storage before auth deletion; auth cascades cannot clean buckets.
     for (const bucket of STORAGE_BUCKETS) {
-      storageDeleted[bucket] = await removeStoragePrefix(admin, bucket, user.id);
+      storageDeleted[bucket] = await deleteAllUserObjects(admin, bucket, user.id);
     }
 
     // These tables do not cascade from auth.users in the verified schema.
