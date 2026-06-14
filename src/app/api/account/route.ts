@@ -10,6 +10,7 @@ const EXPLICIT_DELETE_TABLES = ["today_users", "analytics_events"] as const;
 const STORAGE_REMOVE_CHUNK_SIZE = 100;
 
 type AuthenticatedUser = {
+  email: string | null;
   id: string;
 };
 
@@ -58,11 +59,15 @@ async function getBearerUser(authHeader: string | null): Promise<AuthenticatedUs
   } = await supabase.auth.getUser();
 
   if (error || !user) return null;
-  return { id: user.id };
+  return { email: user.email ?? null, id: user.id };
 }
 
 function isFolder(entry: StorageEntry) {
   return entry.id === null;
+}
+
+function escapeIlikePattern(value: string) {
+  return value.replace(/[\\%_]/g, "\\$&");
 }
 
 async function listStoragePaths(
@@ -117,11 +122,31 @@ async function deleteAllUserObjects(
   return paths.length;
 }
 
-async function deleteExplicitRows(admin: ReturnType<typeof getAdminClient>, userId: string) {
+async function deleteNewsletterSignup(
+  admin: ReturnType<typeof getAdminClient>,
+  email: string | null,
+) {
+  const normalizedEmail = email?.trim();
+  if (!normalizedEmail) return;
+
+  const { error } = await admin
+    .from("newsletter_signups")
+    .delete()
+    .ilike("email", escapeIlikePattern(normalizedEmail));
+
+  if (error) throw new Error(`table_delete_failed:newsletter_signups:${error.message}`);
+}
+
+async function deleteExplicitRows(
+  admin: ReturnType<typeof getAdminClient>,
+  user: AuthenticatedUser,
+) {
   for (const table of EXPLICIT_DELETE_TABLES) {
-    const { error } = await admin.from(table).delete().eq("user_id", userId);
+    const { error } = await admin.from(table).delete().eq("user_id", user.id);
     if (error) throw new Error(`table_delete_failed:${table}:${error.message}`);
   }
+
+  await deleteNewsletterSignup(admin, user.email);
 }
 
 function isAlreadyDeletedUserError(error: unknown) {
@@ -160,7 +185,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // These tables do not cascade from auth.users in the verified schema.
-    await deleteExplicitRows(admin, user.id);
+    await deleteExplicitRows(admin, user);
   } catch (error) {
     console.error("[account/delete] purge failed", {
       user_id: user.id,
